@@ -1,7 +1,8 @@
 package io.github.vulka.impl.vulcan.hebe
 
 import android.content.Context
-import android.security.KeyPairGeneratorSpec
+import android.security.keystore.KeyGenParameterSpec
+import android.security.keystore.KeyProperties
 import com.migcomponents.migbase64.Base64
 import java.math.BigInteger
 import java.net.URLEncoder
@@ -80,26 +81,33 @@ fun getSignatureValues(
     )
 }
 
-fun generateKeyPair(context: Context, alias: String): Triple<String, String, PrivateKey> {
+fun generateKeyPair(alias: String): Triple<String, String, PrivateKey> {
     val now = System.currentTimeMillis()
-    val notBefore = Date(now)
+    val notBefore = Calendar.getInstance().apply { timeInMillis = now }.time
 
     val name = X500Principal("CN=APP_CERTIFICATE CA Certificate")
 
-    val notAfter = Calendar.getInstance()
-    notAfter.time = notBefore
-    notAfter.add(Calendar.YEAR, 20)
+    val notAfter = Calendar.getInstance().apply {
+        time = notBefore
+        add(Calendar.YEAR, 20)
+    }.time
 
-    val genSpec = KeyPairGeneratorSpec.Builder(context)
-        .setAlias(alias)
-        .setSubject(name)
-        .setSerialNumber(BigInteger.ONE)
-        .setStartDate(notBefore)
-        .setEndDate(notAfter.time)
-        .build()
+    val keyGenParameterSpec = KeyGenParameterSpec.Builder(
+        alias,
+        KeyProperties.PURPOSE_ENCRYPT or KeyProperties.PURPOSE_DECRYPT or KeyProperties.PURPOSE_SIGN or KeyProperties.PURPOSE_VERIFY
+    ).apply {
+        setCertificateSubject(name)
+        setCertificateSerialNumber(BigInteger.ONE)
+        setCertificateNotBefore(notBefore)
+        setCertificateNotAfter(notAfter)
+        setKeySize(2048)
+        setEncryptionPaddings(KeyProperties.ENCRYPTION_PADDING_RSA_PKCS1)
+        setSignaturePaddings(KeyProperties.SIGNATURE_PADDING_RSA_PKCS1)
+        setDigests(KeyProperties.DIGEST_SHA256, KeyProperties.DIGEST_SHA1)
+    }.build()
 
     val generator = KeyPairGenerator.getInstance("RSA", "AndroidKeyStore")
-    generator.initialize(genSpec)
+    generator.initialize(keyGenParameterSpec)
     generator.generateKeyPair()
 
     return getKeyEntry(alias)

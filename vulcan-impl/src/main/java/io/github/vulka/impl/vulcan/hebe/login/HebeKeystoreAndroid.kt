@@ -1,6 +1,5 @@
 package io.github.vulka.impl.vulcan.hebe.login
 
-import android.content.Context
 import io.github.vulka.core.api.log.LoggerFactory
 import io.github.vulka.impl.vulcan.hebe.generateKeyPair
 import io.github.vulka.impl.vulcan.hebe.getKeyEntry
@@ -42,9 +41,9 @@ data class HebeKeystore(
         }
 
         @Throws(Exception::class)
-        fun create(context: Context, alias: String, firebaseToken: String?, deviceModel: String): HebeKeystore {
+        fun create(alias: String, firebaseToken: String?, deviceModel: String): HebeKeystore {
             log.debug("Generating key pair...")
-            val (_, fingerprint, _) = generateKeyPair(context, alias)
+            val (_, fingerprint, _) = generateKeyPair(alias)
 
             val token = firebaseToken ?: ""
 

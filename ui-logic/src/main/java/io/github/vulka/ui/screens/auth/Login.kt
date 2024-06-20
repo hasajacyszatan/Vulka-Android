@@ -21,7 +21,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
@@ -56,8 +55,6 @@ fun LoginScreen(
         Platform.Vulcan -> VulcanLoginClient()
         Platform.Librus -> LibrusLoginClient()
     }
-
-    val context = LocalContext.current
 
     var requestData: LoginData? by remember { mutableStateOf(null) }
 
@@ -181,7 +178,6 @@ fun LoginScreen(
                             Platform.Vulcan -> {
                                 // For Vulcan we must create keystore first
                                 val keystore = HebeKeystore.create(
-                                    context = context,
                                     alias = HebeKeystore.generateKeystoreName(vulcanSymbol.value),
                                     firebaseToken = "",
                                     deviceModel = "${Build.MANUFACTURER} ${Build.MODEL} (Vulka)")
