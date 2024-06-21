@@ -30,4 +30,5 @@
         <item quantity="many">ocen</item>
         <item quantity="other">ocen</item>
     </plurals>
+    <string name="LuckyNumber">Szczęśliwy numerek</string>
 </resources>

@@ -34,4 +34,5 @@
         <item quantity="one">grade</item>
         <item quantity="other">grades</item>
     </plurals>
+    <string name="LuckyNumber">Lucky Number</string>
 </resources>

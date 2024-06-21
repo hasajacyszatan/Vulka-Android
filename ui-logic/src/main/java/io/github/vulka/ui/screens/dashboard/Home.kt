@@ -38,7 +38,6 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import androidx.navigation.NavGraph.Companion.findStartDestination
-import androidx.navigation.NavHostController
 import dev.medzik.android.compose.rememberMutable
 import dev.medzik.android.compose.ui.dialog.DialogState
 import dev.medzik.android.compose.ui.dialog.PickerDialog
@@ -68,7 +67,7 @@ class Home(
 @Composable
 fun HomeScreen(
     args: Home,
-    navController: NavHostController,
+    navController: NavController,
     viewModel: VulkaViewModel = hiltViewModel()
 ) {
     val context = LocalContext.current
