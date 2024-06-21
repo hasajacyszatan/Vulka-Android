@@ -4,6 +4,8 @@ import android.util.Log
 import androidx.room.TypeConverter
 import com.google.gson.*
 import com.google.gson.reflect.TypeToken
+import io.github.vulka.core.api.types.Lesson
+import io.github.vulka.core.api.types.LessonChange
 import io.github.vulka.core.api.types.Parent
 import java.lang.reflect.Type
 import io.github.vulka.core.api.types.Student
@@ -47,6 +49,30 @@ class Converters {
     fun localDateToString(date: LocalDate?): String? {
         return date?.format(formatter)
     }
+
+
+    @TypeConverter
+    fun fromLessonType(value: Lesson?): String? {
+        return Gson().toJson(value)
+    }
+
+    @TypeConverter
+    fun toLessonType(value: String?): Lesson? {
+        val type = object : TypeToken<Lesson>() {}.type
+        return Gson().fromJson(value, type)
+    }
+
+    @TypeConverter
+    fun fromLessonChange(change: LessonChange?): String? {
+        return Gson().toJson(change)
+    }
+
+    @TypeConverter
+    fun toLessonChange(changeString: String?): LessonChange? {
+        return Gson().fromJson(changeString, object : TypeToken<LessonChange>() {}.type)
+    }
+
+
 }
 
 // TODO: Make simpler Student deserialized

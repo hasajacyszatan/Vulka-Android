@@ -89,7 +89,7 @@ class VulcanUserClient(
                     position = lesson.time.position,
                     change = null,
                     date = LocalDate.parse(lesson.date.date),
-                    teacherName = lesson.teacher.name
+                    teacherName = lesson.teacher.displayName
                 )
             )
         }

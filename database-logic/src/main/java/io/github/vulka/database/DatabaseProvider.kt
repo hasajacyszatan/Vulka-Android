@@ -8,7 +8,7 @@ import androidx.room.TypeConverters
 
 @Database(
     version = 1,
-    entities = [Credentials::class, LuckyNumber::class, Grades::class],
+    entities = [Credentials::class, LuckyNumber::class, Grades::class, Timetable::class],
     exportSchema = false
 )
 @TypeConverters(Converters::class)
@@ -16,6 +16,7 @@ abstract class VulkaDatabase : RoomDatabase() {
     abstract fun credentialsDao(): CredentialsDao
     abstract fun luckyNumberDao(): LuckyNumberDao
     abstract fun gradesDao(): GradesDao
+    abstract fun timetableDao(): TimetableDao
 }
 
 /**

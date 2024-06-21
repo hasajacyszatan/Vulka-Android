@@ -6,8 +6,10 @@ import io.github.vulka.core.api.Platform
 import io.github.vulka.core.api.types.Student
 import io.github.vulka.database.Grades
 import io.github.vulka.database.LuckyNumber
+import io.github.vulka.database.Timetable
 import io.github.vulka.database.injection.RoomModule
 import io.github.vulka.impl.librus.LibrusUserClient
+import java.time.LocalDate
 import java.util.Date
 import java.util.UUID
 
@@ -49,6 +51,22 @@ suspend fun sync(
         repository.grades.insert(
             Grades(
                 grade = grade,
+                credentialsId = userId
+            )
+        )
+    }
+
+    // Sync timetable
+    val now = LocalDate.now()
+    val lessons = client.getLessons(student,now.minusWeeks(2),now.plusWeeks(1))
+    repository.timetable.deleteRangeByCredentialsId(now.minusWeeks(2),now.plusWeeks(1),userId)
+
+    for (lesson in lessons) {
+        repository.timetable.insert(
+            Timetable(
+                lesson = lesson,
+                lessonDate = lesson.date,
+                lastSync = now,
                 credentialsId = userId
             )
         )

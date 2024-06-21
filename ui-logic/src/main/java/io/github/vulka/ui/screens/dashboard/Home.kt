@@ -232,7 +232,11 @@ fun HomeScreen(
                     )
                 }
                 Timetable -> {
-                    TimetableScreen()
+                    TimetableScreen(
+                        args = Timetable(
+                            userId = args.userId
+                        )
+                    )
                 }
             }
         }
