@@ -1,6 +1,5 @@
 package io.github.vulka.ui.screens.auth
 
-import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -57,10 +56,6 @@ fun ChooseStudentsScreen(
     val credentials = when (args.platform) {
         Platform.Vulcan -> Gson().fromJson(args.credentialsData, VulcanLoginCredentials::class.java)
         Platform.Librus -> Gson().fromJson(args.credentialsData, LibrusLoginCredentials::class.java)
-    }
-
-    if (credentials is LibrusLoginCredentials) {
-        Log.d("Test", credentials.request.login)
     }
 
     val client = when (args.platform) {
