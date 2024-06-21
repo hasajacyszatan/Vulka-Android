@@ -77,7 +77,7 @@ fun VulkaNavigation(viewModel: VulkaViewModel = hiltViewModel()) {
         composable<ChoosePlatform> {
             DefaultScaffold(
                 topBar = {
-                    TopBarWithBack(R.string.SelectJournal,navController)
+                    TopBarWithBack(R.string.SelectJournal, navController)
                 }
             ) {
                 ChoosePlatform(navController)

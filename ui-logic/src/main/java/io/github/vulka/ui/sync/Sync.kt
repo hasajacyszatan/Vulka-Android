@@ -39,14 +39,18 @@ suspend fun sync(
     val luckyNumber = client.getLuckyNumber(student, Date())
     val luckyNumberObject = viewModel.luckyNumberRepository.getByCredentialsId(UUID.fromString(userId))
     if (luckyNumberObject == null) {
-        viewModel.luckyNumberRepository.insert(LuckyNumber(
-            number = luckyNumber,
-            credentialsId = UUID.fromString(userId)
-        ))
+        viewModel.luckyNumberRepository.insert(
+            LuckyNumber(
+                number = luckyNumber,
+                credentialsId = UUID.fromString(userId)
+            )
+        )
     } else {
-        viewModel.luckyNumberRepository.update(luckyNumberObject.copy(
-            number = luckyNumber
-        ))
+        viewModel.luckyNumberRepository.update(
+            luckyNumberObject.copy(
+                number = luckyNumber
+            )
+        )
     }
 
     // Sync grades
