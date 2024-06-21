@@ -78,11 +78,11 @@ fun VulkaNavigation(viewModel: VulkaViewModel = hiltViewModel()) {
             DefaultScaffold(
                 topBar = {
                     TopBarWithBack(R.string.SelectJournal, navController)
-                }
+                },
+                horizontalPadding = false
             ) {
                 ChoosePlatform(navController)
             }
-
         }
 
         composable<Login>(

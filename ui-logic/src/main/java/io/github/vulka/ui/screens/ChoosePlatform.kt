@@ -20,8 +20,7 @@ object ChoosePlatform
 @Composable
 fun ChoosePlatform(navController: NavController) {
     Column(
-        modifier = Modifier
-            .fillMaxSize()
+        modifier = Modifier.fillMaxSize()
     ) {
         BasicPreference(
             leading = { Icon(painterResource(R.drawable.vulcan_logo), contentDescription = null) },
