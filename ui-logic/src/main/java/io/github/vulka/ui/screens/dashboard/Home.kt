@@ -1,6 +1,5 @@
 package io.github.vulka.ui.screens.dashboard
 
-import android.util.Log
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxScope
@@ -32,6 +31,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -47,16 +47,16 @@ import dev.medzik.android.compose.ui.dialog.DialogState
 import dev.medzik.android.compose.ui.dialog.PickerDialog
 import dev.medzik.android.compose.ui.dialog.rememberDialogState
 import dev.medzik.android.utils.runOnIOThread
+import io.github.vulka.business.crypto.decryptCredentials
+import io.github.vulka.business.sync.sync
 import io.github.vulka.core.api.Platform
 import io.github.vulka.database.Credentials
 import io.github.vulka.ui.R
 import io.github.vulka.ui.VulkaViewModel
 import io.github.vulka.ui.common.Avatar
-import io.github.vulka.ui.crypto.decryptCredentials
 import io.github.vulka.ui.screens.dashboard.more.AccountManager
 import io.github.vulka.ui.screens.dashboard.more.LuckyNumber
 import io.github.vulka.ui.screens.dashboard.more.LuckyNumberScreen
-import io.github.vulka.ui.sync.sync
 import io.github.vulka.ui.utils.getInitials
 import io.github.vulka.ui.utils.navtype.PlatformType
 import kotlinx.serialization.Serializable
@@ -78,6 +78,8 @@ fun HomeScreen(
     navController: NavController,
     viewModel: VulkaViewModel = hiltViewModel()
 ) {
+    val context = LocalContext.current
+
     val pullToRefreshState = rememberPullToRefreshState()
 
     val bottomNavController = rememberNavController()
@@ -109,14 +111,13 @@ fun HomeScreen(
                 // Sync database
                 refreshed = false
 
-                Log.d("Home Screen","Sync running...")
-
                 try {
                     sync(
+                        context = context,
                         platform = args.platform,
-                        userId = args.userId,
+                        userId = UUID.fromString(args.userId),
                         credentials = credentials,
-                        viewModel = viewModel
+                        student = student
                     )
                 } catch (e: Exception) {
                     e.printStackTrace()

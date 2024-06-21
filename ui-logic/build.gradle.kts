@@ -46,6 +46,7 @@ dependencies {
     implementation(libs.medzik.libcrypto)
     implementation(libs.gson)
     implementation(libs.ktor.core)
+    implementation(projects.businessLogic)
     implementation(projects.coreApi)
     implementation(projects.vulcanImpl)
     implementation(projects.librusImpl)

@@ -27,6 +27,7 @@ enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")
 rootProject.name = "Vulka"
 include(":app")
 include(":ui-logic")
+include(":business-logic")
 include(":core-api")
 include(":vulcan-impl")
 include(":librus-impl")

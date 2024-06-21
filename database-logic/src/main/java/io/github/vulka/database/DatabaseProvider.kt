@@ -7,7 +7,7 @@ import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
 
 @Database(
-    version = 2,
+    version = 1,
     entities = [Credentials::class, LuckyNumber::class, Grades::class],
     exportSchema = false
 )

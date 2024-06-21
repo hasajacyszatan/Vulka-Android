@@ -1,12 +1,9 @@
-package io.github.vulka.ui.crypto
+package io.github.vulka.business.crypto
 
 import com.google.gson.Gson
 import dev.medzik.android.crypto.KeyStore
 import dev.medzik.android.crypto.KeyStoreAlias
-import dev.medzik.libcrypto.Hex
 import io.github.vulka.core.api.LoginCredentials
-import io.github.vulka.impl.librus.LibrusLoginCredentials
-import io.github.vulka.impl.vulcan.VulcanLoginCredentials
 
 object CredentialsKeyStore : KeyStoreAlias {
     override val name: String = "credentials"
@@ -26,6 +23,7 @@ fun serializeCredentials(response: LoginCredentials): String {
     return Gson().toJson(response)
 }
 
+@OptIn(ExperimentalStdlibApi::class)
 fun decryptCredentials(cipherData: String): String {
     // initialization vector length in hex string
     val ivLength = 12 * 2
@@ -35,7 +33,7 @@ fun decryptCredentials(cipherData: String): String {
     val cipherText = cipherData.substring(ivLength)
 
     // decrypt cipher text
-    val cipher = KeyStore.initForDecryption(CredentialsKeyStore, Hex.decode(iv), false)
+    val cipher = KeyStore.initForDecryption(CredentialsKeyStore, iv.hexToByteArray(), false)
     val decrypted = KeyStore.decrypt(cipher, cipherText)
 
     return String(decrypted)

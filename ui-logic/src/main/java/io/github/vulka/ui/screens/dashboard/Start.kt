@@ -73,7 +73,7 @@ fun StartScreen(
     val student by rememberMutable(viewModel.credentialRepository.getById(UUID.fromString(args.userId))!!.student)
 
     fun updateUI() {
-        luckyNumber = viewModel.luckyNumberRepository.getByCredentialsId(UUID.fromString(args.userId))?.number ?: 0
+        luckyNumber = viewModel.luckyNumberRepository.get(UUID.fromString(args.userId))?.number ?: 0
     }
 
     if (refreshed)

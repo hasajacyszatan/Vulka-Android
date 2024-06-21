@@ -32,6 +32,7 @@ import dev.medzik.android.compose.ui.textfield.PasswordAnimatedTextField
 import dev.medzik.android.compose.ui.textfield.TextFieldValue
 import dev.medzik.android.utils.runOnIOThread
 import dev.medzik.android.utils.runOnUiThread
+import io.github.vulka.business.crypto.serializeCredentials
 import io.github.vulka.core.api.LoginData
 import io.github.vulka.core.api.Platform
 import io.github.vulka.impl.librus.LibrusLoginClient
@@ -40,7 +41,6 @@ import io.github.vulka.impl.vulcan.VulcanLoginClient
 import io.github.vulka.impl.vulcan.VulcanLoginData
 import io.github.vulka.impl.vulcan.hebe.login.HebeKeystore
 import io.github.vulka.ui.R
-import io.github.vulka.ui.crypto.serializeCredentials
 import kotlinx.serialization.Serializable
 
 @Serializable
@@ -208,10 +208,12 @@ fun LoginScreen(
                             val data = serializeCredentials(response)
 
                             runOnUiThread {
-                                navController.navigate(ChooseStudents(
-                                    platform = args.platform,
-                                    credentialsData = data
-                                ))
+                                navController.navigate(
+                                    ChooseStudents(
+                                        platform = args.platform,
+                                        credentialsData = data
+                                    )
+                                )
                             }
                         } catch (e: Exception) {
                             e.printStackTrace()

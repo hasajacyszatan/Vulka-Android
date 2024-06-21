@@ -28,6 +28,7 @@ import dev.medzik.android.compose.rememberMutable
 import dev.medzik.android.compose.ui.LoadingButton
 import dev.medzik.android.utils.runOnIOThread
 import dev.medzik.android.utils.runOnUiThread
+import io.github.vulka.business.crypto.serializeCredentialsAndEncrypt
 import io.github.vulka.core.api.Platform
 import io.github.vulka.core.api.types.Student
 import io.github.vulka.database.Credentials
@@ -37,7 +38,6 @@ import io.github.vulka.impl.vulcan.VulcanLoginCredentials
 import io.github.vulka.impl.vulcan.VulcanUserClient
 import io.github.vulka.ui.R
 import io.github.vulka.ui.VulkaViewModel
-import io.github.vulka.ui.crypto.serializeCredentialsAndEncrypt
 import io.github.vulka.ui.screens.dashboard.Home
 import kotlinx.serialization.Serializable
 
