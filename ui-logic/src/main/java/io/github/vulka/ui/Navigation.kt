@@ -145,7 +145,6 @@ fun VulkaNavigation(viewModel: VulkaViewModel = hiltViewModel()) {
 
                 AccountManagerScreen(args, navController)
             }
-
         }
     }
 }

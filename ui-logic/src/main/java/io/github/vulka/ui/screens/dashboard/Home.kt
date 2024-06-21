@@ -1,11 +1,11 @@
 package io.github.vulka.ui.screens.dashboard
 
+import androidx.compose.animation.AnimatedContent
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
@@ -38,10 +38,7 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import androidx.navigation.NavGraph.Companion.findStartDestination
-import androidx.navigation.compose.NavHost
-import androidx.navigation.compose.composable
-import androidx.navigation.compose.rememberNavController
-import androidx.navigation.toRoute
+import androidx.navigation.NavHostController
 import dev.medzik.android.compose.rememberMutable
 import dev.medzik.android.compose.ui.dialog.DialogState
 import dev.medzik.android.compose.ui.dialog.PickerDialog
@@ -55,13 +52,9 @@ import io.github.vulka.ui.R
 import io.github.vulka.ui.VulkaViewModel
 import io.github.vulka.ui.common.Avatar
 import io.github.vulka.ui.screens.dashboard.more.AccountManager
-import io.github.vulka.ui.screens.dashboard.more.LuckyNumber
-import io.github.vulka.ui.screens.dashboard.more.LuckyNumberScreen
 import io.github.vulka.ui.utils.getInitials
-import io.github.vulka.ui.utils.navtype.PlatformType
 import kotlinx.serialization.Serializable
 import java.util.UUID
-import kotlin.reflect.typeOf
 
 @Serializable
 class Home(
@@ -75,20 +68,18 @@ class Home(
 @Composable
 fun HomeScreen(
     args: Home,
-    navController: NavController,
+    navController: NavHostController,
     viewModel: VulkaViewModel = hiltViewModel()
 ) {
     val context = LocalContext.current
 
     val pullToRefreshState = rememberPullToRefreshState()
 
-    val bottomNavController = rememberNavController()
     val credentials = decryptCredentials(args.credentials)
 
-    // TODO: make something better (Not string based)
-    var bottomSelected by rememberMutable("start")
-    val currentDbCredentials = viewModel.credentialRepository.getById(UUID.fromString(args.userId))!!
-    val student = currentDbCredentials.student
+    var bottomSelected: Any by rememberMutable(Start)
+    val dbCredentials = viewModel.credentialRepository.getById(UUID.fromString(args.userId))!!
+    val student = dbCredentials.student
 
     val dialogState = rememberDialogState()
 
@@ -145,9 +136,9 @@ fun HomeScreen(
                 title = {
                     Text(
                         text = when (bottomSelected) {
-                            "start" -> stringResource(R.string.Home)
-                            "grades" -> stringResource(R.string.Grades)
-                            "timetable" -> stringResource(R.string.Timetable)
+                            Start -> stringResource(R.string.Home)
+                            Grades -> stringResource(R.string.Grades)
+                            Timetable -> stringResource(R.string.Timetable)
                             else -> ""
                         }
                     )
@@ -176,14 +167,9 @@ fun HomeScreen(
                         contentDescription = null
                     ) },
                     label = { Text(stringResource(R.string.Home)) },
-                    selected = bottomSelected == "start" ,
+                    selected = bottomSelected == Start ,
                     onClick = {
-                        bottomSelected = "start"
-                        bottomNavController.navigate(Start(
-                            platform = args.platform,
-                            userId = args.userId,
-                            credentials = credentials,
-                        ))
+                        bottomSelected = Start
                     }
                 )
                 NavigationBarItem(
@@ -193,14 +179,9 @@ fun HomeScreen(
                         contentDescription = null
                     ) },
                     label = { Text(stringResource(R.string.Grades)) },
-                    selected = bottomSelected == "grades",
+                    selected = bottomSelected == Grades,
                     onClick = {
-                        bottomSelected = "grades"
-                        bottomNavController.navigate(Grades(
-                            platform = args.platform,
-                            userId = args.userId,
-                            credentials = credentials,
-                        ))
+                        bottomSelected = Grades
                     }
                 )
                 NavigationBarItem(
@@ -210,70 +191,62 @@ fun HomeScreen(
                         contentDescription = null
                     ) },
                     label = { Text(stringResource(R.string.Timetable)) },
-                    selected = bottomSelected == "timetable",
+                    selected = bottomSelected == Timetable,
                     onClick = {
-                        bottomSelected = "timetable"
-                        bottomNavController.navigate(Timetable)
+                        bottomSelected = Timetable
                     }
                 )
             }
         }
     ) { innerPadding ->
-        NavHost(
-            bottomNavController,
-            startDestination = Start(
-                platform = args.platform,
-                userId = args.userId,
-                credentials = credentials,
-            ),
-            modifier = Modifier.fillMaxSize().padding(innerPadding)
-        ) {
-            composable<Start>(
-                typeMap = mapOf(typeOf<Platform>() to PlatformType)
-            ) {
-                val arg = it.toRoute<Start>()
-                StartScreen(
-                    args = arg,
-                    navController = bottomNavController,
-                    pullToRefreshState = pullToRefreshState,
-                    pullRefresh = {
-                        pullToRefresh()
-                    },
-                    refreshed = refreshed
-                )
-            }
-            composable<Grades>(
-                typeMap = mapOf(typeOf<Platform>() to PlatformType)
-            ) {
-                val arg = it.toRoute<Grades>()
-                GradesScreen(
-                    args = arg,
-                    pullToRefreshState = pullToRefreshState,
-                    pullRefresh = {
-                        pullToRefresh()
-                    },
-                    refreshed = refreshed
-                )
-            }
-            composable<Timetable> {
-                TimetableScreen()
-            }
-
-            composable<LuckyNumber> {
-                val arg = it.toRoute<LuckyNumber>()
-                LuckyNumberScreen(arg)
+        AnimatedContent(
+            modifier = Modifier.padding(innerPadding),
+            targetState = bottomSelected,
+            label = "bottom navigation"
+        ) { target ->
+            when (target) {
+                Start -> {
+                    StartScreen(
+                        args = Start(
+                            platform = args.platform,
+                            userId = args.userId
+                        ),
+                        navController = navController,
+                        pullToRefreshState = pullToRefreshState,
+                        pullRefresh = {
+                            pullToRefresh()
+                        },
+                        refreshed = refreshed
+                    )
+                }
+                Grades -> {
+                    GradesScreen(
+                        args = Grades(
+                            platform = args.platform,
+                            userId = args.userId,
+                            credentials = credentials,
+                        ),
+                        pullToRefreshState = pullToRefreshState,
+                        pullRefresh = {
+                            pullToRefresh()
+                        },
+                        refreshed = refreshed
+                    )
+                }
+                Timetable -> {
+                    TimetableScreen()
+                }
             }
         }
     }
 
     SelectAccount(
         state = dialogState,
-        credentials = currentDbCredentials,
+        credentials = dbCredentials,
         navController = navController,
         args = args
     )
 }
-
 
 @Composable
 fun SelectAccount(

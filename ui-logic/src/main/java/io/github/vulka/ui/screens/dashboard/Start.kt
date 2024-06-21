@@ -53,8 +53,7 @@ import java.util.UUID
 @Serializable
 class Start(
     val platform: Platform,
-    val userId: String,
-    val credentials: String,
+    val userId: String
 )
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -64,7 +63,6 @@ fun StartScreen(
     navController: NavController,
     pullRefresh: @Composable BoxScope.() -> Unit = {},
     pullToRefreshState: PullToRefreshState,
-
     refreshed: Boolean,
     viewModel: VulkaViewModel = hiltViewModel()
 ) {
