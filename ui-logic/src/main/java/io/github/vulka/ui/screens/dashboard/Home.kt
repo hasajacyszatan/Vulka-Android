@@ -210,7 +210,6 @@ fun HomeScreen(
                             platform = args.platform,
                             userId = args.userId
                         ),
-                        navController = navController,
                         pullToRefreshState = pullToRefreshState,
                         pullRefresh = {
                             pullToRefresh()

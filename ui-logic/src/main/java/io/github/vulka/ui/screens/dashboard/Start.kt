@@ -35,16 +35,16 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.navigation.NavController
 import dev.medzik.android.compose.rememberMutable
 import dev.medzik.android.compose.ui.IconBox
+import dev.medzik.android.compose.ui.bottomsheet.rememberBottomSheetState
 import io.github.vulka.core.api.Platform
 import io.github.vulka.core.api.types.Grade
 import io.github.vulka.core.api.types.Student
 import io.github.vulka.ui.R
 import io.github.vulka.ui.VulkaViewModel
 import io.github.vulka.ui.common.Avatar
-import io.github.vulka.ui.screens.dashboard.more.LuckyNumber
+import io.github.vulka.ui.screens.dashboard.more.LuckyNumberBottomSheet
 import io.github.vulka.ui.utils.getInitials
 import kotlinx.serialization.Serializable
 import java.time.LocalDate
@@ -60,7 +60,6 @@ class Start(
 @Composable
 fun StartScreen(
     args: Start,
-    navController: NavController,
     pullRefresh: @Composable BoxScope.() -> Unit = {},
     pullToRefreshState: PullToRefreshState,
     refreshed: Boolean,
@@ -92,7 +91,7 @@ fun StartScreen(
 
             item {
                 Row {
-                    LuckyCard(luckyNumber,navController)
+                    LuckyCard(luckyNumber)
                 }
             }
 
@@ -138,15 +137,16 @@ fun HeaderCard(student: Student) {
 }
 
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun LuckyCard(luckyNumber: Int,navController: NavController) {
+fun LuckyCard(luckyNumber: Int) {
+    val bottomSheetState = rememberBottomSheetState()
+
     Surface(
         modifier = Modifier.padding(horizontal = 3.dp, vertical = 5.dp),
         shape = MaterialTheme.shapes.medium,
         color = MaterialTheme.colorScheme.surfaceContainer,
-        onClick = {
-            navController.navigate(LuckyNumber(luckyNumber))
-        }
+        onClick = { bottomSheetState.show() }
     ) {
         Row(
             modifier = Modifier
@@ -163,6 +163,11 @@ fun LuckyCard(luckyNumber: Int,navController: NavController) {
             )
         }
     }
+
+    LuckyNumberBottomSheet(
+        bottomSheetState = bottomSheetState,
+        luckyNumber = luckyNumber
+    )
 }
 
 @Composable

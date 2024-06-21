@@ -30,8 +30,6 @@ import io.github.vulka.ui.screens.dashboard.Home
 import io.github.vulka.ui.screens.dashboard.HomeScreen
 import io.github.vulka.ui.screens.dashboard.more.AccountManager
 import io.github.vulka.ui.screens.dashboard.more.AccountManagerScreen
-import io.github.vulka.ui.screens.dashboard.more.LuckyNumber
-import io.github.vulka.ui.screens.dashboard.more.LuckyNumberScreen
 import io.github.vulka.ui.utils.navtype.PlatformType
 import kotlin.reflect.typeOf
 
@@ -146,21 +144,6 @@ fun VulkaNavigation(viewModel: VulkaViewModel = hiltViewModel()) {
                 val args = it.toRoute<AccountManager>()
 
                 AccountManagerScreen(args, navController)
-            }
-        }
-
-        composable<LuckyNumber> {
-            DefaultScaffold(
-                topBar = {
-                    TopBarWithBack(
-                        title = R.string.LuckyNumber,
-                        navController
-                    )
-                }
-            ) {
-                val args = it.toRoute<LuckyNumber>()
-
-                LuckyNumberScreen(args)
             }
         }
     }
