@@ -38,4 +38,10 @@
         <item quantity="other">pozsotało %d min.</item>
     </plurals>
     <string name="NoLessons">Brak lekcji w tym dniu</string>
+    <string name="Lesson">Lekcja</string>
+    <string name="Teacher">Nauczyciel</string>
+    <string name="ClassRoom">Sala lekcyjna</string>
+    <string name="Group">Grupa</string>
+    <string name="LessonHours">Godziny</string>
+    <string name="Date">Data</string>
 </resources>

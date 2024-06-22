@@ -40,4 +40,10 @@
         <item quantity="other">%d min. left</item>
     </plurals>
     <string name="NoLessons">No lessons in this day</string>
+    <string name="Lesson">Lesson</string>
+    <string name="Teacher">Teacher</string>
+    <string name="ClassRoom">Class room</string>
+    <string name="Group">Group</string>
+    <string name="LessonHours">Hours</string>
+    <string name="Date">Date</string>
 </resources>

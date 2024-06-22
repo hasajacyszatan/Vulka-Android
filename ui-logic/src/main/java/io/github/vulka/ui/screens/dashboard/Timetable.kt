@@ -18,6 +18,12 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowLeft
 import androidx.compose.material.icons.automirrored.filled.ArrowRight
 import androidx.compose.material.icons.filled.Backpack
+import androidx.compose.material.icons.filled.Book
+import androidx.compose.material.icons.filled.CalendarMonth
+import androidx.compose.material.icons.filled.Groups
+import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.Room
+import androidx.compose.material.icons.filled.Schedule
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -337,15 +343,18 @@ private fun LessonCard(
 @Composable
 private fun LessonDetails(lesson: Lesson) {
     Column(
-        modifier = Modifier.padding(horizontal = 8.dp),
-        verticalArrangement = Arrangement.spacedBy(10.dp)
+        modifier = Modifier.padding(horizontal = 12.dp),
+        verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
         AnimatedTextField(
             value = TextFieldValue(
                 value = lesson.subjectName,
                 editable = false
             ),
-            label = "Lekcja"
+            label = stringResource(R.string.Lesson),
+            leading = {
+                IconBox(Icons.Default.Book)
+            }
         )
 
         AnimatedTextField(
@@ -353,7 +362,10 @@ private fun LessonDetails(lesson: Lesson) {
                 value = lesson.teacherName,
                 editable = false
             ),
-            label = "Nauczyciel"
+            label = stringResource(R.string.Teacher),
+            leading = {
+                IconBox(Icons.Default.Person)
+            }
         )
 
         if (lesson.room != null) {
@@ -362,7 +374,23 @@ private fun LessonDetails(lesson: Lesson) {
                     value = lesson.room!!,
                     editable = false
                 ),
-                label = "Sala"
+                label = stringResource(R.string.ClassRoom),
+                leading = {
+                    IconBox(Icons.Default.Room)
+                }
+            )
+        }
+
+        if (lesson.groupName != null) {
+            AnimatedTextField(
+                value = TextFieldValue(
+                    value = lesson.groupName!!,
+                    editable = false
+                ),
+                label = stringResource(R.string.Group),
+                leading = {
+                    IconBox(Icons.Default.Groups)
+                }
             )
         }
 
@@ -371,7 +399,10 @@ private fun LessonDetails(lesson: Lesson) {
                 value = "${lesson.startTime} - ${lesson.endTime}",
                 editable = false
             ),
-            label = "Godziny"
+            label = stringResource(R.string.LessonHours),
+            leading = {
+                IconBox(Icons.Default.Schedule)
+            }
         )
 
         AnimatedTextField(
@@ -379,7 +410,10 @@ private fun LessonDetails(lesson: Lesson) {
                 value = formatDate(lesson.date),
                 editable = false
             ),
-            label = "Data"
+            label = stringResource(R.string.Date),
+            leading = {
+                IconBox(Icons.Default.CalendarMonth)
+            }
         )
     }
 }
