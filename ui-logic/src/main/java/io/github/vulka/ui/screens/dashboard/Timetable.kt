@@ -1,6 +1,7 @@
 package io.github.vulka.ui.screens.dashboard
 
 import androidx.compose.animation.AnimatedContent
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -14,6 +15,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowLeft
 import androidx.compose.material.icons.automirrored.filled.ArrowRight
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -21,8 +23,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.surfaceColorAtElevation
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -32,10 +33,15 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import dev.medzik.android.compose.color.combineAlpha
+import dev.medzik.android.compose.rememberMutable
 import dev.medzik.android.compose.ui.IconBox
+import dev.medzik.android.compose.ui.bottomsheet.BaseBottomSheet
+import dev.medzik.android.compose.ui.bottomsheet.rememberBottomSheetState
 import io.github.vulka.core.api.types.Lesson
 import io.github.vulka.ui.R
 import io.github.vulka.ui.VulkaViewModel
+import kotlinx.coroutines.launch
 import kotlinx.serialization.Serializable
 import java.time.DayOfWeek
 import java.time.LocalDate
@@ -53,7 +59,7 @@ fun TimetableScreen(
     args: Timetable,
     viewModel: VulkaViewModel = hiltViewModel()
 ) {
-    var currentDate by remember { mutableStateOf(LocalDate.now()) }
+    var currentDate by rememberMutable(LocalDate.now())
 
     fun formatDate(date: LocalDate): String {
         val formatter = DateTimeFormatter.ofPattern("EEEE, d MMMM")
@@ -84,68 +90,12 @@ fun TimetableScreen(
             targetState = currentDate,
             label = "timetable date"
         ) { date ->
-            LazyColumn(
-                modifier = Modifier.fillMaxSize()
-            ) {
-                val lessons = viewModel.timetableRepository.getByDateAndCredentialsId(UUID.fromString(args.userId), date)
-                    .sortedBy { it.lesson.position }
+            val lessons = viewModel.timetableRepository.getByDateAndCredentialsId(
+                UUID.fromString(args.userId),
+                date
+            ).sortedBy { it.lesson.position }
 
-                if (lessons.isNotEmpty()) {
-                    val currentTime = LocalTime.now()
-                    lessons.forEach { lessonWrapper ->
-                        val lesson = lessonWrapper.lesson
-                        val isOngoing = checkIfOngoing(lesson.startTime, lesson.endTime, currentTime, lesson.date,
-                            LocalDate.now())
-                        val minutesLeft = if (isOngoing) calculateMinutesLeft(lesson.endTime, currentTime) else 0L
-
-                        item {
-                            LessonCard(
-                                lesson = lesson,
-                                isOngoing = isOngoing,
-                                timeCard = {
-                                    Column(
-                                        modifier = Modifier.fillMaxWidth().height(70.dp).padding(vertical = 10.dp),
-                                        horizontalAlignment = Alignment.End,
-                                        verticalArrangement = Arrangement.Top
-                                    ) {
-                                        if (isOngoing) {
-                                            Surface(
-                                                modifier = Modifier.height(25.dp),
-                                                shape = MaterialTheme.shapes.small,
-                                                color = MaterialTheme.colorScheme.primary
-                                            ) {
-                                                Column(
-                                                    modifier = Modifier
-                                                        .fillMaxHeight()
-                                                        .padding(horizontal = 8.dp),
-                                                    verticalArrangement = Arrangement.Center,
-                                                    horizontalAlignment = Alignment.CenterHorizontally
-                                                ) {
-                                                    Text(
-                                                        color = MaterialTheme.colorScheme.onPrimary.copy(
-                                                            alpha = 0.7f
-                                                        ),
-                                                        fontSize = 12.sp,
-                                                        text = pluralStringResource(
-                                                            R.plurals.MinutesLeft,
-                                                            minutesLeft.toInt(),
-                                                            minutesLeft
-                                                        )
-                                                    )
-                                                }
-                                            }
-                                        }
-                                    }
-                                }
-                            )
-                        }
-                    }
-                } else {
-                    item {
-                        Text(stringResource(R.string.NoLessons))
-                    }
-                }
-            }
+            LessonsCards(lessons)
         }
 
         Surface(
@@ -187,16 +137,107 @@ fun TimetableScreen(
 }
 
 @Composable
-fun LessonCard(
+private fun LessonsCards(
+    lessons: List<io.github.vulka.database.Timetable>
+) {
+    LazyColumn(
+        modifier = Modifier.fillMaxSize()
+    ) {
+        if (lessons.isNotEmpty()) {
+            lessons.forEach {
+                val lesson = it.lesson
+
+                val isOngoing = checkIfOngoing(
+                    startTime = lesson.startTime,
+                    endTime = lesson.endTime,
+                    lessonDate = lesson.date
+                )
+
+                item {
+                    LessonCard(
+                        lesson = lesson,
+                        isOngoing = isOngoing,
+                        timeCard = {
+                            LessonTimeCard(
+                                lesson = lesson,
+                                isOngoing = isOngoing
+                            )
+                        }
+                    )
+                }
+            }
+        } else {
+            item {
+                Text(stringResource(R.string.NoLessons))
+            }
+        }
+    }
+}
+
+@Composable
+private fun LessonTimeCard(
+    lesson: Lesson,
+    isOngoing: Boolean
+) {
+    val minutesLeft = if (isOngoing) {
+        calculateMinutesLeft(lesson.endTime, LocalTime.now())
+    } else 0L
+
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(70.dp)
+            .padding(vertical = 10.dp),
+        horizontalAlignment = Alignment.End,
+        verticalArrangement = Arrangement.Top
+    ) {
+        if (isOngoing) {
+            Surface(
+                modifier = Modifier.height(25.dp),
+                shape = MaterialTheme.shapes.small,
+                color = MaterialTheme.colorScheme.primary
+            ) {
+                Column(
+                    modifier = Modifier
+                        .fillMaxHeight()
+                        .padding(horizontal = 8.dp),
+                    verticalArrangement = Arrangement.Center,
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Text(
+                        color = MaterialTheme.colorScheme.onPrimary.combineAlpha(0.7f),
+                        fontSize = 12.sp,
+                        text = pluralStringResource(
+                            R.plurals.MinutesLeft,
+                            minutesLeft.toInt(),
+                            minutesLeft
+                        )
+                    )
+                }
+            }
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun LessonCard(
     lesson: Lesson,
     isOngoing: Boolean,
     timeCard: @Composable () -> Unit = {}
 ) {
+    val scope = rememberCoroutineScope()
+    val bottomSheetState = rememberBottomSheetState()
+
     Row(
-        modifier = Modifier.fillMaxWidth().padding(2.dp),
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(2.dp),
     ) {
         Column(
-            modifier = Modifier.width(35.dp).height(70.dp),
+            modifier = Modifier
+                .width(35.dp)
+                .height(70.dp),
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
@@ -218,7 +259,10 @@ fun LessonCard(
                 MaterialTheme.colorScheme.surfaceContainer,
         ) {
             Row(
-                modifier = Modifier.fillMaxWidth().padding(horizontal = 10.dp),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clickable { bottomSheetState.show() }
+                    .padding(horizontal = 10.dp),
                 verticalAlignment = Alignment.CenterVertically,
             ) {
                 Column(
@@ -235,8 +279,7 @@ fun LessonCard(
                 }
 
                 Column(
-                    modifier = Modifier
-                        .padding(horizontal = 5.dp),
+                    modifier = Modifier.padding(horizontal = 5.dp),
                     horizontalAlignment = Alignment.Start
                 ) {
                     Text(
@@ -254,9 +297,28 @@ fun LessonCard(
             }
         }
     }
+
+    BaseBottomSheet(
+        state = bottomSheetState,
+        onDismiss = {
+            scope.launch {
+                bottomSheetState.hide()
+            }
+        }
+    ) {
+        LessonDetails(lesson)
+    }
 }
 
-private fun checkIfOngoing(startTime: String, endTime: String, currentTime: LocalTime, lessonDate: LocalDate, currentDate: LocalDate): Boolean {
+@Composable
+private fun LessonDetails(lesson: Lesson) {
+    // TODO
+}
+
+private fun checkIfOngoing(startTime: String, endTime: String, lessonDate: LocalDate): Boolean {
+    val currentDate = LocalDate.now()
+    val currentTime = LocalTime.now()
+
     val start = LocalTime.parse(startTime)
     val end = LocalTime.parse(endTime)
     return currentTime.isAfter(start) && currentTime.isBefore(end) && currentDate == lessonDate
