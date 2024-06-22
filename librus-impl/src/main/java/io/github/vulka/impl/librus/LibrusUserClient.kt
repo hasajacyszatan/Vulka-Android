@@ -39,7 +39,7 @@ class LibrusUserClient(
         }
     }
 
-    suspend fun renewCredentials() {
+    override suspend fun renewCredentials() {
         val loginData = credentials.request
         credentials = LibrusLoginClient().login(loginData) as LibrusLoginCredentials
         initClient(credentials.cookies)

@@ -8,7 +8,6 @@ import io.github.vulka.database.Grades
 import io.github.vulka.database.LuckyNumber
 import io.github.vulka.database.Timetable
 import io.github.vulka.database.injection.RoomModule
-import io.github.vulka.impl.librus.LibrusUserClient
 import java.time.LocalDate
 import java.util.Date
 import java.util.UUID
@@ -22,9 +21,8 @@ suspend fun sync(
 ) {
     val client = getUserClient(platform, credentials)
 
-    // re-new Librus credentials
-    if (platform == Platform.Librus)
-        (client as LibrusUserClient).renewCredentials()
+    // re-new login credentials if needed
+    client.renewCredentials()
 
     val repository = RoomModule.providesRepository(context)
 

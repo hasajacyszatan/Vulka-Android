@@ -7,9 +7,20 @@ import java.time.LocalDate
 import java.util.Date
 
 interface UserClient {
+    /**
+     * Re-new login credentials if needed.
+     */
+    suspend fun renewCredentials() {
+        // dummy
+    }
+
     suspend fun getStudents(): Array<Student>
     suspend fun getLuckyNumber(student: Student, date: Date): Int
     // TODO: add period selecting
     suspend fun getGrades(student: Student): Array<Grade>
-    suspend fun getLessons(student: Student, dateFrom: LocalDate = LocalDate.now(), dateTo: LocalDate = dateFrom): Array<Lesson>
+    suspend fun getLessons(
+        student: Student,
+        dateFrom: LocalDate = LocalDate.now(),
+        dateTo: LocalDate = dateFrom
+    ): Array<Lesson>
 }
