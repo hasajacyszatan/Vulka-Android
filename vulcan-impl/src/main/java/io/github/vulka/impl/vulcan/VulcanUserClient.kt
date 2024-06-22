@@ -40,9 +40,9 @@ class VulcanUserClient(
         return students.toArray(arrayOfNulls(students.size))
     }
 
-    override suspend fun getLuckyNumber(student: Student, date: Date): Int {
+    override suspend fun getLuckyNumber(student: Student): Int {
         val hebeStudent = student.impl as HebeStudent
-        return api.getLuckyNumber(hebeStudent,date)
+        return api.getLuckyNumber(hebeStudent, Date())
     }
 
     override suspend fun getGrades(student: Student): Array<Grade> {

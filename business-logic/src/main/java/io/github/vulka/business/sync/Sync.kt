@@ -9,7 +9,6 @@ import io.github.vulka.database.LuckyNumber
 import io.github.vulka.database.Timetable
 import io.github.vulka.database.injection.RoomModule
 import java.time.LocalDate
-import java.util.Date
 import java.util.UUID
 
 suspend fun sync(
@@ -27,9 +26,9 @@ suspend fun sync(
     val repository = RoomModule.providesRepository(context)
 
     // sync lucky number
-    val newLuckyNumber = client.getLuckyNumber(student, Date())
+    val newLuckyNumber = client.getLuckyNumber(student)
     val luckyNumber = repository.luckyNumber.get(userId)
-    if (luckyNumber != null) {
+    if (luckyNumber != null && luckyNumber.number != newLuckyNumber) {
         repository.luckyNumber.update(
             luckyNumber.copy(number = newLuckyNumber)
         )

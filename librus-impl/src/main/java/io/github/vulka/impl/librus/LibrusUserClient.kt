@@ -24,7 +24,6 @@ import io.ktor.http.Cookie
 import io.ktor.http.HttpHeaders
 import io.ktor.http.renderCookieHeader
 import java.time.LocalDate
-import java.util.Date
 
 class LibrusUserClient(
     internal var credentials: LibrusLoginCredentials
@@ -64,7 +63,7 @@ class LibrusUserClient(
         )
     }
 
-    override suspend fun getLuckyNumber(student: Student, date: Date): Int {
+    override suspend fun getLuckyNumber(student: Student): Int {
         val response = internalRequestLuckyNumber()
         return response.luckyNumber
     }
