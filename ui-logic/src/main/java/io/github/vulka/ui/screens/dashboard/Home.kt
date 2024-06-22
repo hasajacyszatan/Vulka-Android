@@ -221,8 +221,7 @@ fun HomeScreen(
                     GradesScreen(
                         args = Grades(
                             platform = args.platform,
-                            userId = args.userId,
-                            credentials = credentials,
+                            userId = args.userId
                         ),
                         pullToRefreshState = pullToRefreshState,
                         pullRefresh = {

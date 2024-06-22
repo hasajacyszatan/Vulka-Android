@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
+import androidx.compose.material3.CardColors
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -21,16 +22,18 @@ enum class AvatarShape {
 
 @Composable
 fun Avatar(
-    modifier: Modifier = Modifier,
     text: String,
+    modifier: Modifier = Modifier,
+    cardColors: CardColors = CardDefaults.cardColors(),
     shape: AvatarShape = AvatarShape.Circle,
-    onClick: () -> Unit = {},
+    onClick: () -> Unit = {}
 ) {
     Card(
         shape = if (shape == AvatarShape.Circle) RoundedCornerShape(50.dp) else CardDefaults.shape,
-        modifier = Modifier.size(45.dp).then(modifier),
+        modifier = modifier.size(45.dp),
+        colors = cardColors,
         onClick = onClick
-    ){
+    ) {
         Column(
             modifier = Modifier.fillMaxSize(),
             verticalArrangement = Arrangement.Center,

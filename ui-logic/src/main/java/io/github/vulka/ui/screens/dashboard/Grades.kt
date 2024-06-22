@@ -14,6 +14,7 @@ import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.ArrowDropUp
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -27,6 +28,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.luminance
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
@@ -50,8 +53,7 @@ import java.util.UUID
 @Serializable
 class Grades(
     val platform: Platform,
-    val userId: String,
-    val credentials: String,
+    val userId: String
 )
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -150,10 +152,21 @@ fun GradesTab(
                                             .heightIn(min = 32.dp)
                                             .padding(vertical = 2.dp),
                                     ) {
+                                        val gradeColor = GradeColor.getColorByGrade(grade)
                                         Avatar(
                                             text = grade.value ?: "",
-                                            shape = AvatarShape.Rounded
+                                            shape = AvatarShape.Rounded,
+                                            cardColors = if (gradeColor != null) {
+                                                CardDefaults.cardColors()
+                                                    .copy(
+                                                        containerColor = gradeColor.color,
+                                                        contentColor = if (gradeColor.color.luminance() > 0.5) {
+                                                            Color.Black
+                                                        } else Color.White
+                                                    )
+                                            } else CardDefaults.cardColors()
                                         )
+
                                         Column(
                                             Modifier.fillMaxWidth()
                                                 .weight(1f)
@@ -174,6 +187,7 @@ fun GradesTab(
                             }
                         ) {
                             Text(subjectName)
+
                             val gradesAmount = viewModel.gradesRepository.countBySubjectAndCredentials(
                                 UUID.fromString(args.userId),
                                 subjectName
@@ -248,6 +262,31 @@ fun SummaryTab() {
     ) {
         item {
             Text(stringResource(R.string.Summary))
+        }
+    }
+}
+
+private enum class GradeColor(val color: Color) {
+    ONE(Color(0xFFD32F2F)),
+    TWO(Color(0xFFF08000)),
+    THREE(Color(0xFFFF9800)),
+    FOUR(Color(0xFFC6FF00)),
+    FIVE(Color(0xFF7CFC00)),
+    SIX(Color(0xFF4CAF50));
+
+    companion object {
+        fun getColorByGrade(grade: Grade): GradeColor? {
+            val gradeValue = grade.value ?: return null
+
+            return when {
+                gradeValue.startsWith("1") -> ONE
+                gradeValue.startsWith("2") -> TWO
+                gradeValue.startsWith("3") -> THREE
+                gradeValue.startsWith("4") -> FOUR
+                gradeValue.startsWith("5") -> FIVE
+                gradeValue.startsWith("6") -> SIX
+                else -> null
+            }
         }
     }
 }
