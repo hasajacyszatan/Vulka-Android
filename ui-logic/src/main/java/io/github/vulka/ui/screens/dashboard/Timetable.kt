@@ -6,16 +6,18 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
-import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowLeft
 import androidx.compose.material.icons.automirrored.filled.ArrowRight
+import androidx.compose.material.icons.filled.Backpack
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -63,8 +65,6 @@ fun TimetableScreen(
     args: Timetable,
     viewModel: VulkaViewModel = hiltViewModel()
 ) {
-    var currentDate by rememberMutable(LocalDate.now())
-
     fun getNextWeekday(date: LocalDate): LocalDate {
         var nextDate = date.plusDays(1)
         while (nextDate.dayOfWeek == DayOfWeek.SATURDAY || nextDate.dayOfWeek == DayOfWeek.SUNDAY) {
@@ -80,6 +80,7 @@ fun TimetableScreen(
         }
         return previousDate
     }
+    var currentDate by rememberMutable(getNextWeekday(LocalDate.now()))
 
     Column {
         AnimatedContent(
@@ -94,7 +95,31 @@ fun TimetableScreen(
                 date
             ).sortedBy { it.lesson.position }
 
-            LessonsCards(lessons)
+            if (lessons.isEmpty()) {
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 16.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.Center
+                ) {
+                    IconBox(
+                        imageVector = Icons.Default.Backpack,
+                        modifier = Modifier.size(100.dp)
+                    )
+
+                    Spacer(
+                        modifier = Modifier.height(10.dp)
+                    )
+
+                    Text(
+                        text = stringResource(R.string.NoLessons),
+                        fontSize = 20.sp,
+                    )
+                }
+            } else {
+                LessonsCards(lessons)
+            }
         }
 
         Surface(
@@ -197,23 +222,16 @@ private fun RowScope.LessonTimeCard(
                 shape = MaterialTheme.shapes.small,
                 color = MaterialTheme.colorScheme.primary
             ) {
-                Column(
-                    modifier = Modifier
-                        .fillMaxHeight()
-                        .padding(horizontal = 8.dp),
-                    verticalArrangement = Arrangement.Center,
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
-                    Text(
-                        color = MaterialTheme.colorScheme.onPrimary.combineAlpha(0.7f),
-                        fontSize = 12.sp,
-                        text = pluralStringResource(
-                            R.plurals.MinutesLeft,
-                            minutesLeft.toInt(),
-                            minutesLeft
-                        )
+                Text(
+                    modifier = Modifier.padding(horizontal = 2.dp),
+                    color = MaterialTheme.colorScheme.onPrimary.combineAlpha(0.7f),
+                    fontSize = 10.sp,
+                    text = pluralStringResource(
+                        R.plurals.MinutesLeft,
+                        minutesLeft.toInt(),
+                        minutesLeft
                     )
-                }
+                )
             }
         }
     }
@@ -269,10 +287,12 @@ private fun LessonCard(
                     modifier = Modifier.width(50.dp)
                 ) {
                     Text(
+                        fontSize = 15.sp,
                         color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f),
                         text = lesson.startTime
                     )
                     Text(
+                        fontSize = 15.sp,
                         color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f),
                         text = lesson.endTime
                     )
@@ -281,7 +301,7 @@ private fun LessonCard(
 
                 Column(
                     modifier = (if (isOngoing) Modifier.weight(3f) else Modifier)
-                        .padding(horizontal = 5.dp),
+                        .padding(horizontal = 2.dp),
                     horizontalAlignment = Alignment.Start
                 ) {
                     Text(
@@ -293,7 +313,7 @@ private fun LessonCard(
                     Text(
                         color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f),
                         fontSize = 12.sp,
-                        text = lesson.teacherName
+                        text = (if (!lesson.room.isNullOrEmpty()) "${lesson.room.orEmpty()} " else "") + lesson.teacherName
                     )
                 }
 

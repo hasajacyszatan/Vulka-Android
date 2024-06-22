@@ -36,8 +36,8 @@
     </plurals>
     <string name="LuckyNumber">Lucky Number</string>
     <plurals name="MinutesLeft">
-        <item quantity="one">%d minute left</item>
-        <item quantity="other">%d minutes left</item>
+        <item quantity="one">%d min. left</item>
+        <item quantity="other">%d min. left</item>
     </plurals>
-    <string name="NoLessons">No lessons</string>
+    <string name="NoLessons">No lessons in this day</string>
 </resources>

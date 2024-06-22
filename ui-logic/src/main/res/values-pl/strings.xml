@@ -32,10 +32,10 @@
     </plurals>
     <string name="LuckyNumber">Szczęśliwy numerek</string>
     <plurals name="MinutesLeft">
-        <item quantity="one">pozostała minuta</item>
-        <item quantity="few">pozsotało %d minuty</item>
-        <item quantity="many">pozsotało %d minut</item>
-        <item quantity="other">pozsotało %d minut</item>
+        <item quantity="one">pozostała min.</item>
+        <item quantity="few">pozsotało %d min.</item>
+        <item quantity="many">pozsotało %d min.</item>
+        <item quantity="other">pozsotało %d min.</item>
     </plurals>
-    <string name="NoLessons">Brak lekcji</string>
+    <string name="NoLessons">Brak lekcji w tym dniu</string>
 </resources>
