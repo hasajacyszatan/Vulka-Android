@@ -1,0 +1,17 @@
+version: 2
+
+updates:
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+
+  - package-ecosystem: "gradle"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    groups:
+      kotlin:
+        patterns:
+          - "com.google.devtools.ksp"
+          - "org.jetbrains.kotlin.android"
