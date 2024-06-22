@@ -27,10 +27,12 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import dev.medzik.android.compose.ui.IconBox
+import io.github.vulka.core.api.types.Lesson
 import io.github.vulka.ui.VulkaViewModel
 import kotlinx.serialization.Serializable
 import java.time.DayOfWeek
 import java.time.LocalDate
+import java.time.LocalTime
 import java.time.format.DateTimeFormatter
 import java.util.Locale
 import java.util.UUID
@@ -48,7 +50,7 @@ fun TimetableScreen(
     var currentDate by remember { mutableStateOf(LocalDate.now()) }
 
     fun formatDate(date: LocalDate): String {
-        val formatter = DateTimeFormatter.ofPattern("EEEE, d MMMM", Locale("pl"))
+        val formatter = DateTimeFormatter.ofPattern("EEEE, d MMMM")
         return date.format(formatter)
     }
 
@@ -76,67 +78,49 @@ fun TimetableScreen(
                 .sortedBy { it.lesson.position }
 
             if (lessons.isNotEmpty()) {
-                lessons.forEach {
+                val currentTime = LocalTime.now()
+                lessons.forEach { lessonWrapper ->
+                    val lesson = lessonWrapper.lesson
+                    val isOngoing = checkIfOngoing(lesson.startTime, lesson.endTime, currentTime, lesson.date,
+                        LocalDate.now())
+                    val minutesLeft = if (isOngoing) calculateMinutesLeft(lesson.endTime, currentTime) else 0L
+
                     item {
-                        Row(
-                            modifier = Modifier.fillMaxWidth().padding(5.dp),
-
-                            ) {
-                            Column (
-                                modifier = Modifier.width(50.dp).height(70.dp),
-                                verticalArrangement = Arrangement.Center,
-                                horizontalAlignment = Alignment.CenterHorizontally
-                            ) {
-                                Text(
-                                    fontSize = 30.sp,
-                                    text = "${it.lesson.position}"
-                                )
-                            }
-
-
-                            Surface(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(5.dp)
-                                    .height(70.dp),
-                                shape = MaterialTheme.shapes.medium,
-                                color = MaterialTheme.colorScheme.surfaceContainer,
-                            ) {
-                                Row(
-                                    modifier = Modifier.fillMaxWidth().padding(horizontal = 10.dp),
-                                    verticalAlignment = Alignment.CenterVertically,
+                        LessonCard(
+                            lesson = lesson,
+                            isOngoing = isOngoing,
+                            timecard = {
+                                Column(
+                                    modifier = Modifier.fillMaxWidth().height(70.dp).padding(vertical = 10.dp),
+                                    horizontalAlignment = Alignment.End,
+                                    verticalArrangement = Arrangement.Top
                                 ) {
-                                    Column(
-                                        modifier = Modifier.width(50.dp)
-                                    ) {
-                                        Text(
-                                            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f),
-                                            text = it.lesson.startTime
-                                        )
-                                        Text(
-                                            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f),
-                                            text = it.lesson.endTime
-                                        )
-                                    }
-
-                                    Column(
-                                        modifier = Modifier
-                                            .fillMaxWidth()
-                                            .padding(horizontal = 10.dp),
-                                        horizontalAlignment = Alignment.Start
-                                    ) {
-                                        Text(
-                                            fontSize = 20.sp,
-                                            text = it.lesson.subjectName
-                                        )
-                                        Text(
-                                            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f),
-                                            text = it.lesson.teacherName
-                                        )
+                                    if (isOngoing) {
+                                        Surface(
+                                            modifier = Modifier
+                                                .width(100.dp)
+                                                .height(25.dp),
+                                            shape = MaterialTheme.shapes.small,
+                                            color = MaterialTheme.colorScheme.primary
+                                        ) {
+                                            Column(
+                                                modifier = Modifier.fillMaxSize(),
+                                                verticalArrangement = Arrangement.Center,
+                                                horizontalAlignment = Alignment.CenterHorizontally
+                                            ) {
+                                                Text(
+                                                    color = MaterialTheme.colorScheme.onPrimary.copy(
+                                                        alpha = 0.7f
+                                                    ),
+                                                    fontSize = 12.sp,
+                                                    text = "jeszcze $minutesLeft min"
+                                                )
+                                            }
+                                        }
                                     }
                                 }
                             }
-                        }
+                        )
                     }
                 }
             } else {
@@ -183,4 +167,84 @@ fun TimetableScreen(
             }
         }
     }
+}
+
+@Composable
+fun LessonCard(
+    lesson: Lesson,
+    isOngoing: Boolean,
+    timecard: @Composable () -> Unit = {}
+) {
+    Row(
+        modifier = Modifier.fillMaxWidth().padding(2.dp),
+    ) {
+        Column(
+            modifier = Modifier.width(35.dp).height(70.dp),
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Text(
+                fontSize = 30.sp,
+                text = "${lesson.position}"
+            )
+        }
+
+        Surface(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(3.dp)
+                .height(70.dp),
+            shape = MaterialTheme.shapes.medium,
+            color = if (isOngoing)
+                MaterialTheme.colorScheme.primaryContainer
+            else
+                MaterialTheme.colorScheme.surfaceContainer,
+        ) {
+            Row(
+                modifier = Modifier.fillMaxWidth().padding(horizontal = 10.dp),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                Column(
+                    modifier = Modifier.width(50.dp)
+                ) {
+                    Text(
+                        color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f),
+                        text = lesson.startTime
+                    )
+                    Text(
+                        color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f),
+                        text = lesson.endTime
+                    )
+                }
+
+                Column(
+                    modifier = Modifier
+                        .padding(horizontal = 5.dp),
+                    horizontalAlignment = Alignment.Start
+                ) {
+                    Text(
+                        fontSize = 15.sp,
+                        text = lesson.subjectName
+                    )
+                    Text(
+                        color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f),
+                        fontSize = 12.sp,
+                        text = lesson.teacherName
+                    )
+                }
+
+                timecard()
+            }
+        }
+    }
+}
+fun checkIfOngoing(startTime: String, endTime: String, currentTime: LocalTime, lessonDate: LocalDate, currentDate: LocalDate): Boolean {
+    val start = LocalTime.parse(startTime)
+    val end = LocalTime.parse(endTime)
+    return currentTime.isAfter(start) && currentTime.isBefore(end) && currentDate == lessonDate
+}
+
+fun calculateMinutesLeft(endTime: String, currentTime: LocalTime): Long {
+    val end = LocalTime.parse(endTime)
+    return java.time.Duration.between(currentTime, end).toMinutes()
 }

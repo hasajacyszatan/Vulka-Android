@@ -216,7 +216,7 @@ fun LoginScreen(
                                 )
                             }
                         } catch (e: Exception) {
-                            e.printStackTrace()
+                            throw RuntimeException(e)
                         }
 
                         loading = false
