@@ -1,5 +1,6 @@
 package io.github.vulka.ui.screens.dashboard
 
+import androidx.compose.animation.AnimatedContent
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -76,65 +77,73 @@ fun TimetableScreen(
     }
 
     Column {
-        LazyColumn(
-            modifier = Modifier.fillMaxSize().weight(1f)
-        ) {
-            val lessons = viewModel.timetableRepository.getByDateAndCredentialsId(UUID.fromString(args.userId),currentDate)
-                .sortedBy { it.lesson.position }
+        AnimatedContent(
+            modifier = Modifier
+                .fillMaxSize()
+                .weight(1f),
+            targetState = currentDate,
+            label = "timetable date"
+        ) { date ->
+            LazyColumn(
+                modifier = Modifier.fillMaxSize()
+            ) {
+                val lessons = viewModel.timetableRepository.getByDateAndCredentialsId(UUID.fromString(args.userId), date)
+                    .sortedBy { it.lesson.position }
 
-            if (lessons.isNotEmpty()) {
-                val currentTime = LocalTime.now()
-                lessons.forEach { lessonWrapper ->
-                    val lesson = lessonWrapper.lesson
-                    val isOngoing = checkIfOngoing(lesson.startTime, lesson.endTime, currentTime, lesson.date,
-                        LocalDate.now())
-                    val minutesLeft = if (isOngoing) calculateMinutesLeft(lesson.endTime, currentTime) else 0L
+                if (lessons.isNotEmpty()) {
+                    val currentTime = LocalTime.now()
+                    lessons.forEach { lessonWrapper ->
+                        val lesson = lessonWrapper.lesson
+                        val isOngoing = checkIfOngoing(lesson.startTime, lesson.endTime, currentTime, lesson.date,
+                            LocalDate.now())
+                        val minutesLeft = if (isOngoing) calculateMinutesLeft(lesson.endTime, currentTime) else 0L
 
-                    item {
-                        LessonCard(
-                            lesson = lesson,
-                            isOngoing = isOngoing,
-                            timeCard = {
-                                Column(
-                                    modifier = Modifier.fillMaxWidth().height(70.dp).padding(vertical = 10.dp),
-                                    horizontalAlignment = Alignment.End,
-                                    verticalArrangement = Arrangement.Top
-                                ) {
-                                    if (isOngoing) {
-                                        Surface(
-                                            modifier = Modifier.height(25.dp),
-                                            shape = MaterialTheme.shapes.small,
-                                            color = MaterialTheme.colorScheme.primary
-                                        ) {
-                                            Column(
-                                                modifier = Modifier
-                                                    .fillMaxHeight()
-                                                    .padding(horizontal = 8.dp),
-                                                verticalArrangement = Arrangement.Center,
-                                                horizontalAlignment = Alignment.CenterHorizontally
+                        item {
+                            LessonCard(
+                                lesson = lesson,
+                                isOngoing = isOngoing,
+                                timeCard = {
+                                    Column(
+                                        modifier = Modifier.fillMaxWidth().height(70.dp).padding(vertical = 10.dp),
+                                        horizontalAlignment = Alignment.End,
+                                        verticalArrangement = Arrangement.Top
+                                    ) {
+                                        if (isOngoing) {
+                                            Surface(
+                                                modifier = Modifier.height(25.dp),
+                                                shape = MaterialTheme.shapes.small,
+                                                color = MaterialTheme.colorScheme.primary
                                             ) {
-                                                Text(
-                                                    color = MaterialTheme.colorScheme.onPrimary.copy(
-                                                        alpha = 0.7f
-                                                    ),
-                                                    fontSize = 12.sp,
-                                                    text = pluralStringResource(
-                                                        R.plurals.MinutesLeft,
-                                                        minutesLeft.toInt(),
-                                                        minutesLeft
+                                                Column(
+                                                    modifier = Modifier
+                                                        .fillMaxHeight()
+                                                        .padding(horizontal = 8.dp),
+                                                    verticalArrangement = Arrangement.Center,
+                                                    horizontalAlignment = Alignment.CenterHorizontally
+                                                ) {
+                                                    Text(
+                                                        color = MaterialTheme.colorScheme.onPrimary.copy(
+                                                            alpha = 0.7f
+                                                        ),
+                                                        fontSize = 12.sp,
+                                                        text = pluralStringResource(
+                                                            R.plurals.MinutesLeft,
+                                                            minutesLeft.toInt(),
+                                                            minutesLeft
+                                                        )
                                                     )
-                                                )
+                                                }
                                             }
                                         }
                                     }
                                 }
-                            }
-                        )
+                            )
+                        }
                     }
-                }
-            } else {
-                item {
-                    Text(stringResource(R.string.NoLessons))
+                } else {
+                    item {
+                        Text(stringResource(R.string.NoLessons))
+                    }
                 }
             }
         }
@@ -148,7 +157,6 @@ fun TimetableScreen(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
-
                 IconButton(
                     onClick = {
                         currentDate = getPreviousWeekday(currentDate)
