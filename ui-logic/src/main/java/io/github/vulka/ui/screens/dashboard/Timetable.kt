@@ -1,9 +1,9 @@
 package io.github.vulka.ui.screens.dashboard
 
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -13,28 +13,33 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowLeft
 import androidx.compose.material.icons.automirrored.filled.ArrowRight
-import androidx.compose.material3.Card
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.surfaceColorAtElevation
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.pluralStringResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import dev.medzik.android.compose.ui.IconBox
 import io.github.vulka.core.api.types.Lesson
+import io.github.vulka.ui.R
 import io.github.vulka.ui.VulkaViewModel
 import kotlinx.serialization.Serializable
 import java.time.DayOfWeek
 import java.time.LocalDate
 import java.time.LocalTime
 import java.time.format.DateTimeFormatter
-import java.util.Locale
 import java.util.UUID
 
 @Serializable
@@ -89,7 +94,7 @@ fun TimetableScreen(
                         LessonCard(
                             lesson = lesson,
                             isOngoing = isOngoing,
-                            timecard = {
+                            timeCard = {
                                 Column(
                                     modifier = Modifier.fillMaxWidth().height(70.dp).padding(vertical = 10.dp),
                                     horizontalAlignment = Alignment.End,
@@ -97,14 +102,14 @@ fun TimetableScreen(
                                 ) {
                                     if (isOngoing) {
                                         Surface(
-                                            modifier = Modifier
-                                                .width(100.dp)
-                                                .height(25.dp),
+                                            modifier = Modifier.height(25.dp),
                                             shape = MaterialTheme.shapes.small,
                                             color = MaterialTheme.colorScheme.primary
                                         ) {
                                             Column(
-                                                modifier = Modifier.fillMaxSize(),
+                                                modifier = Modifier
+                                                    .fillMaxHeight()
+                                                    .padding(horizontal = 8.dp),
                                                 verticalArrangement = Arrangement.Center,
                                                 horizontalAlignment = Alignment.CenterHorizontally
                                             ) {
@@ -113,7 +118,11 @@ fun TimetableScreen(
                                                         alpha = 0.7f
                                                     ),
                                                     fontSize = 12.sp,
-                                                    text = "jeszcze $minutesLeft min"
+                                                    text = pluralStringResource(
+                                                        R.plurals.MinutesLeft,
+                                                        minutesLeft.toInt(),
+                                                        minutesLeft
+                                                    )
                                                 )
                                             }
                                         }
@@ -125,7 +134,7 @@ fun TimetableScreen(
                 }
             } else {
                 item {
-                    Text("No lessons")
+                    Text(stringResource(R.string.NoLessons))
                 }
             }
         }
@@ -173,7 +182,7 @@ fun TimetableScreen(
 fun LessonCard(
     lesson: Lesson,
     isOngoing: Boolean,
-    timecard: @Composable () -> Unit = {}
+    timeCard: @Composable () -> Unit = {}
 ) {
     Row(
         modifier = Modifier.fillMaxWidth().padding(2.dp),
@@ -233,18 +242,19 @@ fun LessonCard(
                     )
                 }
 
-                timecard()
+                timeCard()
             }
         }
     }
 }
-fun checkIfOngoing(startTime: String, endTime: String, currentTime: LocalTime, lessonDate: LocalDate, currentDate: LocalDate): Boolean {
+
+private fun checkIfOngoing(startTime: String, endTime: String, currentTime: LocalTime, lessonDate: LocalDate, currentDate: LocalDate): Boolean {
     val start = LocalTime.parse(startTime)
     val end = LocalTime.parse(endTime)
     return currentTime.isAfter(start) && currentTime.isBefore(end) && currentDate == lessonDate
 }
 
-fun calculateMinutesLeft(endTime: String, currentTime: LocalTime): Long {
+private fun calculateMinutesLeft(endTime: String, currentTime: LocalTime): Long {
     val end = LocalTime.parse(endTime)
     return java.time.Duration.between(currentTime, end).toMinutes()
 }
