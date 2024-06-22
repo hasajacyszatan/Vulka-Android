@@ -38,6 +38,8 @@ import dev.medzik.android.compose.rememberMutable
 import dev.medzik.android.compose.ui.IconBox
 import dev.medzik.android.compose.ui.bottomsheet.BaseBottomSheet
 import dev.medzik.android.compose.ui.bottomsheet.rememberBottomSheetState
+import dev.medzik.android.compose.ui.textfield.AnimatedTextField
+import dev.medzik.android.compose.ui.textfield.TextFieldValue
 import io.github.vulka.core.api.types.Lesson
 import io.github.vulka.ui.R
 import io.github.vulka.ui.VulkaViewModel
@@ -60,11 +62,6 @@ fun TimetableScreen(
     viewModel: VulkaViewModel = hiltViewModel()
 ) {
     var currentDate by rememberMutable(LocalDate.now())
-
-    fun formatDate(date: LocalDate): String {
-        val formatter = DateTimeFormatter.ofPattern("EEEE, d MMMM")
-        return date.format(formatter)
-    }
 
     fun getNextWeekday(date: LocalDate): LocalDate {
         var nextDate = date.plusDays(1)
@@ -312,7 +309,52 @@ private fun LessonCard(
 
 @Composable
 private fun LessonDetails(lesson: Lesson) {
-    // TODO
+    Column(
+        modifier = Modifier.padding(horizontal = 8.dp),
+        verticalArrangement = Arrangement.spacedBy(10.dp)
+    ) {
+        AnimatedTextField(
+            value = TextFieldValue(
+                value = lesson.subjectName,
+                editable = false
+            ),
+            label = "Lekcja"
+        )
+
+        AnimatedTextField(
+            value = TextFieldValue(
+                value = lesson.teacherName,
+                editable = false
+            ),
+            label = "Nauczyciel"
+        )
+
+        if (lesson.room != null) {
+            AnimatedTextField(
+                value = TextFieldValue(
+                    value = lesson.room!!,
+                    editable = false
+                ),
+                label = "Sala"
+            )
+        }
+
+        AnimatedTextField(
+            value = TextFieldValue(
+                value = "${lesson.startTime} - ${lesson.endTime}",
+                editable = false
+            ),
+            label = "Godziny"
+        )
+
+        AnimatedTextField(
+            value = TextFieldValue(
+                value = formatDate(lesson.date),
+                editable = false
+            ),
+            label = "Data"
+        )
+    }
 }
 
 private fun checkIfOngoing(startTime: String, endTime: String, lessonDate: LocalDate): Boolean {
@@ -327,4 +369,9 @@ private fun checkIfOngoing(startTime: String, endTime: String, lessonDate: Local
 private fun calculateMinutesLeft(endTime: String, currentTime: LocalTime): Long {
     val end = LocalTime.parse(endTime)
     return java.time.Duration.between(currentTime, end).toMinutes()
+}
+
+private fun formatDate(date: LocalDate): String {
+    val formatter = DateTimeFormatter.ofPattern("EEEE, d MMMM")
+    return date.format(formatter)
 }
