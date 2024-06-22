@@ -3,6 +3,8 @@ package io.github.vulka.impl.librus
 import io.github.vulka.core.api.UserClient
 import io.github.vulka.core.api.types.Grade
 import io.github.vulka.core.api.types.Lesson
+import io.github.vulka.core.api.types.LessonChange
+import io.github.vulka.core.api.types.LessonChangeType
 import io.github.vulka.core.api.types.Parent
 import io.github.vulka.core.api.types.Student
 import io.github.vulka.core.api.types.StudentImpl
@@ -142,7 +144,24 @@ class LibrusUserClient(
                         groupName = "stub.group",
                         date = currentDate,
                         startTime = startTime,
-                        endTime = endTime
+                        endTime = endTime,
+                        change = when (i) {
+                            1 -> LessonChange(
+                                type = LessonChangeType.Canceled,
+                                message = "Stub reason",
+                                room = "101",
+                                newSubjectName = "New subject stub",
+                                newTeacherName = "New teacher stub"
+                            )
+                            4 -> LessonChange(
+                                type = LessonChangeType.Replacement,
+                                message = "Stub reason",
+                                room = "102",
+                                newSubjectName = "New subject stub",
+                                newTeacherName = "New teacher stub"
+                            )
+                            else -> null
+                        }
                     )
                 )
             }

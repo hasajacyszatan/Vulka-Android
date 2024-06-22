@@ -29,6 +29,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.contentColorFor
 import androidx.compose.material3.surfaceColorAtElevation
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -39,11 +40,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import dev.medzik.android.compose.color.combineAlpha
+import dev.medzik.android.compose.color.warningContainer
 import dev.medzik.android.compose.rememberMutable
 import dev.medzik.android.compose.ui.IconBox
 import dev.medzik.android.compose.ui.bottomsheet.BaseBottomSheet
@@ -51,6 +54,7 @@ import dev.medzik.android.compose.ui.bottomsheet.rememberBottomSheetState
 import dev.medzik.android.compose.ui.textfield.AnimatedTextField
 import dev.medzik.android.compose.ui.textfield.TextFieldValue
 import io.github.vulka.core.api.types.Lesson
+import io.github.vulka.core.api.types.LessonChangeType
 import io.github.vulka.ui.R
 import io.github.vulka.ui.VulkaViewModel
 import kotlinx.coroutines.launch
@@ -86,7 +90,14 @@ fun TimetableScreen(
         }
         return previousDate
     }
-    var currentDate by rememberMutable(getNextWeekday(LocalDate.now()))
+    fun getWeekday(date: LocalDate): LocalDate {
+        var previousDate = date
+        while (previousDate.dayOfWeek == DayOfWeek.SATURDAY || previousDate.dayOfWeek == DayOfWeek.SUNDAY) {
+            previousDate = previousDate.plusDays(1)
+        }
+        return previousDate
+    }
+    var currentDate by rememberMutable(getWeekday(LocalDate.now()))
 
     Column {
         AnimatedContent(
@@ -271,16 +282,24 @@ private fun LessonCard(
             )
         }
 
+        val cardColor = if (isOngoing && lesson.change == null) {
+            MaterialTheme.colorScheme.primaryContainer
+        } else if (isOngoing && lesson.change!!.type == LessonChangeType.Replacement)
+            MaterialTheme.colorScheme.primaryContainer
+        else if (lesson.change != null) {
+            when (lesson.change!!.type) {
+                LessonChangeType.Replacement -> MaterialTheme.colorScheme.warningContainer
+                LessonChangeType.Canceled -> MaterialTheme.colorScheme.errorContainer
+            }
+        } else MaterialTheme.colorScheme.surfaceContainer
+
         Surface(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(3.dp)
                 .height(70.dp),
             shape = MaterialTheme.shapes.medium,
-            color = if (isOngoing)
-                MaterialTheme.colorScheme.primaryContainer
-            else
-                MaterialTheme.colorScheme.surfaceContainer,
+            color = cardColor
         ) {
             Row(
                 modifier = Modifier
@@ -294,16 +313,17 @@ private fun LessonCard(
                 ) {
                     Text(
                         fontSize = 15.sp,
-                        color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f),
+                        color = contentColorFor(cardColor).copy(alpha = 0.7f),
                         text = lesson.startTime
                     )
                     Text(
                         fontSize = 15.sp,
-                        color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f),
+                        color = contentColorFor(cardColor).copy(alpha = 0.7f),
                         text = lesson.endTime
                     )
                 }
 
+                val wasLessonChanged = lesson.change != null
 
                 Column(
                     modifier = (if (isOngoing) Modifier.weight(3f) else Modifier)
@@ -312,18 +332,34 @@ private fun LessonCard(
                 ) {
                     Text(
                         fontSize = 15.sp,
-                        text = lesson.subjectName,
+                        text = if (wasLessonChanged && !lesson.change!!.newSubjectName.isNullOrEmpty())
+                            lesson.change!!.newSubjectName!!
+                        else
+                            lesson.subjectName,
                         maxLines = 1,
-                        overflow = TextOverflow.Ellipsis
+                        overflow = TextOverflow.Ellipsis,
+                        textDecoration = if (wasLessonChanged && lesson.change!!.type == LessonChangeType.Canceled)
+                            TextDecoration.LineThrough
+                        else
+                            TextDecoration.None,
                     )
                     Text(
-                        color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f),
+                        color = contentColorFor(cardColor).copy(alpha = 0.7f),
                         fontSize = 12.sp,
-                        text = (if (!lesson.room.isNullOrEmpty()) "${lesson.room.orEmpty()} " else "") + lesson.teacherName
+                        text = if (wasLessonChanged)
+                            when (lesson.change!!.type) {
+                                LessonChangeType.Canceled -> lesson.change!!.message.orEmpty()
+                                LessonChangeType.Replacement ->
+                                    (if (!lesson.change!!.room.isNullOrEmpty()) "${lesson.change!!.room.orEmpty()} " else "") +
+                                            lesson.change!!.newTeacherName
+                            }
+                        else
+                            (if (!lesson.room.isNullOrEmpty()) "${lesson.room.orEmpty()} " else "") + lesson.teacherName
                     )
                 }
 
-                timeCard()
+                if (!wasLessonChanged || lesson.change?.type != LessonChangeType.Canceled)
+                    timeCard()
             }
         }
     }

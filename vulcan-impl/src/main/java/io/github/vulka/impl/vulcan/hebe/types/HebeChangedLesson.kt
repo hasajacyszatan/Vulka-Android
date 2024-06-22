@@ -28,10 +28,13 @@ data class HebeChangedLesson(
     val room: HebeLessonRoom? = null,
 
     @SerializedName("TeacherPrimary")
-    val teacher: HebeTeacher? = null,
+    val teacherPrimary: HebeTeacher? = null,
 
     @SerializedName("TeacherSecondary")
     val secondTeacher: HebeTeacher? = null,
+
+    @SerializedName("TeacherAbsenceEffectName")
+    val teacherAbsenceEffectName: String?,
 
     @SerializedName("Subject")
     val subject: HebeSubject? = null,

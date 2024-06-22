@@ -56,7 +56,7 @@ suspend fun sync(
     // Sync timetable
     val now = LocalDate.now()
     val lessons = client.getLessons(student,now.minusWeeks(2),now.plusWeeks(1))
-    repository.timetable.deleteRangeByCredentialsId(now.minusWeeks(2),now.plusWeeks(1),userId)
+    repository.timetable.deleteByCredentialsId(userId)
 
     for (lesson in lessons) {
         repository.timetable.insert(

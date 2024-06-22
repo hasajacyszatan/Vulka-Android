@@ -4,6 +4,8 @@ import io.github.vulka.core.api.LoginCredentials
 import io.github.vulka.core.api.UserClient
 import io.github.vulka.core.api.types.Grade
 import io.github.vulka.core.api.types.Lesson
+import io.github.vulka.core.api.types.LessonChange
+import io.github.vulka.core.api.types.LessonChangeType
 import io.github.vulka.core.api.types.Parent
 import io.github.vulka.core.api.types.Student
 import io.github.vulka.impl.vulcan.hebe.VulcanHebeApi
@@ -80,6 +82,8 @@ class VulcanUserClient(
             if (!lesson.visible)
                 continue
 
+            val change = changedLesson.find { it.scheduleId == lesson.id }
+
             lessons.add(
                 Lesson(
                     subjectName = lesson.subject.name,
@@ -87,7 +91,19 @@ class VulcanUserClient(
                     endTime = lesson.time.to,
                     room = lesson.room?.code,
                     position = lesson.time.position,
-                    change = null,
+                    change = if (change != null) {
+                        LessonChange(
+                            type = when (change.changes?.type) {
+                                1 -> LessonChangeType.Canceled
+                                2 -> LessonChangeType.Replacement
+                                else -> LessonChangeType.Replacement
+                            },
+                            message = change.teacherAbsenceEffectName,
+                            room = change.room?.code,
+                            newSubjectName = change.subject?.name,
+                            newTeacherName = change.teacherPrimary?.displayName
+                        )
+                    } else null,
                     date = LocalDate.parse(lesson.date.date),
                     teacherName = lesson.teacher.displayName
                 )

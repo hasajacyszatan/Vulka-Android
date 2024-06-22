@@ -2,13 +2,14 @@ package io.github.vulka.database
 
 import androidx.room.Dao
 import androidx.room.Insert
+import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Update
 import java.util.UUID
 
 @Dao
 interface LuckyNumberDao {
-    @Insert
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insert(luckyNumber: LuckyNumber)
 
     @Update
