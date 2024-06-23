@@ -46,7 +46,7 @@ suspend fun sync(
     }
 
     // sync grades
-    val grades = client.getGrades(student)
+    val grades = client.getGrades(student, client.getCurrentSemester(student))
     repository.grades.deleteByCredentialsId(userId)
     for (grade in grades) {
         repository.grades.insert(
@@ -59,7 +59,7 @@ suspend fun sync(
 
     // Sync timetable
     val now = LocalDateTime.now()
-    val lessons = client.getLessons(student,now.minusWeeks(2).toLocalDate(),now.plusWeeks(1).toLocalDate())
+    val lessons = client.getLessons(student, now.minusWeeks(2).toLocalDate(), now.plusWeeks(1).toLocalDate())
     repository.timetable.deleteByCredentialsId(userId)
 
     for (lesson in lessons) {
@@ -74,19 +74,19 @@ suspend fun sync(
     }
 }
 
-fun getUserClientFromCredentials(platform:Platform,credentials: String): UserClient {
+fun getUserClientFromCredentials(platform: Platform, credentials: String): UserClient {
     val decryptedCredentials = decryptCredentials(credentials)
     val client = getUserClient(platform, decryptedCredentials)
     return client
 }
 
-fun getStudentFromCredentials(context: Context,userId: UUID): Student {
+fun getStudentFromCredentials(context: Context, userId: UUID): Student {
     val repository = RoomModule.providesRepository(context)
     val dbCredentials = repository.credentials.getById(userId)!!
     return dbCredentials.student
 }
 
-suspend fun syncTimetableAtSwitch(context: Context,client: UserClient,student: Student,selectedDate: LocalDate,userId: UUID) {
+suspend fun syncTimetableAtSwitch(context: Context, client: UserClient, student: Student, selectedDate: LocalDate, userId: UUID) {
     val now = LocalDateTime.now()
 
     val repository = RoomModule.providesRepository(context)

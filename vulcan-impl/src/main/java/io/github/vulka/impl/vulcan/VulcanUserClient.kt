@@ -7,10 +7,13 @@ import io.github.vulka.core.api.types.Lesson
 import io.github.vulka.core.api.types.LessonChange
 import io.github.vulka.core.api.types.LessonChangeType
 import io.github.vulka.core.api.types.Parent
+import io.github.vulka.core.api.types.Semester
 import io.github.vulka.core.api.types.Student
 import io.github.vulka.impl.vulcan.hebe.VulcanHebeApi
 import io.github.vulka.impl.vulcan.hebe.types.HebeStudent
 import java.time.LocalDate
+import java.time.LocalDateTime
+import java.time.ZoneOffset
 import java.util.Date
 
 class VulcanUserClient(
@@ -47,12 +50,15 @@ class VulcanUserClient(
         return api.getLuckyNumber(hebeStudent, Date())
     }
 
-    override suspend fun getGrades(student: Student): Array<Grade> {
+    override suspend fun getGrades(student: Student, semester: Semester): Array<Grade> {
         val hebeStudent = student.impl as HebeStudent
-        val currentPeriod = hebeStudent.periods.find { it.current }!!
+        val currentHebePeriod = hebeStudent.periods.find { it.current }!!
+
+        val currentPeriod = hebeStudent.periods.find { it.number == semester.number && it.level == currentHebePeriod.level }!!
+
         val response = api.getGrades(hebeStudent,currentPeriod)
 
-        val grades = ArrayList<Grade>()
+        val grades = java.util.ArrayList<Grade>()
 
         for (grade in response) {
             grades.add(Grade(
@@ -75,7 +81,7 @@ class VulcanUserClient(
         val lessonsResponse = api.getLessons(hebeStudent,dateFrom,dateTo)
         val changedLesson = api.getChangedLessons(hebeStudent,dateFrom,dateTo)
 
-        val lessons = ArrayList<Lesson>()
+        val lessons = java.util.ArrayList<Lesson>()
 
         for (lesson in lessonsResponse) {
             // Skip lessons that is not for this student
@@ -111,5 +117,33 @@ class VulcanUserClient(
         }
 
         return lessons.toTypedArray()
+    }
+
+    override suspend fun getSemesters(student: Student): Array<Semester> {
+        val hebeStudent = student.impl as HebeStudent
+
+        val currentSemester = hebeStudent.periods.find { it.current }!!
+        val currentYearSemesters = hebeStudent.periods.filter { it.level == currentSemester.level }
+
+        val semesters = java.util.ArrayList<Semester>()
+
+        for (semester in currentYearSemesters) {
+            semesters.add(
+                Semester(
+                    number = semester.number,
+                    current = semester.current
+                )
+            )
+        }
+        return semesters.toTypedArray()
+    }
+
+    override fun shouldSyncSemesters(student: Student): Boolean {
+        val hebeStudent = student.impl as HebeStudent
+
+        val currentSemester = hebeStudent.periods.find { it.current }!!
+
+        val date = LocalDateTime.now()
+        return (date.toEpochSecond(ZoneOffset.UTC) * 1000 + date.nano / 1000000) > currentSemester.end.timestamp
     }
 }

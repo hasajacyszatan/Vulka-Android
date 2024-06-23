@@ -7,6 +7,7 @@ import io.github.vulka.core.api.UserClient
 import io.github.vulka.core.api.types.Grade
 import io.github.vulka.core.api.types.Lesson
 import io.github.vulka.core.api.types.Parent
+import io.github.vulka.core.api.types.Semester
 import io.github.vulka.core.api.types.Student
 import io.github.vulka.core.api.types.StudentImpl
 import io.github.vulka.impl.librus.internal.api.internalRequestClass
@@ -75,7 +76,7 @@ class LibrusUserClient(
         return response.luckyNumber
     }
 
-    override suspend fun getGrades(student: Student): Array<Grade> {
+    override suspend fun getGrades(student: Student, semester: Semester): Array<Grade> {
         val grades = internalRequestGrades()
         val categories = internalRequestGradesCategories()
         val subjects = internalRequestSubjects()
@@ -178,6 +179,26 @@ class LibrusUserClient(
         }
 
         return lessons.toTypedArray()
+    }
+
+    override suspend fun getSemesters(student: Student): Array<Semester> {
+        // Stub
+        val semesters = ArrayList<Semester>()
+        for (i in 1..2) {
+            semesters.add(
+                Semester(
+                    number = i,
+                    current = i == 2
+                )
+            )
+        }
+
+        return semesters.toTypedArray()
+    }
+
+    override fun shouldSyncSemesters(student: Student): Boolean {
+        // Stub
+        return true
     }
 }
 
