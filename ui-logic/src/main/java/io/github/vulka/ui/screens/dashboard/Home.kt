@@ -233,7 +233,9 @@ fun HomeScreen(
                 Timetable -> {
                     TimetableScreen(
                         args = Timetable(
-                            userId = args.userId
+                            platform = args.platform,
+                            userId = args.userId,
+                            credentials = args.credentials
                         )
                     )
                 }

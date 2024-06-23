@@ -24,6 +24,7 @@ import androidx.compose.material.icons.filled.Groups
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Room
 import androidx.compose.material.icons.filled.Schedule
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -37,6 +38,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -53,6 +55,12 @@ import dev.medzik.android.compose.ui.bottomsheet.BaseBottomSheet
 import dev.medzik.android.compose.ui.bottomsheet.rememberBottomSheetState
 import dev.medzik.android.compose.ui.textfield.AnimatedTextField
 import dev.medzik.android.compose.ui.textfield.TextFieldValue
+import dev.medzik.android.utils.runOnIOThread
+import io.github.vulka.business.sync.checkIfTimetableShouldBeSync
+import io.github.vulka.business.sync.getStudentFromCredentials
+import io.github.vulka.business.sync.getUserClientFromCredentials
+import io.github.vulka.business.sync.syncTimetableAtSwitch
+import io.github.vulka.core.api.Platform
 import io.github.vulka.core.api.types.Lesson
 import io.github.vulka.core.api.types.LessonChangeType
 import io.github.vulka.ui.R
@@ -67,7 +75,9 @@ import java.util.UUID
 
 @Serializable
 class Timetable(
-    val userId: String
+    val platform: Platform,
+    val userId: String,
+    val credentials: String
 )
 
 @Composable
@@ -75,6 +85,9 @@ fun TimetableScreen(
     args: Timetable,
     viewModel: VulkaViewModel = hiltViewModel()
 ) {
+
+    val context = LocalContext.current
+
     fun getNextWeekday(date: LocalDate): LocalDate {
         var nextDate = date.plusDays(1)
         while (nextDate.dayOfWeek == DayOfWeek.SATURDAY || nextDate.dayOfWeek == DayOfWeek.SUNDAY) {
@@ -97,7 +110,32 @@ fun TimetableScreen(
         }
         return previousDate
     }
+
     var currentDate by rememberMutable(getWeekday(LocalDate.now()))
+
+    var timetableRefreshing by rememberMutable(false)
+
+    val client by rememberMutable(getUserClientFromCredentials(args.platform, args.credentials))
+    var userClientCredentialsRenewed by rememberMutable(false)
+    val student by rememberMutable(getStudentFromCredentials(context,UUID.fromString(args.userId)))
+
+    fun syncTimetable() {
+        if (!checkIfTimetableShouldBeSync(context, currentDate,UUID.fromString(args.userId)))
+            return
+
+        runOnIOThread {
+            if (!userClientCredentialsRenewed) {
+                client.renewCredentials()
+                userClientCredentialsRenewed = true
+            }
+
+            timetableRefreshing = true
+
+            syncTimetableAtSwitch(context,client,student,currentDate,UUID.fromString(args.userId))
+
+            timetableRefreshing = false
+        }
+    }
 
     Column {
         AnimatedContent(
@@ -112,30 +150,40 @@ fun TimetableScreen(
                 date
             ).sortedBy { it.lesson.position }
 
-            if (lessons.isEmpty()) {
+            if (!timetableRefreshing) {
+                if (lessons.isEmpty()) {
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(vertical = 16.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.Center
+                    ) {
+                        IconBox(
+                            imageVector = Icons.Default.Backpack,
+                            modifier = Modifier.size(100.dp)
+                        )
+
+                        Spacer(
+                            modifier = Modifier.height(10.dp)
+                        )
+
+                        Text(
+                            text = stringResource(R.string.NoLessons),
+                            fontSize = 20.sp,
+                        )
+                    }
+                } else {
+                    LessonsCards(lessons)
+                }
+            } else {
                 Column(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(vertical = 16.dp),
+                    modifier = Modifier.fillMaxWidth(),
                     horizontalAlignment = Alignment.CenterHorizontally,
                     verticalArrangement = Arrangement.Center
                 ) {
-                    IconBox(
-                        imageVector = Icons.Default.Backpack,
-                        modifier = Modifier.size(100.dp)
-                    )
-
-                    Spacer(
-                        modifier = Modifier.height(10.dp)
-                    )
-
-                    Text(
-                        text = stringResource(R.string.NoLessons),
-                        fontSize = 20.sp,
-                    )
+                    CircularProgressIndicator()
                 }
-            } else {
-                LessonsCards(lessons)
             }
         }
 
@@ -151,6 +199,7 @@ fun TimetableScreen(
                 IconButton(
                     onClick = {
                         currentDate = getPreviousWeekday(currentDate)
+                        syncTimetable()
                     }
                 ) {
                     IconBox(
@@ -166,6 +215,7 @@ fun TimetableScreen(
                 IconButton(
                     onClick = {
                         currentDate = getNextWeekday(currentDate)
+                        syncTimetable()
                     }
                 ) {
                     IconBox(

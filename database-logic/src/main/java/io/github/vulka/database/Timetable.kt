@@ -5,6 +5,7 @@ import androidx.room.Entity
 import androidx.room.PrimaryKey
 import io.github.vulka.core.api.types.Lesson
 import java.time.LocalDate
+import java.time.LocalDateTime
 import java.util.UUID
 
 @Entity
@@ -14,6 +15,6 @@ data class Timetable(
     @Embedded
     val lesson: Lesson,
     val lessonDate: LocalDate,
-    val lastSync: LocalDate,
+    val lastSync: LocalDateTime,
     val credentialsId: UUID
 )
