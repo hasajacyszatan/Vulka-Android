@@ -15,6 +15,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Backpack
 import androidx.compose.material.icons.filled.Looks6
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.Card
@@ -28,6 +29,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -97,9 +99,10 @@ fun StartScreen(
 
             item {
                 GradesCard(UUID.fromString(args.userId))
-                Spacer(
-                    modifier = Modifier.size(5.dp)
-                )
+            }
+
+            item {
+                TimetableCard(UUID.fromString(args.userId))
             }
         }
 
@@ -175,79 +178,106 @@ fun GradesCard(
     userId: UUID,
     viewModel: VulkaViewModel = hiltViewModel()
 ) {
+    val gradesDb = viewModel.gradesRepository.getFromLastWeek(userId, LocalDate.now().minusWeeks(1))!!
+
+    val gradeList: List<Grade> = gradesDb.map { it.grade }
+    val uniqueSubjectNames: Set<String> = gradeList.map { it.subjectName }.sortedBy { it }.toSet()
+
+    DashboardCard(
+        icon = Icons.Default.Looks6,
+        title = stringResource(R.string.LatestGrades)
+    ) {
+        if (gradeList.isNotEmpty()) {
+            uniqueSubjectNames.forEach { subject ->
+                Column {
+                    Row(
+                        modifier = Modifier.padding(vertical = 3.dp).wrapContentSize()
+                    ) {
+                        Text(
+                            modifier = Modifier.padding(end = 5.dp),
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis,
+                            text = if (subject.length > 25) subject.substring(
+                                0,
+                                25
+                            ) + "..." else subject
+                        )
+                        val filterGrades = gradeList.filter { it.subjectName == subject }
+
+                        for (grade in filterGrades) {
+                            Card(
+                                modifier = Modifier
+                                    .padding(horizontal = 2.dp)
+                                    .size(25.dp)
+                            ) {
+                                Column(
+                                    modifier = Modifier.fillMaxSize(),
+                                    verticalArrangement = Arrangement.Center,
+                                    horizontalAlignment = Alignment.CenterHorizontally
+                                ) {
+                                    Text(
+                                        text = grade.value ?: "",
+                                        fontSize = 15.sp
+                                    )
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        } else {
+            Text(
+                modifier = Modifier.padding(vertical = 7.dp),
+                text = stringResource(R.string.NoLatestGrades)
+            )
+        }
+    }
+}
+
+@Composable
+fun TimetableCard(
+    userId: UUID,
+    viewModel: VulkaViewModel = hiltViewModel()
+) {
+    DashboardCard(
+        icon = Icons.Default.Backpack,
+        title = stringResource(R.string.Lessons)
+    ) {
+        Text(text = stringResource(R.string.NoLessons))
+    }
+}
+
+@Composable
+fun DashboardCard(
+    icon: ImageVector,
+    title: String,
+    content: @Composable () -> Unit
+) {
     Surface(
         modifier = Modifier.fillMaxWidth()
             .padding(horizontal = 3.dp, vertical = 5.dp),
         shape = MaterialTheme.shapes.medium,
         color = MaterialTheme.colorScheme.surfaceContainer
     ) {
-        val gradesDb = viewModel.gradesRepository.getFromLastWeek(userId, LocalDate.now().minusWeeks(1))!!
-
-        val gradeList: List<Grade> = gradesDb.map { it.grade }
-        val uniqueSubjectNames: Set<String> = gradeList.map { it.subjectName }.sortedBy { it }.toSet()
-
-
         Column(
             modifier = Modifier.padding(10.dp)
         ) {
             Row {
                 IconBox(
                     modifier = Modifier.padding(end = 5.dp),
-                    imageVector = Icons.Default.Looks6
+                    imageVector = icon
                 )
 
                 Text(
                     fontWeight = FontWeight.Bold,
                     fontSize = 18.sp,
-                    text = stringResource(R.string.LatestGrades)
+                    text = title
                 )
             }
 
             Spacer(modifier = Modifier.height(8.dp))
-            if (gradeList.isNotEmpty()) {
-                uniqueSubjectNames.forEach { subject ->
-                    Column {
-                        Row(
-                            modifier = Modifier.padding(vertical = 3.dp).wrapContentSize()
-                        ) {
-                            Text(
-                                modifier = Modifier.padding(end = 5.dp),
-                                maxLines = 1,
-                                overflow = TextOverflow.Ellipsis,
-                                text = if (subject.length > 25) subject.substring(
-                                    0,
-                                    25
-                                ) + "..." else subject
-                            )
-                            val filterGrades = gradeList.filter { it.subjectName == subject }
 
-                            for (grade in filterGrades) {
-                                Card(
-                                    modifier = Modifier
-                                        .padding(horizontal = 2.dp)
-                                        .size(25.dp)
-                                ) {
-                                    Column(
-                                        modifier = Modifier.fillMaxSize(),
-                                        verticalArrangement = Arrangement.Center,
-                                        horizontalAlignment = Alignment.CenterHorizontally
-                                    ) {
-                                        Text(
-                                            text = grade.value ?: "",
-                                            fontSize = 15.sp
-                                        )
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            } else {
-                Text(
-                    modifier = Modifier.padding(vertical = 7.dp),
-                    text = stringResource(R.string.NoLatestGrades)
-                )
-            }
+            content()
         }
     }
 }

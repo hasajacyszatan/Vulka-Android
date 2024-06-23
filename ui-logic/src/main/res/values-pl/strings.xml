@@ -44,4 +44,5 @@
     <string name="Group">Grupa</string>
     <string name="LessonHours">Godziny</string>
     <string name="Date">Data</string>
+    <string name="Lessons">Lekcje</string>
 </resources>
