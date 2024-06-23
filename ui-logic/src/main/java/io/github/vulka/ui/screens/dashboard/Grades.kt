@@ -285,7 +285,15 @@ private enum class GradeColor(val color: Color) {
                 gradeValue.startsWith("4") -> FOUR
                 gradeValue.startsWith("5") -> FIVE
                 gradeValue.startsWith("6") -> SIX
-                else -> null
+                else -> when (gradeValue.lowercase()) {
+                    "-" -> ONE
+                    "+" -> SIX
+                    // nieprzygotowanie
+                    "np" -> TWO
+                    // brak zadania
+                    "bz" -> TWO
+                    else -> null
+                }
             }
         }
     }
