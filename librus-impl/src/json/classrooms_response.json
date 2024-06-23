@@ -1,0 +1,43 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Librus API '/Classrooms' endpoint",
+  "type": "object",
+  "properties": {
+    "Classrooms": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "Id": {
+            "type": "integer"
+          },
+          "Name": {
+            "type": "string"
+          },
+          "Symbol": {
+            "type": "string"
+          },
+          "Size": {
+            "type": "integer"
+          },
+          "SchoolCommonRoom": {
+            "type": "boolean"
+          },
+          "Description": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "Id",
+          "Name",
+          "Symbol",
+          "Size",
+          "SchoolCommonRoom"
+        ]
+      }
+    }
+  },
+  "required": [
+    "Classrooms"
+  ]
+}

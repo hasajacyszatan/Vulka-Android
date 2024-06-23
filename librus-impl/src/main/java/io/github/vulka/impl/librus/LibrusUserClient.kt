@@ -1,21 +1,25 @@
 package io.github.vulka.impl.librus
 
+import com.google.gson.Gson
+import com.google.gson.JsonObject
+import com.google.gson.reflect.TypeToken
 import io.github.vulka.core.api.UserClient
 import io.github.vulka.core.api.types.Grade
 import io.github.vulka.core.api.types.Lesson
-import io.github.vulka.core.api.types.LessonChange
-import io.github.vulka.core.api.types.LessonChangeType
 import io.github.vulka.core.api.types.Parent
 import io.github.vulka.core.api.types.Student
 import io.github.vulka.core.api.types.StudentImpl
 import io.github.vulka.impl.librus.internal.api.internalRequestClass
+import io.github.vulka.impl.librus.internal.api.internalRequestClassrooms
 import io.github.vulka.impl.librus.internal.api.internalRequestGrades
 import io.github.vulka.impl.librus.internal.api.internalRequestGradesCategories
 import io.github.vulka.impl.librus.internal.api.internalRequestLuckyNumber
 import io.github.vulka.impl.librus.internal.api.internalRequestMe
 import io.github.vulka.impl.librus.internal.api.internalRequestSubjects
+import io.github.vulka.impl.librus.internal.api.internalRequestTimetable
 import io.github.vulka.impl.librus.internal.api.internalRequestUserProfile
 import io.github.vulka.impl.librus.internal.api.internalRequestUsers
+import io.github.vulka.impl.librus.internal.api.types.TimetablesDay
 import io.github.vulka.impl.librus.internal.api.types.UserProfile
 import io.ktor.client.HttpClient
 import io.ktor.client.engine.okhttp.OkHttp
@@ -25,6 +29,7 @@ import io.ktor.client.request.HttpRequestBuilder
 import io.ktor.http.Cookie
 import io.ktor.http.HttpHeaders
 import io.ktor.http.renderCookieHeader
+import java.time.DayOfWeek
 import java.time.LocalDate
 
 class LibrusUserClient(
@@ -99,7 +104,6 @@ class LibrusUserClient(
         return gradesList.toTypedArray()
     }
 
-    // Some advanced stub
     override suspend fun getLessons(
         student: Student,
         dateFrom: LocalDate,
@@ -107,63 +111,67 @@ class LibrusUserClient(
     ): Array<Lesson> {
         val lessons = ArrayList<Lesson>()
 
+        val classRooms = internalRequestClassrooms()
+
+        lateinit var timetable: JsonObject
+
+        fun getTimetableDay(date: LocalDate): Array<Array<TimetablesDay>?>? {
+            println(date.toString())
+
+            return try {
+                val type = object : TypeToken<Array<Array<TimetablesDay>?>?>() {}.type
+                return Gson().fromJson(timetable[date.toString()], type)
+            } catch (e: Exception) {
+                null
+            }
+        }
+
         var currentDate = dateFrom
         while (!currentDate.isAfter(dateTo)) {
-            for (i in 1..7) {
-                if (currentDate.isAfter(dateTo))
-                    break // Stop adding lessons beyond dateTo
+            if (currentDate.dayOfWeek == DayOfWeek.MONDAY) {
+                timetable = internalRequestTimetable(currentDate.toString())
+            }
 
-                val startTime = when (i) {
-                    1 -> "08:00"
-                    2 -> "09:00"
-                    3 -> "10:00"
-                    4 -> "11:00"
-                    5 -> "13:00"
-                    6 -> "14:00"
-                    7 -> "15:00"
-                    else -> "08:00"
-                }
+            if (currentDate.isAfter(dateTo))
+                break // Stop adding lessons beyond dateTo
 
-                val endTime = when (i) {
-                    1 -> "08:45"
-                    2 -> "09:45"
-                    3 -> "10:45"
-                    4 -> "11:45"
-                    5 -> "13:45"
-                    6 -> "14:45"
-                    7 -> "15:45"
-                    else -> "08:45"
-                }
+            getTimetableDay(currentDate)?.forEach {
+                if (!it.isNullOrEmpty()) {
+                    val lesson = it[0]
 
-                lessons.add(
-                    Lesson(
-                        subjectName = "Stub subject",
-                        position = i,
-                        teacherName = "Stub teacher",
-                        room = "100",
-                        groupName = "stub.group",
-                        date = currentDate,
-                        startTime = startTime,
-                        endTime = endTime,
-                        change = when (i) {
-                            1 -> LessonChange(
-                                type = LessonChangeType.Canceled,
-                                message = "Stub reason",
-                                room = "101",
-                                newSubjectName = "New subject stub",
-                                newTeacherName = "New teacher stub"
-                            )
-                            4 -> LessonChange(
-                                type = LessonChangeType.Replacement,
-                                message = "Stub reason",
-                                room = "102",
-                                newSubjectName = "New subject stub",
-                                newTeacherName = "New teacher stub"
-                            )
-                            else -> null
-                        }
+                    lessons.add(
+                        Lesson(
+                            subjectName = lesson.subject.name,
+                            position = lesson.lessonNo.toInt(),
+                            teacherName = "${lesson.teacher.firstName} ${lesson.teacher.lastName}",
+                            room = classRooms.find { x -> x.id.toString() == lesson.classroom.id }?.name,
+                            groupName = lesson.virtualClassName ?: null,
+                            date = currentDate,
+                            startTime = lesson.hourFrom,
+                            endTime = lesson.hourTo
+                            // TODO: changes
+//                            change = when (i) {
+//                                1 -> LessonChange(
+//                                    type = LessonChangeType.Canceled,
+//                                    message = "Stub reason",
+//                                    room = "101",
+//                                    newSubjectName = "New subject stub",
+//                                    newTeacherName = "New teacher stub"
+//                                )
+//
+//                                4 -> LessonChange(
+//                                    type = LessonChangeType.Replacement,
+//                                    message = "Stub reason",
+//                                    room = "102",
+//                                    newSubjectName = "New subject stub",
+//                                    newTeacherName = "New teacher stub"
+//                                )
+//
+//                                else -> null
+//                            }
+                        )
                     )
-                )
+                }
             }
 
             currentDate = currentDate.plusDays(1)
