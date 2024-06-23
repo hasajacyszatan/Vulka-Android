@@ -1,6 +1,7 @@
 package io.github.vulka.business.sync
 
 import android.content.Context
+import android.util.Log
 import io.github.vulka.business.crypto.decryptCredentials
 import io.github.vulka.business.utils.getUserClient
 import io.github.vulka.core.api.Platform
@@ -8,6 +9,7 @@ import io.github.vulka.core.api.UserClient
 import io.github.vulka.core.api.types.Student
 import io.github.vulka.database.Grades
 import io.github.vulka.database.LuckyNumber
+import io.github.vulka.database.Semesters
 import io.github.vulka.database.Timetable
 import io.github.vulka.database.injection.RoomModule
 import java.time.Duration
@@ -45,16 +47,31 @@ suspend fun sync(
         )
     }
 
-    // sync grades
-    val grades = client.getGrades(student, client.getCurrentSemester(student))
+    // TODO: Add use of shouldSyncSemesters
+    // sync grades and semesters
+    val semesters = client.getSemesters(student)
     repository.grades.deleteByCredentialsId(userId)
-    for (grade in grades) {
-        repository.grades.insert(
-            Grades(
-                grade = grade,
+    repository.semesters.deleteByCredentialsId(userId)
+
+    for (semester in semesters) {
+        repository.semesters.insert(
+            Semesters(
+                semester = semester,
                 credentialsId = userId
             )
         )
+
+        // sync grades
+        val grades = client.getGrades(student, semester)
+        for (grade in grades) {
+            repository.grades.insert(
+                Grades(
+                    grade = grade,
+                    semesterNumber = semester.number,
+                    credentialsId = userId
+                )
+            )
+        }
     }
 
     // Sync timetable

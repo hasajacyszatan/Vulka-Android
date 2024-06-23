@@ -7,6 +7,7 @@ interface RepositoryInterface {
     val luckyNumber: LuckyNumberDao
     val grades: GradesDao
     val timetable: TimetableDao
+    val semesters: SemestersDao
 }
 
 class Repository(context: Context) : RepositoryInterface {
@@ -16,4 +17,5 @@ class Repository(context: Context) : RepositoryInterface {
     override val luckyNumber = database.luckyNumberDao()
     override val grades = database.gradesDao()
     override val timetable = database.timetableDao()
+    override val semesters = database.semestersDao()
 }

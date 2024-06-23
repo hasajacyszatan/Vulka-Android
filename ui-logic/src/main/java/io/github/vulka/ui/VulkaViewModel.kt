@@ -6,6 +6,7 @@ import io.github.vulka.database.CredentialsDao
 import io.github.vulka.database.GradesDao
 import io.github.vulka.database.LuckyNumberDao
 import io.github.vulka.database.Repository
+import io.github.vulka.database.SemestersDao
 import io.github.vulka.database.TimetableDao
 import javax.inject.Inject
 
@@ -14,5 +15,6 @@ class VulkaViewModel @Inject constructor(
     val credentialRepository: CredentialsDao,
     val luckyNumberRepository: LuckyNumberDao,
     val gradesRepository: GradesDao,
-    val timetableRepository: TimetableDao
+    val timetableRepository: TimetableDao,
+    val semestersRepository: SemestersDao
 ) : ViewModel()

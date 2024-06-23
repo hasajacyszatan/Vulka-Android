@@ -3,15 +3,14 @@ package io.github.vulka.database
 import androidx.room.Embedded
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-import io.github.vulka.core.api.types.Grade
+import io.github.vulka.core.api.types.Semester
 import java.util.UUID
 
 @Entity
-data class Grades(
+data class Semesters(
     @PrimaryKey
     val id: UUID = UUID.randomUUID(),
     @Embedded
-    val grade: Grade,
-    val semesterNumber: Int,
+    val semester: Semester,
     val credentialsId: UUID
 )

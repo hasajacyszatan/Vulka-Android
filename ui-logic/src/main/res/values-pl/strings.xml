@@ -45,4 +45,5 @@
     <string name="LessonHours">Godziny</string>
     <string name="Date">Data</string>
     <string name="Lessons">Lekcje</string>
+    <string name="Semester">Semestr</string>
 </resources>

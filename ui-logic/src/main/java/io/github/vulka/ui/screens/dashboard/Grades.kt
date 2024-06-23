@@ -1,11 +1,13 @@
 package io.github.vulka.ui.screens.dashboard
 
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
@@ -23,6 +25,7 @@ import androidx.compose.material3.TabRow
 import androidx.compose.material3.TabRowDefaults
 import androidx.compose.material3.TabRowDefaults.tabIndicatorOffset
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.pulltorefresh.PullToRefreshState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -127,82 +130,106 @@ fun GradesTab(
 
     refreshed: Boolean
 ) {
-    val gradesDb = viewModel.gradesRepository.getByCredentialsId(UUID.fromString(args.userId))
-    if (gradesDb != null) {
-        val gradeList: List<Grade> = gradesDb.map { it.grade }
-        val uniqueSubjectNames: Set<String> = gradeList.map { it.subjectName }.sortedBy { it }.toSet()
+    if (refreshed) {
+        val semesters = viewModel.semestersRepository.getByCredentialsId(UUID.fromString(args.userId))
 
-        Box(
-            modifier = Modifier.nestedScroll(connection = pullToRefreshState.nestedScrollConnection)
-        ) {
-            LazyColumn(
-                modifier = Modifier.fillMaxSize()
+        var semester by rememberMutable(semesters.find { it.semester.current }!!)
+
+        val gradesDb = viewModel.gradesRepository.getBySemesterAndCredentialsId(semester.semester.number,UUID.fromString(args.userId))
+        if (gradesDb != null) {
+            val gradeList: List<Grade> = gradesDb.map { it.grade }
+            val uniqueSubjectNames: Set<String> = gradeList.map { it.subjectName }.sortedBy { it }.toSet()
+
+            Box(
+                modifier = Modifier.nestedScroll(connection = pullToRefreshState.nestedScrollConnection)
             ) {
-                item {
-                    if (refreshed) uniqueSubjectNames.forEach { subjectName ->
-                        SubjectCard(
-                            more = {
-                                val filterGrades =
-                                    gradeList.filter { it.subjectName == subjectName }
+                LazyColumn(
+                    modifier = Modifier.fillMaxSize()
+                ) {
+                    item {
+                        // TODO: make better UI
+                        Row(
+                            modifier = Modifier.fillMaxWidth().height(35.dp),
+                            horizontalArrangement = Arrangement.Center
+                        ) {
+                            for (s in semesters) {
+                                TextButton(
+                                    onClick = {
+                                        semester = s
+                                    }
+                                ) {
+                                    Text("${stringResource(R.string.Semester)} ${s.semester.number}")
+                                }
+                            }
+                        }
+                    }
+                    item {
+                        uniqueSubjectNames.forEach { subjectName ->
+                            SubjectCard(
+                                more = {
+                                    val filterGrades =
+                                        gradeList.filter { it.subjectName == subjectName }
 
-                                filterGrades.forEach { grade ->
-                                    Row(
-                                        modifier = Modifier
-                                            .fillMaxWidth()
-                                            .heightIn(min = 32.dp)
-                                            .padding(vertical = 2.dp),
-                                    ) {
-                                        val gradeColor = GradeColor.getColorByGrade(grade)
-                                        Avatar(
-                                            text = grade.value ?: "",
-                                            shape = AvatarShape.Rounded,
-                                            cardColors = if (gradeColor != null) {
-                                                CardDefaults.cardColors()
-                                                    .copy(
-                                                        containerColor = gradeColor.color,
-                                                        contentColor = if (gradeColor.color.luminance() > 0.5) {
-                                                            Color.Black
-                                                        } else Color.White
-                                                    )
-                                            } else CardDefaults.cardColors()
-                                        )
-
-                                        Column(
-                                            Modifier.fillMaxWidth()
-                                                .weight(1f)
-                                                .padding(horizontal = 10.dp)
+                                    filterGrades.forEach { grade ->
+                                        Row(
+                                            modifier = Modifier
+                                                .fillMaxWidth()
+                                                .heightIn(min = 32.dp)
+                                                .padding(vertical = 2.dp),
                                         ) {
-                                            Text(
-                                                text = grade.name,
-                                                maxLines = 1,
-                                                overflow = TextOverflow.Ellipsis
+                                            val gradeColor = GradeColor.getColorByGrade(grade)
+                                            Avatar(
+                                                text = grade.value ?: "",
+                                                shape = AvatarShape.Rounded,
+                                                cardColors = if (gradeColor != null) {
+                                                    CardDefaults.cardColors()
+                                                        .copy(
+                                                            containerColor = gradeColor.color,
+                                                            contentColor = if (gradeColor.color.luminance() > 0.5) {
+                                                                Color.Black
+                                                            } else Color.White
+                                                        )
+                                                } else CardDefaults.cardColors()
                                             )
-                                            Text(
-                                                fontSize = 12.sp,
-                                                text = "${grade.date}  ${stringResource(R.string.Weight)}: ${grade.weight}"
-                                            )
+
+                                            Column(
+                                                Modifier.fillMaxWidth()
+                                                    .weight(1f)
+                                                    .padding(horizontal = 10.dp)
+                                            ) {
+                                                Text(
+                                                    text = grade.name,
+                                                    maxLines = 1,
+                                                    overflow = TextOverflow.Ellipsis
+                                                )
+                                                Text(
+                                                    fontSize = 12.sp,
+                                                    text = "${grade.date}  ${stringResource(R.string.Weight)}: ${grade.weight}"
+                                                )
+                                            }
                                         }
                                     }
                                 }
-                            }
-                        ) {
-                            Text(subjectName)
+                            ) {
+                                Text(subjectName)
 
-                            val gradesAmount = viewModel.gradesRepository.countBySubjectAndCredentials(
-                                UUID.fromString(args.userId),
-                                subjectName
-                            )
-                            Text(
-                                fontSize = 12.sp,
-                                text = "$gradesAmount ${pluralStringResource(R.plurals.GradesAmount,gradesAmount)}"
-                            )
+                                val gradesAmount = viewModel.gradesRepository.countBySubjectSemesterAndCredentials(
+                                    id = UUID.fromString(args.userId),
+                                    semesterNumber = semester.semester.number,
+                                    subjectName = subjectName,
+                                )
+                                Text(
+                                    fontSize = 12.sp,
+                                    text = "$gradesAmount ${pluralStringResource(R.plurals.GradesAmount,gradesAmount)}"
+                                )
+                            }
                         }
                     }
                 }
             }
+        } else {
+            Text("Not loaded")
         }
-    } else {
-        Text("Not loaded")
     }
 }
 

@@ -10,6 +10,7 @@ import io.github.vulka.database.CredentialsDao
 import io.github.vulka.database.GradesDao
 import io.github.vulka.database.LuckyNumberDao
 import io.github.vulka.database.Repository
+import io.github.vulka.database.SemestersDao
 import io.github.vulka.database.Timetable
 import io.github.vulka.database.TimetableDao
 import javax.inject.Singleton
@@ -47,5 +48,11 @@ object RoomModule {
     @Provides
     fun provideTimetableRepository(repository: Repository): TimetableDao {
         return repository.timetable
+    }
+
+    @Singleton
+    @Provides
+    fun provideSemestersRepository(repository: Repository): SemestersDao {
+        return repository.semesters
     }
 }

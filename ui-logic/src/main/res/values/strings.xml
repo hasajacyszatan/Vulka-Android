@@ -47,4 +47,5 @@
     <string name="LessonHours">Hours</string>
     <string name="Date">Date</string>
     <string name="Lessons">Lessons</string>
+    <string name="Semester">Semester</string>
 </resources>

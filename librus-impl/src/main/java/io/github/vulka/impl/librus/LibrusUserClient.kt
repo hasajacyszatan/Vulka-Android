@@ -197,7 +197,7 @@ class LibrusUserClient(
     }
 
     override fun shouldSyncSemesters(student: Student): Boolean {
-        // Stub
+        // Stub, but maybe in Librus should stay always true
         return true
     }
 }
