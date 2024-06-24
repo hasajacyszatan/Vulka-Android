@@ -243,7 +243,15 @@ fun TimetableCard(
         icon = Icons.Default.Backpack,
         title = stringResource(R.string.Lessons)
     ) {
-        Text(text = stringResource(R.string.NoLessons))
+        val lessons = viewModel.timetableRepository.getByDateAndCredentialsId(userId, LocalDate.now())
+            .map { it.lesson }.sortedBy { it.position }
+        if (lessons.isNotEmpty()) {
+            for (lesson in lessons) {
+                Text(text = "${lesson.position}. ${lesson.subjectName}" + (if (lesson.room != null) " (${lesson.room})" else ""))
+            }
+        } else {
+            Text(text = stringResource(R.string.NoLessons))
+        }
     }
 }
 
