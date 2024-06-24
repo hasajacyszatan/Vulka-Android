@@ -1,6 +1,6 @@
 package io.github.vulka.impl.vulcan.hebe.login
 
-import io.github.vulka.core.api.log.LoggerFactory
+import android.util.Log
 import io.github.vulka.impl.vulcan.hebe.generateKeyPair
 import io.github.vulka.impl.vulcan.hebe.getKeyEntry
 import java.security.PrivateKey
@@ -16,7 +16,7 @@ data class HebeKeystore(
     }
 
     companion object {
-        private val log = LoggerFactory.get(HebeKeystore::class.java)
+        private const val TAG = "HebeKeystore"
 
         fun generateKeystoreName(symbol: String): String {
             // Key name must be random, without login we don't have any information about account
@@ -25,8 +25,6 @@ data class HebeKeystore(
 
         @Throws(Exception::class)
         fun restore(alias: String, firebaseToken: String?, deviceModel: String): HebeKeystore {
-            log.info("Restoring key pair...")
-
             val token = firebaseToken ?: ""
 
             val keystore = HebeKeystore(
@@ -36,13 +34,12 @@ data class HebeKeystore(
             )
             val (_, fingerprint, _) = keystore.getData()
 
-            log.debug("Generated for $deviceModel, sha1: $fingerprint")
+            Log.d(TAG, "Generated for $deviceModel, sha1: $fingerprint")
             return keystore
         }
 
         @Throws(Exception::class)
         fun create(alias: String, firebaseToken: String?, deviceModel: String): HebeKeystore {
-            log.debug("Generating key pair...")
             val (_, fingerprint, _) = generateKeyPair(alias)
 
             val token = firebaseToken ?: ""
@@ -53,9 +50,8 @@ data class HebeKeystore(
                 deviceModel = deviceModel
             )
 
-            log.debug("Generated for $deviceModel, sha1: $fingerprint")
+            Log.d(TAG, "Generated for $deviceModel, sha1: $fingerprint")
             return keystore
         }
-
     }
 }

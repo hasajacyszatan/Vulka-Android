@@ -155,7 +155,7 @@ fun StudentCard(
                 .weight(1f)
         ) {
             if (student.isParent) {
-                Text(student.parent!!.name)
+                Text(student.parent!!.fullName)
                 Text(
                     text = "${student.fullName} - ${stringResource(R.string.Parent)}",
                     fontSize = 12.sp

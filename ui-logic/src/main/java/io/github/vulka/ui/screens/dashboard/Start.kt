@@ -181,7 +181,7 @@ fun GradesCard(
     val gradesDb = viewModel.gradesRepository.getFromLastWeek(userId, LocalDate.now().minusWeeks(1))!!
 
     val gradeList: List<Grade> = gradesDb.map { it.grade }
-    val uniqueSubjectNames: Set<String> = gradeList.map { it.subjectName }.sortedBy { it }.toSet()
+    val uniqueSubjectNames: Set<String> = gradeList.map { it.subject }.sortedBy { it }.toSet()
 
     DashboardCard(
         icon = Icons.Default.Looks6,
@@ -202,7 +202,7 @@ fun GradesCard(
                                 25
                             ) + "..." else subject
                         )
-                        val filterGrades = gradeList.filter { it.subjectName == subject }
+                        val filterGrades = gradeList.filter { it.subject == subject }
 
                         for (grade in filterGrades) {
                             Card(
@@ -247,7 +247,7 @@ fun TimetableCard(
             .map { it.lesson }.sortedBy { it.position }
         if (lessons.isNotEmpty()) {
             for (lesson in lessons) {
-                Text(text = "${lesson.position}. ${lesson.subjectName}" + (if (lesson.room != null) " (${lesson.room})" else ""))
+                Text(text = "${lesson.position}. ${lesson.subjectName}" + (if (lesson.classRoom != null) " (${lesson.classRoom})" else ""))
             }
         } else {
             Text(text = stringResource(R.string.NoLessons))

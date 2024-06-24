@@ -15,6 +15,6 @@ interface LuckyNumberDao {
     @Update
     suspend fun update(luckyNumber: LuckyNumber)
 
-    @Query("SELECT * FROM luckynumber WHERE id = :id LIMIT 1")
-    fun get(id: UUID): LuckyNumber?
+    @Query("SELECT * FROM luckynumber WHERE credentialsId = :credentialsId LIMIT 1")
+    fun get(credentialsId: UUID): LuckyNumber?
 }

@@ -1,5 +1,6 @@
 package io.github.vulka.impl.vulcan
 
+import com.google.gson.Gson
 import io.github.vulka.core.api.LoginCredentials
 import io.github.vulka.core.api.UserClient
 import io.github.vulka.core.api.types.Grade
@@ -9,6 +10,7 @@ import io.github.vulka.core.api.types.LessonChangeType
 import io.github.vulka.core.api.types.Parent
 import io.github.vulka.core.api.types.Semester
 import io.github.vulka.core.api.types.Student
+import io.github.vulka.core.api.types.Teacher
 import io.github.vulka.impl.vulcan.hebe.VulcanHebeApi
 import io.github.vulka.impl.vulcan.hebe.types.HebeStudent
 import java.time.LocalDate
@@ -31,27 +33,29 @@ class VulcanUserClient(
 
         for (student in response) {
             val isParent = student.login.role == "Opiekun"
-            students.add(Student(
-                fullName = "${student.pupil.firstName} ${student.pupil.lastName}",
-                classId = student.classDisplay,
-                isParent = isParent,
-                parent = if (isParent) Parent(
-                    name = student.login.name
-                ) else null,
-                impl = student
-            ))
+            students.add(
+                Student(
+                    fullName = "${student.pupil.firstName} ${student.pupil.lastName}",
+                    classId = student.classDisplay,
+                    isParent = isParent,
+                    parent = if (isParent) Parent(
+                        fullName = student.login.name
+                    ) else null,
+                    customData = Gson().toJson(student)
+                )
+            )
         }
 
         return students.toArray(arrayOfNulls(students.size))
     }
 
     override suspend fun getLuckyNumber(student: Student): Int {
-        val hebeStudent = student.impl as HebeStudent
+        val hebeStudent = Gson().fromJson(student.customData, HebeStudent::class.java)
         return api.getLuckyNumber(hebeStudent, Date())
     }
 
     override suspend fun getGrades(student: Student, semester: Semester): Array<Grade> {
-        val hebeStudent = student.impl as HebeStudent
+        val hebeStudent = Gson().fromJson(student.customData, HebeStudent::class.java)
         val currentHebePeriod = hebeStudent.periods.find { it.current }!!
 
         val currentPeriod = hebeStudent.periods.find { it.number == semester.number && it.level == currentHebePeriod.level }!!
@@ -61,22 +65,25 @@ class VulcanUserClient(
         val grades = java.util.ArrayList<Grade>()
 
         for (grade in response) {
-            grades.add(Grade(
-                value = grade.content.replace("\\.0$".toRegex(), ""),
-                weight = grade.column.weight,
-                name = grade.column.name,
-                date = LocalDate.parse(grade.dateCreated.date),
-                subjectName = grade.column.subject.name,
-                subjectCode = grade.column.subject.code,
-                teacherName = grade.teacherCreated.displayName
-            ))
+            grades.add(
+                Grade(
+                    value = grade.content.replace("\\.0$".toRegex(), ""),
+                    weight = grade.column.weight,
+                    name = grade.column.name,
+                    date = LocalDate.parse(grade.dateCreated.date),
+                    subject = grade.column.subject.name,
+                    teacher = Teacher(
+                        fullName = grade.teacherCreated.displayName
+                    )
+                )
+            )
         }
 
         return grades.toTypedArray()
     }
 
     override suspend fun getLessons(student: Student, dateFrom: LocalDate, dateTo: LocalDate): Array<Lesson> {
-        val hebeStudent = student.impl as HebeStudent
+        val hebeStudent = Gson().fromJson(student.customData, HebeStudent::class.java)
 
         val lessonsResponse = api.getLessons(hebeStudent,dateFrom,dateTo)
         val changedLesson = api.getChangedLessons(hebeStudent,dateFrom,dateTo)
@@ -95,7 +102,7 @@ class VulcanUserClient(
                     subjectName = lesson.subject.name,
                     startTime = lesson.time.from,
                     endTime = lesson.time.to,
-                    room = lesson.room?.code,
+                    classRoom = lesson.room?.code,
                     position = lesson.time.position,
                     change = if (change != null) {
                         LessonChange(
@@ -105,9 +112,13 @@ class VulcanUserClient(
                                 else -> LessonChangeType.Replacement
                             },
                             message = change.teacherAbsenceEffectName,
-                            room = change.room?.code,
+                            classRoom = change.room?.code,
                             newSubjectName = change.subject?.name,
-                            newTeacherName = change.teacherPrimary?.displayName
+                            newTeacher = change.teacherPrimary?.displayName?.let {
+                                Teacher(
+                                    fullName = it
+                                )
+                            }
                         )
                     } else null,
                     date = LocalDate.parse(lesson.date.date),
@@ -120,7 +131,7 @@ class VulcanUserClient(
     }
 
     override suspend fun getSemesters(student: Student): Array<Semester> {
-        val hebeStudent = student.impl as HebeStudent
+        val hebeStudent = Gson().fromJson(student.customData, HebeStudent::class.java)
 
         val currentSemester = hebeStudent.periods.find { it.current }!!
         val currentYearSemesters = hebeStudent.periods.filter { it.level == currentSemester.level }
@@ -139,7 +150,7 @@ class VulcanUserClient(
     }
 
     override fun shouldSyncSemesters(student: Student): Boolean {
-        val hebeStudent = student.impl as HebeStudent
+        val hebeStudent = Gson().fromJson(student.customData, HebeStudent::class.java)
 
         val currentSemester = hebeStudent.periods.find { it.current }!!
 

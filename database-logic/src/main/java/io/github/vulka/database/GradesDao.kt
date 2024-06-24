@@ -22,12 +22,12 @@ interface GradesDao {
     @Query("DELETE FROM grades WHERE credentialsId = :id")
     fun deleteByCredentialsId(id: UUID)
 
-    @Query("SELECT * FROM grades WHERE credentialsId = :id AND semesterNumber = :semesterNumber")
-    fun getBySemesterAndCredentialsId(semesterNumber: Int,id: UUID): List<Grades>?
+    @Query("SELECT * FROM grades WHERE credentialsId = :id AND semester = :semester")
+    fun getBySemesterAndCredentialsId(semester: Int, id: UUID): List<Grades>?
 
-    @Query("SELECT COUNT(*) FROM grades WHERE subjectName = :subjectName AND credentialsId = :id AND semesterNumber = :semesterNumber")
-    fun countBySubjectSemesterAndCredentials(id: UUID,semesterNumber: Int,subjectName: String): Int
+    @Query("SELECT COUNT(*) FROM grades WHERE semester = :subjectName AND credentialsId = :id AND semester = :semester")
+    fun countBySubjectSemesterAndCredentials(id: UUID, semester: Int, subjectName: String): Int
 
     @Query("SELECT * FROM Grades WHERE DATE(date) >= DATE(:weekAgoDate) AND credentialsId = :id")
-    fun getFromLastWeek(id: UUID,weekAgoDate: LocalDate): List<Grades>?
+    fun getFromLastWeek(id: UUID, weekAgoDate: LocalDate): List<Grades>?
 }

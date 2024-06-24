@@ -168,7 +168,7 @@ private fun StudentBox(student: Student,studentsList: MutableList<Student>) {
 
         Column {
             if (student.isParent) {
-                Text(student.parent!!.name)
+                Text(student.parent!!.fullName)
                 Text(
                     text = "${student.fullName} - ${stringResource(R.string.Parent)}",
                     fontSize = 12.sp

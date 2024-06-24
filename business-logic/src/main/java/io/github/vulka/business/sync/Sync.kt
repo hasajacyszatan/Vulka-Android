@@ -1,7 +1,6 @@
 package io.github.vulka.business.sync
 
 import android.content.Context
-import android.util.Log
 import io.github.vulka.business.crypto.decryptCredentials
 import io.github.vulka.business.utils.getUserClient
 import io.github.vulka.core.api.Platform
@@ -41,7 +40,7 @@ suspend fun sync(
     } else {
         repository.luckyNumber.insert(
             LuckyNumber(
-                id = userId,
+                credentialsId = userId,
                 number = newLuckyNumber
             )
         )
@@ -67,7 +66,7 @@ suspend fun sync(
             repository.grades.insert(
                 Grades(
                     grade = grade,
-                    semesterNumber = semester.number,
+                    semester = semester.number,
                     credentialsId = userId
                 )
             )

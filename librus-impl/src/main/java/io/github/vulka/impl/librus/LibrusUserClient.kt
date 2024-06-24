@@ -9,7 +9,7 @@ import io.github.vulka.core.api.types.Lesson
 import io.github.vulka.core.api.types.Parent
 import io.github.vulka.core.api.types.Semester
 import io.github.vulka.core.api.types.Student
-import io.github.vulka.core.api.types.StudentImpl
+import io.github.vulka.core.api.types.Teacher
 import io.github.vulka.impl.librus.internal.api.internalRequestClass
 import io.github.vulka.impl.librus.internal.api.internalRequestClassrooms
 import io.github.vulka.impl.librus.internal.api.internalRequestGrades
@@ -63,10 +63,9 @@ class LibrusUserClient(
                 fullName = "${me.user.firstName} ${me.user.lastName}",
                 isParent = userProfile.accountType == UserProfile.AccountType.PARENT,
                 parent = Parent(
-                    name = "${me.account.firstName} ${me.account.lastName}"
+                    fullName = "${me.account.firstName} ${me.account.lastName}"
                 ),
-                classId = "${classInfo.number}${classInfo.symbol}",
-                impl = StudentImpl()
+                classId = "${classInfo.number}${classInfo.symbol}"
             )
         )
     }
@@ -95,9 +94,10 @@ class LibrusUserClient(
                     weight = category.weight ?: 0f,
                     name = category.name,
                     date = LocalDate.parse(grade.date),
-                    subjectName = subject.name,
-                    subjectCode = subject.short,
-                    teacherName = "${teacher?.firstName} ${teacher?.lastName}"
+                    subject = subject.name,
+                    teacher = Teacher(
+                        fullName = "${teacher?.firstName} ${teacher?.lastName}"
+                    )
                 )
             )
         }
@@ -145,7 +145,7 @@ class LibrusUserClient(
                             subjectName = lesson.subject.name,
                             position = lesson.lessonNo.toInt(),
                             teacherName = "${lesson.teacher.firstName} ${lesson.teacher.lastName}",
-                            room = classRooms.find { x -> x.id.toString() == lesson.classroom.id }?.name,
+                            classRoom = classRooms.find { x -> x.id.toString() == lesson.classroom.id }?.name,
                             groupName = lesson.virtualClassName ?: null,
                             date = currentDate,
                             startTime = lesson.hourFrom,

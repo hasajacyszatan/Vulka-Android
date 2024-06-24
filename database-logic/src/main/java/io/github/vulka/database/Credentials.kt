@@ -4,7 +4,7 @@ import androidx.room.Entity
 import androidx.room.PrimaryKey
 import io.github.vulka.core.api.Platform
 import io.github.vulka.core.api.types.Student
-import java.util.*
+import java.util.UUID
 
 @Entity
 data class Credentials(

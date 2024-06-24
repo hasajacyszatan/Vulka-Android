@@ -400,11 +400,11 @@ private fun LessonCard(
                             when (lesson.change!!.type) {
                                 LessonChangeType.Canceled -> lesson.change!!.message.orEmpty()
                                 LessonChangeType.Replacement ->
-                                    (if (!lesson.change!!.room.isNullOrEmpty()) "${lesson.change!!.room.orEmpty()} " else "") +
-                                            lesson.change!!.newTeacherName
+                                    (if (!lesson.change!!.classRoom.isNullOrEmpty()) "${lesson.change!!.classRoom.orEmpty()} " else "") +
+                                            lesson.change!!.newTeacher!!.fullName
                             }
                         else
-                            (if (!lesson.room.isNullOrEmpty()) "${lesson.room.orEmpty()} " else "") + lesson.teacherName
+                            (if (!lesson.classRoom.isNullOrEmpty()) "${lesson.classRoom.orEmpty()} " else "") + lesson.teacherName
                     )
                 }
 
@@ -454,10 +454,10 @@ private fun LessonDetails(lesson: Lesson) {
             }
         )
 
-        if (lesson.room != null) {
+        if (lesson.classRoom != null) {
             AnimatedTextField(
                 value = TextFieldValue(
-                    value = lesson.room!!,
+                    value = lesson.classRoom!!,
                     editable = false
                 ),
                 label = stringResource(R.string.ClassRoom),

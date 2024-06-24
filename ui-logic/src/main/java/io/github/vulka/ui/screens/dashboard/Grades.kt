@@ -138,7 +138,7 @@ fun GradesTab(
         val gradesDb = viewModel.gradesRepository.getBySemesterAndCredentialsId(semester.semester.number,UUID.fromString(args.userId))
         if (gradesDb != null) {
             val gradeList: List<Grade> = gradesDb.map { it.grade }
-            val uniqueSubjectNames: Set<String> = gradeList.map { it.subjectName }.sortedBy { it }.toSet()
+            val uniqueSubjectNames: Set<String> = gradeList.map { it.subject }.sortedBy { it }.toSet()
 
             Box(
                 modifier = Modifier.nestedScroll(connection = pullToRefreshState.nestedScrollConnection)
@@ -168,7 +168,7 @@ fun GradesTab(
                             SubjectCard(
                                 more = {
                                     val filterGrades =
-                                        gradeList.filter { it.subjectName == subjectName }
+                                        gradeList.filter { it.subject == subjectName }
 
                                     filterGrades.forEach { grade ->
                                         Row(
@@ -215,7 +215,7 @@ fun GradesTab(
 
                                 val gradesAmount = viewModel.gradesRepository.countBySubjectSemesterAndCredentials(
                                     id = UUID.fromString(args.userId),
-                                    semesterNumber = semester.semester.number,
+                                    semester = semester.semester.number,
                                     subjectName = subjectName,
                                 )
                                 Text(

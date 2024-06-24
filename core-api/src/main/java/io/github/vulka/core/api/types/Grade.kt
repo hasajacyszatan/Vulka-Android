@@ -7,8 +7,6 @@ data class Grade(
     val weight: Float,
     val name: String,
     val date: LocalDate,
-    val subjectName: String,
-    /** Subject code for filtering grades, usually subject name in lowercase */
-    val subjectCode: String,
-    val teacherName: String
+    val subject: String,
+    val teacher: Teacher
 )

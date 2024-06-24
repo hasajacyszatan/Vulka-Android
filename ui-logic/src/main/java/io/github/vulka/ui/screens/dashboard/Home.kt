@@ -311,7 +311,7 @@ fun SelectAccount(
                 modifier = Modifier.padding(horizontal = 10.dp)
             ) {
                 if (it.student.isParent) {
-                    Text(it.student.parent!!.name)
+                    Text(it.student.parent!!.fullName)
                     Text(
                         text = "${it.student.fullName} - ${stringResource(R.string.Parent)}",
                         fontSize = 12.sp

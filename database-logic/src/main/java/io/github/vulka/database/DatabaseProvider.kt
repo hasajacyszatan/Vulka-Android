@@ -8,7 +8,13 @@ import androidx.room.TypeConverters
 
 @Database(
     version = 1,
-    entities = [Credentials::class, LuckyNumber::class, Grades::class, Timetable::class, Semesters::class],
+    entities = [
+        Credentials::class,
+        LuckyNumber::class,
+        Grades::class,
+        Timetable::class,
+        Semesters::class
+    ],
     exportSchema = false
 )
 @TypeConverters(Converters::class)
@@ -27,10 +33,7 @@ object DatabaseProvider {
     private var database: VulkaDatabase? = null
 
     /**
-     * Get database instance. If database is not initialized, it will be initialize.
-     *
-     * @param context Application context.
-     * @return Database instance.
+     * Get database instance. If the database is not initialized, it will be initialize.
      */
     fun getInstance(context: Context): VulkaDatabase {
         if (database == null) {

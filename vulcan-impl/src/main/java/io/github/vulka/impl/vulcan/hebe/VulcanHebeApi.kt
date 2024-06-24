@@ -1,6 +1,5 @@
 package io.github.vulka.impl.vulcan.hebe
 
-import io.github.vulka.core.api.log.LoggerFactory
 import io.github.vulka.impl.vulcan.Utils
 import io.github.vulka.impl.vulcan.VulcanLoginCredentials
 import io.github.vulka.impl.vulcan.hebe.login.HebeKeystore
@@ -21,8 +20,6 @@ import java.time.format.DateTimeFormatter
 import java.util.*
 
 class VulcanHebeApi {
-    private val log = LoggerFactory.get(VulcanHebeApi::class.java)
-
     private lateinit var client: HebeHttpClient
     private lateinit var credentials: VulcanLoginCredentials
 
@@ -83,9 +80,6 @@ class VulcanHebeApi {
             selfIdentifier = Utils.uuid(fingerprint)
         )
 
-        log.info("URL: $fullUrl")
-        log.info("Registering to $lowerSymbol")
-
         val response = client.post(fullUrl, pfxRequest,HebeAccount::class.java)
 
         credentials = VulcanLoginCredentials(response!!,keystore)
@@ -96,8 +90,6 @@ class VulcanHebeApi {
         val baseUrl = credentials.account.restUrl
 
         val fullUrl = "$baseUrl${ApiEndpoints.STUDENT_LIST}"
-
-        log.info("Students URL: $fullUrl")
 
         return client.get(fullUrl, Array<HebeStudent>::class.java)!!
     }

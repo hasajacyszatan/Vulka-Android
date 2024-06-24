@@ -12,6 +12,6 @@ data class Grades(
     val id: UUID = UUID.randomUUID(),
     @Embedded
     val grade: Grade,
-    val semesterNumber: Int,
+    val semester: Int,
     val credentialsId: UUID
 )

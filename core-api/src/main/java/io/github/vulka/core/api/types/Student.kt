@@ -1,11 +1,6 @@
 package io.github.vulka.core.api.types
 
 /**
- * Student platform specific class
- */
-open class StudentImpl
-
-/**
  * Represent student account in e-journal
  */
 data class Student(
@@ -13,14 +8,12 @@ data class Student(
     val isParent: Boolean,
     val parent: Parent?,
     val classId: String?,
-
-    // Platform specific data (should be cast), don't use directly
-    val impl: StudentImpl
+    val customData: String? = null
 )
 
 /**
  * Represent parent of student
  */
 data class Parent(
-    val name: String
+    val fullName: String
 )

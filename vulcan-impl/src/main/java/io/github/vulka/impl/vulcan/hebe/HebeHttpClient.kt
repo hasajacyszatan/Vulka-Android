@@ -2,8 +2,6 @@ package io.github.vulka.impl.vulcan.hebe
 
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
-import io.github.vulka.core.api.log.Logger
-import io.github.vulka.core.api.log.LoggerFactory
 import io.github.vulka.impl.*
 import io.github.vulka.impl.vulcan.*
 import io.github.vulka.impl.vulcan.hebe.login.HebeKeystore
@@ -23,8 +21,6 @@ import java.util.*
 import java.util.regex.Pattern
 
 class HebeHttpClient(private val keystore: HebeKeystore) {
-    private val logger: Logger = LoggerFactory.get(HebeHttpClient::class.java)
-
     companion object {
         const val APP_NAME = "DzienniczekPlus 2.0"
         const val APP_VERSION = "1.4.2"
@@ -99,15 +95,9 @@ class HebeHttpClient(private val keystore: HebeKeystore) {
             setBody(payloadString)
         }
 
-        logger.debug("HTTP: POST")
-        logger.debug("HTTP Request URL: $url")
-        logger.debug("HTTP Response code: ${response.status.value}")
-
         val type = TypeToken.getParameterized(ApiResponse::class.java, clazz).type
         val responseBody = response.bodyAsText()
         val apiResponse = Gson().fromJson<ApiResponse<T>>(responseBody, type)
-
-        logger.debug("API Response code: ${apiResponse.status.code}")
 
         checkErrors(apiResponse)
 
@@ -122,55 +112,23 @@ class HebeHttpClient(private val keystore: HebeKeystore) {
             urlBuilder.parameters.append(key, value)
         }
 
-        val buildedUrl = urlBuilder.buildString()
-        val headers = buildHeaders(buildedUrl)
+        val builtUrl = urlBuilder.buildString()
+        val headers = buildHeaders(builtUrl)
 
-        val response: HttpResponse = client.get(buildedUrl) {
+        val response: HttpResponse = client.get(builtUrl) {
             headers {
                 headers.forEach { (key, value) -> append(key, value) }
             }
         }
 
-        logger.debug("HTTP: GET")
-        logger.debug("HTTP Request URL: $buildedUrl")
-        logger.debug("HTTP Response code: ${response.status.value}")
-
         val responseBody = response.bodyAsText()
-
-        logger.debug("HTTP Response body: $responseBody")
 
         val type = TypeToken.getParameterized(ApiResponse::class.java, clazz).type
         val apiResponse = Gson().fromJson<ApiResponse<T>>(responseBody, type)
 
-        logger.debug("API Response code: ${apiResponse.status.code}")
-
         checkErrors(apiResponse)
 
         return@runBlocking apiResponse.envelope
-    }
-
-    @Throws(IOException::class)
-    fun getDebug(url: String, query: Map<String, String>? = null): HttpResponse = runBlocking {
-        val urlBuilder = URLBuilder(url)
-
-        query?.forEach { (key, value) ->
-            urlBuilder.parameters.append(key, value)
-        }
-
-        val buildedUrl = urlBuilder.buildString()
-        val headers = buildHeaders(buildedUrl)
-
-        val response: HttpResponse = client.get(buildedUrl) {
-            headers {
-                headers.forEach { (key, value) -> append(key, value) }
-            }
-        }
-
-        logger.debug("HTTP: GET (DEBUG)")
-        logger.debug("HTTP Request URL: $buildedUrl")
-        logger.debug("HTTP Response body: ${response.bodyAsText()}")
-
-        return@runBlocking response
     }
 
     private fun checkErrors(apiResponse: ApiResponse<*>) {
@@ -179,29 +137,23 @@ class HebeHttpClient(private val keystore: HebeKeystore) {
 
         when (apiResponse.status.code) {
             200 -> {
-                logger.debug("Throw InvalidTokenException")
                 throw InvalidTokenException(apiResponse.status.message)
             }
             108 -> {
-                logger.debug("Throw UnauthorizedCertificateException")
                 throw UnauthorizedCertificateException(apiResponse.status.message)
             }
             203 -> {
-                logger.debug("Throw InvalidPINException")
                 throw InvalidPINException(apiResponse.status.message)
             }
             204 -> {
-                logger.debug("Throw ExpiredTokenException")
                 throw ExpiredTokenException(apiResponse.status.message)
             }
             -1 -> {
-                logger.debug("Throw InvalidSymbolException")
                 throw InvalidSymbolException(apiResponse.status.message)
             }
         }
 
         if (apiResponse.status.code != 0) {
-            logger.debug("Throw VulcanAPIException")
             throw VulcanAPIException("")
         }
     }

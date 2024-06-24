@@ -21,6 +21,10 @@ android {
     kotlinOptions {
         jvmTarget = JavaVersion.VERSION_17.toString()
     }
+
+    ksp {
+        arg("room.generateKotlin", "true")
+    }
 }
 
 dependencies {

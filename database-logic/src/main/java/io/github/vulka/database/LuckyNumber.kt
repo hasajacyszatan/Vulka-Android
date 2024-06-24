@@ -6,10 +6,7 @@ import java.util.UUID
 
 @Entity
 data class LuckyNumber(
-    /**
-     * ID corresponds to credentials id.
-     */
     @PrimaryKey
-    val id: UUID,
+    val credentialsId: UUID,
     val number: Int
 )
