@@ -20,12 +20,12 @@ interface TimetableDao {
     @Delete
     fun delete(timetable: Timetable)
 
-    @Query("DELETE FROM timetable WHERE credentialsId = :id AND DATE(lessonDate) BETWEEN DATE(:dateFrom) AND DATE(:dateTo)")
+    @Query("DELETE FROM timetable WHERE credentialsId = :id AND DATE(date) BETWEEN DATE(:dateFrom) AND DATE(:dateTo)")
     fun deleteRangeByCredentialsId(dateFrom: LocalDate, dateTo: LocalDate, id: UUID)
 
     @Query("DELETE FROM timetable WHERE credentialsId = :id")
     fun deleteByCredentialsId(id: UUID)
 
-    @Query("SELECT * FROM timetable WHERE credentialsId = :id AND lessonDate = :date")
+    @Query("SELECT * FROM timetable WHERE credentialsId = :id AND date = :date")
     fun getByDateAndCredentialsId(id: UUID, date: LocalDate): List<Timetable>
 }
