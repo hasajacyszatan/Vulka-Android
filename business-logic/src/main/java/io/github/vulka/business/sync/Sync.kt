@@ -82,7 +82,6 @@ suspend fun sync(
         repository.timetable.insert(
             Timetable(
                 lesson = lesson,
-                lessonDate = lesson.date,
                 lastSync = now,
                 credentialsId = userId
             )
@@ -112,7 +111,6 @@ suspend fun syncTimetableAtSwitch(context: Context, client: UserClient, student:
         repository.timetable.insert(
             Timetable(
                 lesson = lesson,
-                lessonDate = lesson.date,
                 lastSync = now,
                 credentialsId = userId
             )
