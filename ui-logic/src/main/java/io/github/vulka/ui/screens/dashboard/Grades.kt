@@ -25,7 +25,6 @@ import androidx.compose.material3.TabRow
 import androidx.compose.material3.TabRowDefaults
 import androidx.compose.material3.TabRowDefaults.tabIndicatorOffset
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.material3.pulltorefresh.PullToRefreshState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -50,6 +49,8 @@ import io.github.vulka.ui.R
 import io.github.vulka.ui.VulkaViewModel
 import io.github.vulka.ui.common.Avatar
 import io.github.vulka.ui.common.AvatarShape
+import io.github.vulka.ui.common.SegmentedButtonItem
+import io.github.vulka.ui.common.SegmentedButtons
 import kotlinx.serialization.Serializable
 import java.util.UUID
 
@@ -147,18 +148,21 @@ fun GradesTab(
                     modifier = Modifier.fillMaxSize()
                 ) {
                     item {
-                        // TODO: make better UI
                         Row(
-                            modifier = Modifier.fillMaxWidth().height(35.dp),
+                            modifier = Modifier
+                                .padding(horizontal = 50.dp)
+                                .padding(top = 10.dp)
+                                .fillMaxWidth()
+                                .height(35.dp),
                             horizontalArrangement = Arrangement.Center
                         ) {
-                            for (s in semesters) {
-                                TextButton(
-                                    onClick = {
-                                        semester = s
-                                    }
-                                ) {
-                                    Text("${stringResource(R.string.Semester)} ${s.semester.number}")
+                            SegmentedButtons {
+                                for (s in semesters) {
+                                    SegmentedButtonItem(
+                                        selected = semester.semester.number == s.semester.number,
+                                        onClick = { semester = s },
+                                        label = { Text("${stringResource(R.string.Semester)} ${s.semester.number}") }
+                                    )
                                 }
                             }
                         }
