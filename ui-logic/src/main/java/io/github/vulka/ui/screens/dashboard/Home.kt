@@ -20,6 +20,11 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Snackbar
+import androidx.compose.material3.SnackbarDuration
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.SnackbarResult
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
@@ -50,6 +55,7 @@ import io.github.vulka.database.Credentials
 import io.github.vulka.ui.R
 import io.github.vulka.ui.VulkaViewModel
 import io.github.vulka.ui.common.Avatar
+import io.github.vulka.ui.common.ErrorDialog
 import io.github.vulka.ui.screens.dashboard.more.AccountManager
 import io.github.vulka.ui.utils.getInitials
 import kotlinx.serialization.Serializable
@@ -88,6 +94,10 @@ fun HomeScreen(
     // If data was saved in DB and now can be safely loaded
     var refreshed by rememberMutable(!args.firstSync)
 
+    val snackBarState by rememberMutable(SnackbarHostState())
+    val errorDialogState = rememberDialogState()
+    var exception: Exception? by rememberMutable(null)
+
     LaunchedEffect(Unit) {
         if (!wasRefreshed) {
             pullToRefreshState.startRefresh()
@@ -110,8 +120,21 @@ fun HomeScreen(
                         student = student
                     )
                 } catch (e: Exception) {
-                    e.printStackTrace()
                     refreshed = true
+                    runOnIOThread {
+                        val snackBarResult = snackBarState.showSnackbar(
+                            message = "${context.getText(R.string.Error)}: ${e.message}",
+                            actionLabel = context.getText(R.string.Details).toString(),
+                            duration = SnackbarDuration.Long
+                        )
+                        when (snackBarResult) {
+                            SnackbarResult.ActionPerformed -> {
+                                exception = e
+                                errorDialogState.show()
+                            }
+                            else -> {}
+                        }
+                    }
                 }
 
                 pullToRefreshState.endRefresh()
@@ -156,6 +179,16 @@ fun HomeScreen(
                     }
                 }
             )
+        },
+        snackbarHost = {
+            SnackbarHost(snackBarState) { data ->
+                Snackbar(
+                    snackbarData = data,
+                    containerColor = MaterialTheme.colorScheme.surfaceContainer,
+                    contentColor = MaterialTheme.colorScheme.onSurface,
+                    actionColor = MaterialTheme.colorScheme.primary
+                )
+            }
         },
         bottomBar = {
             NavigationBar {
@@ -248,6 +281,11 @@ fun HomeScreen(
         credentials = dbCredentials,
         navController = navController,
         args = args
+    )
+
+    ErrorDialog(
+        dialogState = errorDialogState,
+        error = exception
     )
 }
 

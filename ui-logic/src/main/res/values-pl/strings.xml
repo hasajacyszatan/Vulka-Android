@@ -46,4 +46,9 @@
     <string name="Date">Data</string>
     <string name="Lessons">Lekcje</string>
     <string name="Semester">Semestr</string>
+    <string name="Error">Błąd</string>
+    <string name="Copy">Kopiuj</string>
+    <string name="Cancel">Anuluj</string>
+    <string name="Copied">Skopiowano</string>
+    <string name="Details">Szczegóły</string>
 </resources>

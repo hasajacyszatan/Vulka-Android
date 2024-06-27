@@ -48,4 +48,9 @@
     <string name="Date">Date</string>
     <string name="Lessons">Lessons</string>
     <string name="Semester">Semester</string>
+    <string name="Error">Error</string>
+    <string name="Copy">Copy</string>
+    <string name="Cancel">Cancel</string>
+    <string name="Copied">Copied</string>
+    <string name="Details">Details</string>
 </resources>

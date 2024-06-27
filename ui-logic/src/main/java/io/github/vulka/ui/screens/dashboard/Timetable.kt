@@ -28,6 +28,7 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.contentColorFor
@@ -42,6 +43,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -53,6 +55,7 @@ import dev.medzik.android.compose.rememberMutable
 import dev.medzik.android.compose.ui.IconBox
 import dev.medzik.android.compose.ui.bottomsheet.BaseBottomSheet
 import dev.medzik.android.compose.ui.bottomsheet.rememberBottomSheetState
+import dev.medzik.android.compose.ui.dialog.rememberDialogState
 import dev.medzik.android.compose.ui.textfield.AnimatedTextField
 import dev.medzik.android.compose.ui.textfield.TextFieldValue
 import dev.medzik.android.utils.runOnIOThread
@@ -65,6 +68,7 @@ import io.github.vulka.core.api.types.Lesson
 import io.github.vulka.core.api.types.LessonChangeType
 import io.github.vulka.ui.R
 import io.github.vulka.ui.VulkaViewModel
+import io.github.vulka.ui.common.ErrorDialog
 import kotlinx.coroutines.launch
 import kotlinx.serialization.Serializable
 import java.time.DayOfWeek
@@ -119,6 +123,10 @@ fun TimetableScreen(
     var userClientCredentialsRenewed by rememberMutable(false)
     val student by rememberMutable(getStudentFromCredentials(context,UUID.fromString(args.userId)))
 
+    var exception: Exception? by rememberMutable(null)
+    var loadingError by rememberMutable(false)
+    val errorDialogState = rememberDialogState()
+
     fun syncTimetable() {
         if (!checkIfTimetableShouldBeSync(context, currentDate,UUID.fromString(args.userId)))
             return
@@ -131,7 +139,13 @@ fun TimetableScreen(
 
             timetableRefreshing = true
 
-            syncTimetableAtSwitch(context,client,student,currentDate,UUID.fromString(args.userId))
+            try {
+                loadingError = false
+                syncTimetableAtSwitch(context,client,student,currentDate,UUID.fromString(args.userId))
+            } catch (e: Exception) {
+                loadingError = true
+                exception = e
+            }
 
             timetableRefreshing = false
         }
@@ -150,7 +164,39 @@ fun TimetableScreen(
                 date
             ).sortedBy { it.lesson.position }
 
-            if (!timetableRefreshing) {
+            if (loadingError) {
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 16.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.Center
+                ) {
+                    IconBox(
+                        imageVector = Icons.Default.Backpack,
+                        modifier = Modifier.size(100.dp)
+                    )
+
+                    Spacer(
+                        modifier = Modifier.height(10.dp)
+                    )
+
+                    Text(
+                        modifier = Modifier.padding(20.dp),
+                        text = "${stringResource(R.string.Error)}: ${exception?.message}",
+                        fontSize = 15.sp,
+                        textAlign = TextAlign.Center
+                    )
+
+                    OutlinedButton(
+                        onClick = {
+                            errorDialogState.show()
+                        }
+                    ) {
+                        Text(text = stringResource(R.string.Details))
+                    }
+                }
+            } else if (!timetableRefreshing) {
                 if (lessons.isEmpty()) {
                     Column(
                         modifier = Modifier
@@ -225,6 +271,11 @@ fun TimetableScreen(
             }
         }
     }
+
+    ErrorDialog(
+        dialogState = errorDialogState,
+        error = exception
+    )
 }
 
 @Composable
@@ -401,7 +452,7 @@ private fun LessonCard(
                                 LessonChangeType.Canceled -> lesson.change!!.message.orEmpty()
                                 LessonChangeType.Replacement ->
                                     (if (!lesson.change!!.classRoom.isNullOrEmpty()) "${lesson.change!!.classRoom.orEmpty()} " else "") +
-                                            lesson.change!!.newTeacher!!.fullName
+                                            lesson.change!!.newTeacher?.fullName
                             }
                         else
                             (if (!lesson.classRoom.isNullOrEmpty()) "${lesson.classRoom.orEmpty()} " else "") + lesson.teacherName

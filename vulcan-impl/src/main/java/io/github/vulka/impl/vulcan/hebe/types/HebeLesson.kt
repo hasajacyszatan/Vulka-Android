@@ -16,7 +16,7 @@ data class HebeLesson(
     @SerializedName("TeacherSecondary")
     val secondTeacher: HebeTeacher? = null,
     @SerializedName("Subject")
-    val subject: HebeSubject,
+    val subject: HebeSubject?,
     @SerializedName("Event")
     val event: String? = null,
     @SerializedName("Change")

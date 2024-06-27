@@ -99,7 +99,7 @@ class VulcanUserClient(
 
             lessons.add(
                 Lesson(
-                    subjectName = lesson.subject.name,
+                    subjectName = lesson.subject?.name ?: "",
                     startTime = lesson.time.from,
                     endTime = lesson.time.to,
                     classRoom = lesson.room?.code,
