@@ -20,6 +20,10 @@
 # hide the original source file name.
 #-renamesourcefileattribute SourceFile
 
+# General
+-dontobfuscate
+-ignorewarnings
+
 # Fix SLF4J errors
 -dontwarn org.slf4j.impl.StaticLoggerBinder
 
