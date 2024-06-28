@@ -51,4 +51,6 @@
     <string name="Cancel">Anuluj</string>
     <string name="Copied">Skopiowano</string>
     <string name="Details">Szczegóły</string>
+    <string name="Attendance">Frekwencja</string>
+    <string name="More">Więcej</string>
 </resources>

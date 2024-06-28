@@ -11,6 +11,8 @@ import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.EventNote
+import androidx.compose.material.icons.automirrored.filled.Notes
 import androidx.compose.material.icons.filled.Backpack
 import androidx.compose.material.icons.filled.Dashboard
 import androidx.compose.material.icons.filled.Looks6
@@ -160,7 +162,9 @@ fun HomeScreen(
                         text = when (bottomSelected) {
                             Start -> stringResource(R.string.Home)
                             Grades -> stringResource(R.string.Grades)
+                            Attendance -> stringResource(R.string.Grades)
                             Timetable -> stringResource(R.string.Timetable)
+                            More -> stringResource(R.string.More)
                             else -> ""
                         }
                     )
@@ -219,6 +223,18 @@ fun HomeScreen(
                 NavigationBarItem(
                     alwaysShowLabel = true,
                     icon = { Icon(
+                        imageVector = Icons.AutoMirrored.Filled.EventNote,
+                        contentDescription = null
+                    ) },
+                    label = { Text(stringResource(R.string.Attendance)) },
+                    selected = bottomSelected == Attendance,
+                    onClick = {
+                        bottomSelected = Attendance
+                    }
+                )
+                NavigationBarItem(
+                    alwaysShowLabel = true,
+                    icon = { Icon(
                         imageVector = Icons.Default.Backpack,
                         contentDescription = null
                     ) },
@@ -226,6 +242,18 @@ fun HomeScreen(
                     selected = bottomSelected == Timetable,
                     onClick = {
                         bottomSelected = Timetable
+                    }
+                )
+                NavigationBarItem(
+                    alwaysShowLabel = true,
+                    icon = { Icon(
+                        imageVector = Icons.AutoMirrored.Filled.Notes,
+                        contentDescription = null
+                    ) },
+                    label = { Text(stringResource(R.string.More)) },
+                    selected = bottomSelected == More,
+                    onClick = {
+                        bottomSelected = More
                     }
                 )
             }
@@ -263,9 +291,27 @@ fun HomeScreen(
                         refreshed = refreshed
                     )
                 }
+                Attendance -> {
+                    AttendanceScreen(
+                        args = Attendance(
+                            platform = args.platform,
+                            userId = args.userId,
+                            credentials = args.credentials
+                        )
+                    )
+                }
                 Timetable -> {
                     TimetableScreen(
                         args = Timetable(
+                            platform = args.platform,
+                            userId = args.userId,
+                            credentials = args.credentials
+                        )
+                    )
+                }
+                More -> {
+                    MoreScreen(
+                        args = More(
                             platform = args.platform,
                             userId = args.userId,
                             credentials = args.credentials

@@ -53,4 +53,6 @@
     <string name="Cancel">Cancel</string>
     <string name="Copied">Copied</string>
     <string name="Details">Details</string>
+    <string name="Attendance">Attendance</string>
+    <string name="More">More</string>
 </resources>
