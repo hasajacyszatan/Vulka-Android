@@ -176,7 +176,7 @@ class VulcanHebeApi {
         return@runBlocking response
     }
 
-    fun getSummary(student: HebeStudent, period: HebePeriod) = runBlocking {
+    fun getSummaryGrades(student: HebeStudent, period: HebePeriod) = runBlocking {
         val baseUrl = getRestUrl(student)
 
         val response = client.get(
@@ -195,7 +195,7 @@ class VulcanHebeApi {
         return@runBlocking response
     }
 
-    fun getAverage(student: HebeStudent, period: HebePeriod) = runBlocking {
+    fun getAverages(student: HebeStudent, period: HebePeriod) = runBlocking {
         val baseUrl = getRestUrl(student)
 
         val response = client.get(

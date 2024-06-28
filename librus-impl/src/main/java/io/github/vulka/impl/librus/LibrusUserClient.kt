@@ -4,13 +4,12 @@ import com.google.gson.Gson
 import com.google.gson.JsonObject
 import com.google.gson.reflect.TypeToken
 import io.github.vulka.core.api.UserClient
-import io.github.vulka.core.api.types.Average
-import io.github.vulka.core.api.types.EndGrade
 import io.github.vulka.core.api.types.Grade
 import io.github.vulka.core.api.types.Lesson
 import io.github.vulka.core.api.types.Parent
 import io.github.vulka.core.api.types.Semester
 import io.github.vulka.core.api.types.Student
+import io.github.vulka.core.api.types.Summary
 import io.github.vulka.core.api.types.Teacher
 import io.github.vulka.impl.librus.internal.api.internalRequestClass
 import io.github.vulka.impl.librus.internal.api.internalRequestClassrooms
@@ -198,30 +197,20 @@ class LibrusUserClient(
         return semesters.toTypedArray()
     }
 
-    override suspend fun getEndGrades(student: Student, semester: Semester): Array<EndGrade> {
+    override suspend fun getSummary(student: Student, semester: Semester): Array<Summary> {
         // Stub
-        val endGrades = ArrayList<EndGrade>()
-        endGrades.add(
-            EndGrade(
+        val summary = ArrayList<Summary>()
+        summary.add(
+            Summary(
                 proposedGrade = "4",
                 endGrade = "5",
-                subject = "Stub subject"
-            )
-        )
-        return endGrades.toTypedArray()
-    }
-
-    override suspend fun getSubjectAverages(student: Student, semester: Semester): Array<Average> {
-        // Stub
-        val averages = ArrayList<Average>()
-        averages.add(
-            Average(
                 average = 4.80f,
                 subject = "Stub subject"
             )
         )
-        return averages.toTypedArray()
+        return summary.toTypedArray()
     }
+
 
     override fun shouldSyncSemesters(student: Student): Boolean {
         // Stub, but maybe in Librus should stay always true

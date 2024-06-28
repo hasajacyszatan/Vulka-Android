@@ -3,8 +3,6 @@ package io.github.vulka.impl.vulcan
 import com.google.gson.Gson
 import io.github.vulka.core.api.LoginCredentials
 import io.github.vulka.core.api.UserClient
-import io.github.vulka.core.api.types.Average
-import io.github.vulka.core.api.types.EndGrade
 import io.github.vulka.core.api.types.Grade
 import io.github.vulka.core.api.types.Lesson
 import io.github.vulka.core.api.types.LessonChange
@@ -12,6 +10,7 @@ import io.github.vulka.core.api.types.LessonChangeType
 import io.github.vulka.core.api.types.Parent
 import io.github.vulka.core.api.types.Semester
 import io.github.vulka.core.api.types.Student
+import io.github.vulka.core.api.types.Summary
 import io.github.vulka.core.api.types.Teacher
 import io.github.vulka.impl.vulcan.hebe.VulcanHebeApi
 import io.github.vulka.impl.vulcan.hebe.types.HebeStudent
@@ -150,49 +149,45 @@ class VulcanUserClient(
         return semesters.toTypedArray()
     }
 
-    override suspend fun getEndGrades(student: Student, semester: Semester): Array<EndGrade> {
+    override suspend fun getSummary(student: Student, semester: Semester): Array<Summary> {
         val hebeStudent = Gson().fromJson(student.customData, HebeStudent::class.java)
         val currentHebePeriod = hebeStudent.periods.find { it.current }!!
 
         val currentPeriod = hebeStudent.periods.find { it.number == semester.number && it.level == currentHebePeriod.level }!!
 
-        val response = api.getSummary(hebeStudent,currentPeriod)
+        val endGradesResponse = api.getSummaryGrades(hebeStudent,currentPeriod)
+        val averagesResponse = api.getAverages(hebeStudent,currentPeriod)
 
-        val grades = ArrayList<EndGrade>()
+        val summaryMap = mutableMapOf<String, Summary>()
 
-        for (grade in response) {
-            grades.add(
-                EndGrade(
-                    proposedGrade = grade.entry1,
-                    endGrade = grade.entry2,
-                    subject = grade.subject.name
-                )
+        endGradesResponse.forEach { endGrade ->
+            val subjectName = endGrade.subject.name
+            summaryMap[subjectName] = Summary(
+                proposedGrade = endGrade.entry1,
+                endGrade = endGrade.entry2,
+                average = null,
+                subject = subjectName
             )
         }
 
-        return grades.toTypedArray()
-    }
+        averagesResponse.forEach { averageGrade ->
+            val subjectName = averageGrade.subject.name
+            val averageValue = averageGrade.average?.replace(",",".")?.toFloatOrNull()
 
-    override suspend fun getSubjectAverages(student: Student, semester: Semester): Array<Average> {
-        val hebeStudent = Gson().fromJson(student.customData, HebeStudent::class.java)
-        val currentHebePeriod = hebeStudent.periods.find { it.current }!!
-
-        val currentPeriod = hebeStudent.periods.find { it.number == semester.number && it.level == currentHebePeriod.level }!!
-
-        val response = api.getAverage(hebeStudent,currentPeriod)
-
-        val averages = ArrayList<Average>()
-
-        for (average in response) {
-            averages.add(
-                Average(
-                    average = average.average?.replace(",",".")?.toFloat(),
-                    subject = average.subject.name
+            if (summaryMap.containsKey(subjectName)) {
+                val existingSummary = summaryMap[subjectName]!!
+                summaryMap[subjectName] = existingSummary.copy(average = averageValue)
+            } else {
+                summaryMap[subjectName] = Summary(
+                    proposedGrade = null,
+                    endGrade = null,
+                    average = averageValue,
+                    subject = subjectName
                 )
-            )
+            }
         }
 
-        return averages.toTypedArray()
+        return summaryMap.values.toTypedArray()
     }
 
     override fun shouldSyncSemesters(student: Student): Boolean {
