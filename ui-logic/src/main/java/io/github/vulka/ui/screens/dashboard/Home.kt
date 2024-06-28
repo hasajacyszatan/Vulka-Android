@@ -18,7 +18,6 @@ import androidx.compose.material.icons.filled.Backpack
 import androidx.compose.material.icons.filled.Dashboard
 import androidx.compose.material.icons.filled.Looks6
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
@@ -48,6 +47,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import dev.medzik.android.compose.rememberMutable
+import dev.medzik.android.compose.ui.IconBox
 import dev.medzik.android.compose.ui.dialog.DialogState
 import dev.medzik.android.compose.ui.dialog.PickerDialog
 import dev.medzik.android.compose.ui.dialog.rememberDialogState
@@ -207,64 +207,59 @@ fun HomeScreen(
 
             NavigationBar {
                 NavigationBarItem(
-                    alwaysShowLabel = true,
-                    icon = { Icon(
-                        imageVector = Icons.Default.Dashboard,
-                        contentDescription = null
-                    ) },
+                    icon = {
+                        IconBox(Icons.Default.Dashboard)
+                    },
                     label = { NavigationBarItemLabel(R.string.Home) },
                     selected = bottomSelected == Start ,
                     onClick = {
                         bottomSelected = Start
-                    }
+                    },
+                    alwaysShowLabel = false
                 )
                 NavigationBarItem(
-                    alwaysShowLabel = true,
-                    icon = { Icon(
-                        imageVector = Icons.Default.Looks6,
-                        contentDescription = null
-                    ) },
+                    icon = {
+                        IconBox(Icons.Default.Looks6)
+                    },
                     label = { NavigationBarItemLabel(R.string.Grades) },
                     selected = bottomSelected == Grades,
                     onClick = {
                         bottomSelected = Grades
-                    }
+                    },
+                    alwaysShowLabel = false
                 )
                 NavigationBarItem(
-                    alwaysShowLabel = true,
-                    icon = { Icon(
-                        imageVector = Icons.AutoMirrored.Filled.EventNote,
-                        contentDescription = null
-                    ) },
+                    icon = {
+                        IconBox(Icons.AutoMirrored.Filled.EventNote)
+                    },
                     label = { NavigationBarItemLabel(R.string.Attendance) },
                     selected = bottomSelected == Attendance,
                     onClick = {
                         bottomSelected = Attendance
-                    }
+                    },
+                    alwaysShowLabel = false,
                 )
                 NavigationBarItem(
-                    alwaysShowLabel = true,
-                    icon = { Icon(
-                        imageVector = Icons.Default.Backpack,
-                        contentDescription = null
-                    ) },
+                    icon = {
+                        IconBox(Icons.Default.Backpack)
+                    },
                     label = { NavigationBarItemLabel(R.string.Timetable) },
                     selected = bottomSelected == Timetable,
                     onClick = {
                         bottomSelected = Timetable
-                    }
+                    },
+                    alwaysShowLabel = false,
                 )
                 NavigationBarItem(
-                    alwaysShowLabel = true,
-                    icon = { Icon(
-                        imageVector = Icons.AutoMirrored.Filled.Notes,
-                        contentDescription = null
-                    ) },
+                    icon = {
+                        IconBox(Icons.AutoMirrored.Filled.Notes)
+                    },
                     label = { NavigationBarItemLabel(R.string.More) },
                     selected = bottomSelected == More,
                     onClick = {
                         bottomSelected = More
-                    }
+                    },
+                    alwaysShowLabel = false
                 )
             }
         }
