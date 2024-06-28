@@ -1,5 +1,6 @@
 package io.github.vulka.ui.screens.dashboard
 
+import androidx.annotation.StringRes
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Box
@@ -40,6 +41,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -195,6 +197,14 @@ fun HomeScreen(
             }
         },
         bottomBar = {
+            @Composable
+            fun NavigationBarItemLabel(@StringRes resId: Int) {
+                Text(
+                    text = stringResource(resId),
+                    textAlign = TextAlign.Center
+                )
+            }
+
             NavigationBar {
                 NavigationBarItem(
                     alwaysShowLabel = true,
@@ -202,7 +212,7 @@ fun HomeScreen(
                         imageVector = Icons.Default.Dashboard,
                         contentDescription = null
                     ) },
-                    label = { Text(stringResource(R.string.Home)) },
+                    label = { NavigationBarItemLabel(R.string.Home) },
                     selected = bottomSelected == Start ,
                     onClick = {
                         bottomSelected = Start
@@ -214,7 +224,7 @@ fun HomeScreen(
                         imageVector = Icons.Default.Looks6,
                         contentDescription = null
                     ) },
-                    label = { Text(stringResource(R.string.Grades)) },
+                    label = { NavigationBarItemLabel(R.string.Grades) },
                     selected = bottomSelected == Grades,
                     onClick = {
                         bottomSelected = Grades
@@ -226,7 +236,7 @@ fun HomeScreen(
                         imageVector = Icons.AutoMirrored.Filled.EventNote,
                         contentDescription = null
                     ) },
-                    label = { Text(stringResource(R.string.Attendance)) },
+                    label = { NavigationBarItemLabel(R.string.Attendance) },
                     selected = bottomSelected == Attendance,
                     onClick = {
                         bottomSelected = Attendance
@@ -238,7 +248,7 @@ fun HomeScreen(
                         imageVector = Icons.Default.Backpack,
                         contentDescription = null
                     ) },
-                    label = { Text(stringResource(R.string.Timetable)) },
+                    label = { NavigationBarItemLabel(R.string.Timetable) },
                     selected = bottomSelected == Timetable,
                     onClick = {
                         bottomSelected = Timetable
@@ -250,7 +260,7 @@ fun HomeScreen(
                         imageVector = Icons.AutoMirrored.Filled.Notes,
                         contentDescription = null
                     ) },
-                    label = { Text(stringResource(R.string.More)) },
+                    label = { NavigationBarItemLabel(R.string.More) },
                     selected = bottomSelected == More,
                     onClick = {
                         bottomSelected = More
