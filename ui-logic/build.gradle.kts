@@ -25,6 +25,10 @@ android {
     kotlinOptions {
         jvmTarget = JavaVersion.VERSION_17.toString()
     }
+
+    buildFeatures {
+        compose = true
+    }
 }
 
 dependencies {
@@ -51,7 +55,9 @@ dependencies {
     implementation(projects.vulcanImpl)
     implementation(projects.librusImpl)
     implementation(projects.databaseLogic)
-    testImplementation(libs.junit)
-    androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
+    androidTestImplementation(libs.androidx.junit)
+    debugImplementation(libs.compose.ui.test.manifest)
+    debugImplementation(libs.compose.ui.tooling)
+    testImplementation(libs.junit)
 }

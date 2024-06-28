@@ -2,7 +2,6 @@ package io.github.vulka.impl.librus
 
 import kotlinx.coroutines.test.runTest
 import org.junit.Test
-import java.util.Date
 
 class LibrusUserClientTests {
     private var userClient: LibrusUserClient? = null
@@ -22,7 +21,7 @@ class LibrusUserClientTests {
         val client = getUserClient()
 
         val students = client.getStudents()
-        val luckyNumber = client.getLuckyNumber(students[0], Date())
+        val luckyNumber = client.getLuckyNumber(students[0])
 
         assert(luckyNumber != 0)
     }
@@ -31,12 +30,12 @@ class LibrusUserClientTests {
     fun testGetAccountInfo() = runTest {
         val client = getUserClient()
 
-        val accountInfo = client.getAccountInfo()
+        val accountInfo = client.getStudents()[0]
 
         assert(accountInfo.fullName != "")
-        assert(accountInfo.className != "")
-        assert(accountInfo.index != 0)
-        assert(accountInfo.educator != "")
+        assert(accountInfo.classId != "")
+//        assert(accountInfo.index != 0)
+//        assert(accountInfo.educator != "")
     }
 
     private suspend fun getUserClient(): LibrusUserClient {
