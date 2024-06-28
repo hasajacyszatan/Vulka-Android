@@ -1,6 +1,5 @@
 package io.github.vulka.impl.vulcan.hebe
 
-import android.content.Context
 import android.security.keystore.KeyGenParameterSpec
 import android.security.keystore.KeyProperties
 import com.migcomponents.migbase64.Base64

@@ -23,13 +23,10 @@ data class HebeKeystore(
             return "vulcan_hebe_key_$symbol-${Random.nextInt()}"
         }
 
-        @Throws(Exception::class)
         fun restore(alias: String, firebaseToken: String?, deviceModel: String): HebeKeystore {
-            val token = firebaseToken ?: ""
-
             val keystore = HebeKeystore(
                 privateKeyAlias = alias,
-                firebaseToken = token,
+                firebaseToken = firebaseToken.orEmpty(),
                 deviceModel = deviceModel
             )
             val (_, fingerprint, _) = keystore.getData()
@@ -38,15 +35,12 @@ data class HebeKeystore(
             return keystore
         }
 
-        @Throws(Exception::class)
         fun create(alias: String, firebaseToken: String?, deviceModel: String): HebeKeystore {
             val (_, fingerprint, _) = generateKeyPair(alias)
 
-            val token = firebaseToken ?: ""
-
             val keystore = HebeKeystore(
                 privateKeyAlias = alias,
-                firebaseToken = token,
+                firebaseToken = firebaseToken.orEmpty(),
                 deviceModel = deviceModel
             )
 

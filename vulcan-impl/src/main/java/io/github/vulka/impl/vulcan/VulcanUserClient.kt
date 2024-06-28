@@ -16,7 +16,6 @@ import io.github.vulka.impl.vulcan.hebe.types.HebeStudent
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.ZoneOffset
-import java.util.Date
 
 class VulcanUserClient(
     credentials: LoginCredentials
@@ -46,12 +45,12 @@ class VulcanUserClient(
             )
         }
 
-        return students.toArray(arrayOfNulls(students.size))
+        return students.toTypedArray()
     }
 
     override suspend fun getLuckyNumber(student: Student): Int {
         val hebeStudent = Gson().fromJson(student.customData, HebeStudent::class.java)
-        return api.getLuckyNumber(hebeStudent, Date())
+        return api.getLuckyNumber(hebeStudent, LocalDate.now())
     }
 
     override suspend fun getGrades(student: Student, semester: Semester): Array<Grade> {

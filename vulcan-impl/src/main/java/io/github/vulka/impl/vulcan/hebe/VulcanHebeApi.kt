@@ -3,7 +3,7 @@ package io.github.vulka.impl.vulcan.hebe
 import io.github.vulka.impl.vulcan.Utils
 import io.github.vulka.impl.vulcan.VulcanLoginCredentials
 import io.github.vulka.impl.vulcan.hebe.login.HebeKeystore
-import io.github.vulka.impl.vulcan.hebe.login.PfxRequest
+import io.github.vulka.impl.vulcan.hebe.login.RegisterRequest
 import io.github.vulka.impl.vulcan.hebe.types.HebeAccount
 import io.github.vulka.impl.vulcan.hebe.types.HebeChangedLesson
 import io.github.vulka.impl.vulcan.hebe.types.HebeGrade
@@ -11,10 +11,12 @@ import io.github.vulka.impl.vulcan.hebe.types.HebeLesson
 import io.github.vulka.impl.vulcan.hebe.types.HebeLuckyNumber
 import io.github.vulka.impl.vulcan.hebe.types.HebePeriod
 import io.github.vulka.impl.vulcan.hebe.types.HebeStudent
+import io.ktor.client.HttpClient
+import io.ktor.client.engine.okhttp.OkHttp
+import io.ktor.client.request.get
+import io.ktor.client.statement.bodyAsText
 import kotlinx.coroutines.runBlocking
-import okhttp3.*
 import java.io.IOException
-import java.text.SimpleDateFormat
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import java.util.*
@@ -28,35 +30,29 @@ class VulcanHebeApi {
         this.credentials = credentials
     }
 
+    private fun getBaseUrl(token: String): String? = runBlocking {
+        val client = HttpClient(OkHttp)
 
-    @Throws(IOException::class)
-    fun getBaseUrl(token: String): String? {
-        val client = OkHttpClient()
+        val response = client.get("http://komponenty.vulcan.net.pl/UonetPlusMobile/RoutingRules.txt")
 
-        val request = Request.Builder()
-            .url("http://komponenty.vulcan.net.pl/UonetPlusMobile/RoutingRules.txt")
-            .build()
+        if (response.status.value !in 200..299)
+            throw IOException("Unexpected code $response")
 
-        client.newCall(request).execute().use { response ->
-            if (!response.isSuccessful) throw IOException("Unexpected code $response")
+        val content = response.bodyAsText()
+        val lines = content.lines()
 
-            val content = response.body?.string() ?: return null
-            val lines = content.lines()
-
-            for (line in lines) {
-                if (line.startsWith(token.substring(0,3)))
-                    return line.substring(line.indexOf(",") + 1)
-            }
+        for (line in lines) {
+            if (line.startsWith(token.substring(0,3)))
+                return@runBlocking line.substring(line.indexOf(",") + 1)
         }
 
-        return null
+        return@runBlocking null
     }
 
     private fun getRestUrl(student: HebeStudent): String {
         return credentials.account.restUrl + student.unit.code
     }
 
-    @Throws(Exception::class)
     fun register(keystore: HebeKeystore, symbol: String, token: String, pin: String): HebeAccount {
         val upperToken = token.uppercase()
         val lowerSymbol = symbol.lowercase()
@@ -69,8 +65,8 @@ class VulcanHebeApi {
 
         val (certificate,fingerprint,_) = keystore.getData()
 
-        val pfxRequest = PfxRequest(
-            OS = "Android",
+        val registerRequest = RegisterRequest(
+            os = "Android",
             deviceModel = keystore.deviceModel,
             certificate = certificate,
             certificateType = "X509",
@@ -80,7 +76,7 @@ class VulcanHebeApi {
             selfIdentifier = Utils.uuid(fingerprint)
         )
 
-        val response = client.post(fullUrl, pfxRequest,HebeAccount::class.java)
+        val response = client.post(fullUrl, registerRequest,HebeAccount::class.java)
 
         credentials = VulcanLoginCredentials(response!!,keystore)
         return response
@@ -94,13 +90,13 @@ class VulcanHebeApi {
         return client.get(fullUrl, Array<HebeStudent>::class.java)!!
     }
 
-    fun getLuckyNumber(student: HebeStudent,date: Date): Int {
+    fun getLuckyNumber(student: HebeStudent,date: LocalDate): Int {
         val baseUrl = getRestUrl(student)
         val response = client.get(
             url = "$baseUrl/${ApiEndpoints.DATA_ROOT}/${ApiEndpoints.DATA_LUCKY_NUMBER}",
             query = mapOf(
                 "constituentId" to student.school.id.toString(),
-                "day" to SimpleDateFormat("yyyy-MM-dd").format(date)
+                "day" to DateTimeFormatter.ofPattern("yyyy-MM-dd").format(date)
             ),
             clazz = HebeLuckyNumber::class.java
         )
@@ -126,7 +122,7 @@ class VulcanHebeApi {
         return@runBlocking response
     }
 
-    fun getLessons(student: HebeStudent,dateFrom: LocalDate = LocalDate.parse("2024-06-12"),dateTo: LocalDate = dateFrom): Array<HebeLesson> = runBlocking {
+    fun getLessons(student: HebeStudent,dateFrom: LocalDate = LocalDate.now(),dateTo: LocalDate = dateFrom): Array<HebeLesson> = runBlocking {
         val baseUrl = getRestUrl(student)
 
         val currentPeriod = student.periods.find { it.current }!!
@@ -152,7 +148,7 @@ class VulcanHebeApi {
         return@runBlocking response
     }
 
-    fun getChangedLessons(student: HebeStudent,dateFrom: LocalDate = LocalDate.parse("2024-06-12"),dateTo: LocalDate = dateFrom): Array<HebeChangedLesson> = runBlocking {
+    fun getChangedLessons(student: HebeStudent,dateFrom: LocalDate = LocalDate.now(),dateTo: LocalDate = dateFrom): Array<HebeChangedLesson> = runBlocking {
         val baseUrl = getRestUrl(student)
 
         val currentPeriod = student.periods.find { it.current }!!

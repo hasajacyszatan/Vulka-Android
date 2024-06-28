@@ -16,7 +16,9 @@ import kotlinx.coroutines.runBlocking
 import java.io.IOException
 import java.net.URLEncoder
 import java.text.SimpleDateFormat
+import java.time.LocalDateTime
 import java.time.ZonedDateTime
+import java.time.format.DateTimeFormatter
 import java.util.*
 import java.util.regex.Pattern
 
@@ -77,7 +79,7 @@ class HebeHttpClient(private val keystore: HebeKeystore) {
             api = 1,
             requestId = UUID.randomUUID(),
             timestamp = System.currentTimeMillis(),
-            timestampFormatted = SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(Date())
+            timestampFormatted = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss").format(LocalDateTime.now())
         )
     }
 
@@ -154,7 +156,7 @@ class HebeHttpClient(private val keystore: HebeKeystore) {
         }
 
         if (apiResponse.status.code != 0) {
-            throw VulcanAPIException("")
+            throw VulcanAPIException(apiResponse.status.message)
         }
     }
 }

@@ -1,7 +1,10 @@
 package io.github.vulka.impl.vulcan.hebe.login
 
-data class PfxRequest(
-    val OS: String,
+import com.google.gson.annotations.SerializedName
+
+data class RegisterRequest(
+    @SerializedName("OS")
+    val os: String,
     val deviceModel: String,
     val certificate: String,
     val certificateType: String,
