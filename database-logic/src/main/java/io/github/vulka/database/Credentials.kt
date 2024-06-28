@@ -1,5 +1,6 @@
 package io.github.vulka.database
 
+import androidx.room.Embedded
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import io.github.vulka.core.api.Platform
@@ -12,5 +13,6 @@ data class Credentials(
     val id: UUID = UUID.randomUUID(),
     val platform: Platform,
     val data: String,
+    @Embedded
     val student: Student
 )

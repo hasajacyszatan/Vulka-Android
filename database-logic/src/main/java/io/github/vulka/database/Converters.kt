@@ -5,22 +5,11 @@ import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import io.github.vulka.core.api.types.Lesson
 import io.github.vulka.core.api.types.LessonChange
-import io.github.vulka.core.api.types.Student
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
 class Converters {
-    @TypeConverter
-    fun fromStudent(student: Student): String {
-        return Gson().toJson(student)
-    }
-
-    @TypeConverter
-    fun toStudent(json: String): Student {
-        return Gson().fromJson(json, Student::class.java)
-    }
-
     private val dateFormatter = DateTimeFormatter.ISO_LOCAL_DATE
     private val dateTimeFormatter = DateTimeFormatter.ISO_LOCAL_DATE_TIME
 

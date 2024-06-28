@@ -14,6 +14,7 @@ data class Student(
 /**
  * Represent parent of student
  */
-data class Parent(
+@JvmInline
+value class Parent(
     val fullName: String
 )
