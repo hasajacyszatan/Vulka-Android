@@ -5,12 +5,14 @@ import io.github.vulka.impl.vulcan.VulcanLoginCredentials
 import io.github.vulka.impl.vulcan.hebe.login.HebeKeystore
 import io.github.vulka.impl.vulcan.hebe.login.RegisterRequest
 import io.github.vulka.impl.vulcan.hebe.types.HebeAccount
+import io.github.vulka.impl.vulcan.hebe.types.HebeAverageGrade
 import io.github.vulka.impl.vulcan.hebe.types.HebeChangedLesson
 import io.github.vulka.impl.vulcan.hebe.types.HebeGrade
 import io.github.vulka.impl.vulcan.hebe.types.HebeLesson
 import io.github.vulka.impl.vulcan.hebe.types.HebeLuckyNumber
 import io.github.vulka.impl.vulcan.hebe.types.HebePeriod
 import io.github.vulka.impl.vulcan.hebe.types.HebeStudent
+import io.github.vulka.impl.vulcan.hebe.types.HebeSummaryGrade
 import io.ktor.client.HttpClient
 import io.ktor.client.engine.okhttp.OkHttp
 import io.ktor.client.request.get
@@ -90,7 +92,7 @@ class VulcanHebeApi {
         return client.get(fullUrl, Array<HebeStudent>::class.java)!!
     }
 
-    fun getLuckyNumber(student: HebeStudent,date: LocalDate): Int {
+    fun getLuckyNumber(student: HebeStudent, date: LocalDate): Int {
         val baseUrl = getRestUrl(student)
         val response = client.get(
             url = "$baseUrl/${ApiEndpoints.DATA_ROOT}/${ApiEndpoints.DATA_LUCKY_NUMBER}",
@@ -103,7 +105,7 @@ class VulcanHebeApi {
         return response!!.number
     }
 
-    fun getGrades(student: HebeStudent,period: HebePeriod): Array<HebeGrade> = runBlocking {
+    fun getGrades(student: HebeStudent, period: HebePeriod): Array<HebeGrade> = runBlocking {
         val baseUrl = getRestUrl(student)
 
         val response = client.get(
@@ -122,7 +124,7 @@ class VulcanHebeApi {
         return@runBlocking response
     }
 
-    fun getLessons(student: HebeStudent,dateFrom: LocalDate = LocalDate.now(),dateTo: LocalDate = dateFrom): Array<HebeLesson> = runBlocking {
+    fun getLessons(student: HebeStudent, dateFrom: LocalDate = LocalDate.now(), dateTo: LocalDate = dateFrom): Array<HebeLesson> = runBlocking {
         val baseUrl = getRestUrl(student)
 
         val currentPeriod = student.periods.find { it.current }!!
@@ -148,7 +150,7 @@ class VulcanHebeApi {
         return@runBlocking response
     }
 
-    fun getChangedLessons(student: HebeStudent,dateFrom: LocalDate = LocalDate.now(),dateTo: LocalDate = dateFrom): Array<HebeChangedLesson> = runBlocking {
+    fun getChangedLessons(student: HebeStudent, dateFrom: LocalDate = LocalDate.now(), dateTo: LocalDate = dateFrom): Array<HebeChangedLesson> = runBlocking {
         val baseUrl = getRestUrl(student)
 
         val currentPeriod = student.periods.find { it.current }!!
@@ -169,6 +171,44 @@ class VulcanHebeApi {
                 "dateTo" to dateTo.format(dateFormatter)
             ),
             clazz = Array<HebeChangedLesson>::class.java
+        )!!
+
+        return@runBlocking response
+    }
+
+    fun getSummary(student: HebeStudent, period: HebePeriod) = runBlocking {
+        val baseUrl = getRestUrl(student)
+
+        val response = client.get(
+            url = "$baseUrl/${ApiEndpoints.DATA_ROOT}/${ApiEndpoints.DATA_GRADE_SUMMARY}/${ApiEndpoints.DATA_BY_PUPIL}",
+            query = mapOf(
+                "unitId" to student.unit.id.toString(),
+                "pupilId" to student.pupil.id.toString(),
+                "periodId" to period.id.toString(),
+
+                "lastId" to "-2147483648",  // don't ask, it's just Vulcan
+                "pageSize" to 500.toString(),
+            ),
+            clazz = Array<HebeSummaryGrade>::class.java
+        )!!
+
+        return@runBlocking response
+    }
+
+    fun getAverage(student: HebeStudent, period: HebePeriod) = runBlocking {
+        val baseUrl = getRestUrl(student)
+
+        val response = client.get(
+            url = "$baseUrl/${ApiEndpoints.DATA_ROOT}/${ApiEndpoints.DATA_GRADE_AVERAGE}/${ApiEndpoints.DATA_BY_PUPIL}",
+            query = mapOf(
+                "unitId" to student.unit.id.toString(),
+                "pupilId" to student.pupil.id.toString(),
+                "periodId" to period.id.toString(),
+
+                "lastId" to "-2147483648",  // don't ask, it's just Vulcan
+                "pageSize" to 500.toString(),
+            ),
+            clazz = Array<HebeAverageGrade>::class.java
         )!!
 
         return@runBlocking response

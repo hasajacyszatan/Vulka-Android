@@ -3,6 +3,8 @@ package io.github.vulka.impl.vulcan
 import com.google.gson.Gson
 import io.github.vulka.core.api.LoginCredentials
 import io.github.vulka.core.api.UserClient
+import io.github.vulka.core.api.types.Average
+import io.github.vulka.core.api.types.EndGrade
 import io.github.vulka.core.api.types.Grade
 import io.github.vulka.core.api.types.Lesson
 import io.github.vulka.core.api.types.LessonChange
@@ -146,6 +148,51 @@ class VulcanUserClient(
             )
         }
         return semesters.toTypedArray()
+    }
+
+    override suspend fun getEndGrades(student: Student, semester: Semester): Array<EndGrade> {
+        val hebeStudent = Gson().fromJson(student.customData, HebeStudent::class.java)
+        val currentHebePeriod = hebeStudent.periods.find { it.current }!!
+
+        val currentPeriod = hebeStudent.periods.find { it.number == semester.number && it.level == currentHebePeriod.level }!!
+
+        val response = api.getSummary(hebeStudent,currentPeriod)
+
+        val grades = ArrayList<EndGrade>()
+
+        for (grade in response) {
+            grades.add(
+                EndGrade(
+                    proposedGrade = grade.entry1,
+                    endGrade = grade.entry2,
+                    subject = grade.subject.name
+                )
+            )
+        }
+
+        return grades.toTypedArray()
+    }
+
+    override suspend fun getSubjectAverages(student: Student, semester: Semester): Array<Average> {
+        val hebeStudent = Gson().fromJson(student.customData, HebeStudent::class.java)
+        val currentHebePeriod = hebeStudent.periods.find { it.current }!!
+
+        val currentPeriod = hebeStudent.periods.find { it.number == semester.number && it.level == currentHebePeriod.level }!!
+
+        val response = api.getAverage(hebeStudent,currentPeriod)
+
+        val averages = ArrayList<Average>()
+
+        for (average in response) {
+            averages.add(
+                Average(
+                    average = average.average?.replace(",",".")?.toFloat(),
+                    subject = average.subject.name
+                )
+            )
+        }
+
+        return averages.toTypedArray()
     }
 
     override fun shouldSyncSemesters(student: Student): Boolean {
