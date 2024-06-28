@@ -485,7 +485,10 @@ private fun LessonDetails(lesson: Lesson) {
     ) {
         AnimatedTextField(
             value = TextFieldValue(
-                value = lesson.subjectName,
+                value = when {
+                    lesson.change?.newSubjectName != null -> lesson.change?.newSubjectName!!
+                    else -> lesson.subjectName
+                },
                 editable = false
             ),
             label = stringResource(R.string.Lesson),
@@ -496,7 +499,10 @@ private fun LessonDetails(lesson: Lesson) {
 
         AnimatedTextField(
             value = TextFieldValue(
-                value = lesson.teacherName,
+                value = when {
+                    lesson.change?.newTeacher != null -> lesson.change?.newTeacher!!.fullName
+                    else -> lesson.teacherName
+                },
                 editable = false
             ),
             label = stringResource(R.string.Teacher),
@@ -505,10 +511,13 @@ private fun LessonDetails(lesson: Lesson) {
             }
         )
 
-        if (lesson.classRoom != null) {
+        if (lesson.classRoom != null || lesson.change?.classRoom != null) {
             AnimatedTextField(
                 value = TextFieldValue(
-                    value = lesson.classRoom!!,
+                    value = when {
+                        lesson.change?.classRoom != null -> lesson.change?.classRoom!!
+                        else -> lesson.classRoom!!
+                    },
                     editable = false
                 ),
                 label = stringResource(R.string.ClassRoom),
