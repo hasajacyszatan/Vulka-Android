@@ -109,9 +109,14 @@ class VulcanUserClient(
                             type = when (change.changes?.type) {
                                 1 -> LessonChangeType.Canceled
                                 2 -> LessonChangeType.Replacement
+                                3 -> LessonChangeType.Canceled
+                                4 -> LessonChangeType.Canceled
                                 else -> LessonChangeType.Replacement
                             },
-                            message = change.teacherAbsenceEffectName,
+                            message = when (change.changes?.type) {
+                                4 -> change.reason
+                                else -> change.teacherAbsenceEffectName
+                            },
                             classRoom = change.room?.code,
                             newSubjectName = change.subject?.name,
                             newTeacher = change.teacherPrimary?.displayName?.let {
