@@ -49,9 +49,9 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
-import dev.medzik.android.compose.color.combineAlpha
-import dev.medzik.android.compose.color.warningContainer
 import dev.medzik.android.compose.rememberMutable
+import dev.medzik.android.compose.theme.combineAlpha
+import dev.medzik.android.compose.theme.warningContainer
 import dev.medzik.android.compose.ui.IconBox
 import dev.medzik.android.compose.ui.bottomsheet.BaseBottomSheet
 import dev.medzik.android.compose.ui.bottomsheet.rememberBottomSheetState

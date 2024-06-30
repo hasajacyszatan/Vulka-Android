@@ -25,7 +25,7 @@ kotlin-ksp = "2.0.0-1.0.22"
 kotlinx-coroutines = "1.8.1"
 kotlinx-serialization = "1.7.0"
 ktor = "2.3.12"
-medzik-android-utils = "1.6.1"
+medzik-android-utils = "1.7.0"
 medzik-libcrypto = "1.2.0"
 migbase64 = "2.2"
 
