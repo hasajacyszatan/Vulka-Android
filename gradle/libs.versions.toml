@@ -7,7 +7,7 @@ android-sdk-target = "34"
 androidx-core = "1.13.1"
 androidx-espresso-core = "3.6.1"
 androidx-junit = "1.2.1"
-androidx-lifecycle-runtime = "2.8.2"
+androidx-lifecycle = "2.8.3"
 androidx-room = "2.6.1"
 compose = "1.6.8"
 compose-activity = "1.9.0"
@@ -34,7 +34,7 @@ accompanist-drawablepainter = { module = "com.google.accompanist:accompanist-dra
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "androidx-core" }
 androidx-espresso-core = { group = "androidx.test.espresso", name = "espresso-core", version.ref = "androidx-espresso-core" }
 androidx-junit = { group = "androidx.test.ext", name = "junit", version.ref = "androidx-junit" }
-androidx-lifecycle-runtime-ktx = { group = "androidx.lifecycle", name = "lifecycle-runtime-ktx", version.ref = "androidx-lifecycle-runtime" }
+androidx-lifecycle-runtime-ktx = { group = "androidx.lifecycle", name = "lifecycle-runtime-ktx", version.ref = "androidx-lifecycle" }
 androidx-room-compiler = { module = "androidx.room:room-compiler", version.ref = "androidx-room" }
 androidx-room-ktx = { module = "androidx.room:room-ktx", version.ref = "androidx-room" }
 androidx-room-runtime = { module = "androidx.room:room-runtime", version.ref = "androidx-room" }
