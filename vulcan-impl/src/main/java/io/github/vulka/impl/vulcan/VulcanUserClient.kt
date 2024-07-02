@@ -115,7 +115,7 @@ class VulcanUserClient(
                             },
                             message = when (change.changes?.type) {
                                 4 -> change.reason
-                                else -> change.teacherAbsenceEffectName
+                                else -> change.teacherAbsenceEffectName ?: change.reason
                             },
                             classRoom = change.room?.code,
                             newSubjectName = change.subject?.name,
