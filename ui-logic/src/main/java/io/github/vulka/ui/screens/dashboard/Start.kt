@@ -178,7 +178,7 @@ fun GradesCard(
     userId: UUID,
     viewModel: VulkaViewModel = hiltViewModel()
 ) {
-    val gradesDb = viewModel.gradesRepository.getFromLastWeek(userId, LocalDate.now().minusWeeks(1))!!
+    val gradesDb = viewModel.gradesRepository.getFromLastWeek(userId, LocalDate.now().minusWeeks(1))
 
     val gradeList: List<Grade> = gradesDb.map { it.grade }
     val uniqueSubjectNames: Set<String> = gradeList.map { it.subject }.sortedBy { it }.toSet()
