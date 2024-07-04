@@ -71,7 +71,6 @@ import io.github.vulka.ui.VulkaViewModel
 import io.github.vulka.ui.common.ErrorDialog
 import kotlinx.coroutines.launch
 import kotlinx.serialization.Serializable
-import java.time.DayOfWeek
 import java.time.LocalDate
 import java.time.LocalTime
 import java.time.format.DateTimeFormatter
@@ -89,33 +88,17 @@ fun TimetableScreen(
     args: Timetable,
     viewModel: VulkaViewModel = hiltViewModel()
 ) {
-
     val context = LocalContext.current
 
     fun getNextWeekday(date: LocalDate): LocalDate {
-        var nextDate = date.plusDays(1)
-        while (nextDate.dayOfWeek == DayOfWeek.SATURDAY || nextDate.dayOfWeek == DayOfWeek.SUNDAY) {
-            nextDate = nextDate.plusDays(1)
-        }
-        return nextDate
+        return date.plusDays(1)
     }
 
     fun getPreviousWeekday(date: LocalDate): LocalDate {
-        var previousDate = date.minusDays(1)
-        while (previousDate.dayOfWeek == DayOfWeek.SATURDAY || previousDate.dayOfWeek == DayOfWeek.SUNDAY) {
-            previousDate = previousDate.minusDays(1)
-        }
-        return previousDate
-    }
-    fun getWeekday(date: LocalDate): LocalDate {
-        var previousDate = date
-        while (previousDate.dayOfWeek == DayOfWeek.SATURDAY || previousDate.dayOfWeek == DayOfWeek.SUNDAY) {
-            previousDate = previousDate.plusDays(1)
-        }
-        return previousDate
+        return date.minusDays(1)
     }
 
-    var currentDate by rememberMutable(getWeekday(LocalDate.now()))
+    var currentDate by rememberMutable(LocalDate.now())
 
     var timetableRefreshing by rememberMutable(false)
 
