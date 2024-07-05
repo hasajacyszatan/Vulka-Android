@@ -1,6 +1,5 @@
 package io.github.vulka.ui.screens.auth
 
-import android.os.Build
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -17,12 +16,11 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import dev.medzik.android.compose.rememberMutable
 import dev.medzik.android.compose.theme.combineAlpha
@@ -32,15 +30,7 @@ import dev.medzik.android.compose.ui.textfield.AnimatedTextField
 import dev.medzik.android.compose.ui.textfield.PasswordAnimatedTextField
 import dev.medzik.android.compose.ui.textfield.TextFieldValue
 import dev.medzik.android.utils.runOnIOThread
-import dev.medzik.android.utils.runOnUiThread
-import io.github.vulka.business.crypto.serializeCredentials
-import io.github.vulka.core.api.LoginData
 import io.github.vulka.core.api.Platform
-import io.github.vulka.impl.librus.LibrusLoginClient
-import io.github.vulka.impl.librus.LibrusLoginData
-import io.github.vulka.impl.vulcan.VulcanLoginClient
-import io.github.vulka.impl.vulcan.VulcanLoginData
-import io.github.vulka.impl.vulcan.hebe.login.HebeKeystore
 import io.github.vulka.ui.R
 import io.github.vulka.ui.common.ErrorDialog
 import kotlinx.serialization.Serializable
@@ -51,24 +41,9 @@ class Login(val platform: Platform)
 @Composable
 fun LoginScreen(
     args: Login,
-    navController: NavController
+    navController: NavController,
+    viewModel: LoginViewModel = hiltViewModel()
 ) {
-    val client = when (args.platform) {
-        Platform.Vulcan -> VulcanLoginClient()
-        Platform.Librus -> LibrusLoginClient()
-    }
-
-    var requestData: LoginData? by remember { mutableStateOf(null) }
-
-    var loading by rememberMutable(false)
-
-    val vulcanSymbol = rememberMutable("")
-    val vulcanToken = rememberMutable("")
-    val vulcanPin = rememberMutable("")
-
-    val librusLogin = rememberMutable("")
-    val librusPassword = rememberMutable("")
-
     LazyColumn(
         modifier = Modifier.fillMaxSize(),
         verticalArrangement = Arrangement.SpaceBetween
@@ -76,7 +51,6 @@ fun LoginScreen(
         item {
             when (args.platform) {
                 Platform.Vulcan -> {
-
                     Surface(
                         modifier = Modifier.padding(bottom = 12.dp),
                         shape = MaterialTheme.shapes.medium,
@@ -93,7 +67,7 @@ fun LoginScreen(
                     AnimatedTextField(
                         modifier = Modifier.padding(vertical = 5.dp),
                         label = stringResource(R.string.Field_Symbol),
-                        value = TextFieldValue.fromMutableState(vulcanSymbol),
+                        value = TextFieldValue.fromMutableState(viewModel.vulcanSymbol),
                         clearButton = true,
                         singleLine = true,
                         leading = {
@@ -107,7 +81,7 @@ fun LoginScreen(
                     AnimatedTextField(
                         modifier = Modifier.padding(vertical = 5.dp),
                         label = stringResource(R.string.Field_Token),
-                        value = TextFieldValue.fromMutableState(vulcanToken),
+                        value = TextFieldValue.fromMutableState(viewModel.vulcanToken),
                         clearButton = true,
                         singleLine = true,
                         leading = {
@@ -121,7 +95,7 @@ fun LoginScreen(
                     AnimatedTextField(
                         modifier = Modifier.padding(vertical = 5.dp),
                         label = stringResource(R.string.Field_Pin),
-                        value = TextFieldValue.fromMutableState(vulcanPin),
+                        value = TextFieldValue.fromMutableState(viewModel.vulcanPin),
                         clearButton = true,
                         singleLine = true,
                         leading = {
@@ -150,7 +124,7 @@ fun LoginScreen(
                     AnimatedTextField(
                         modifier = Modifier.padding(vertical = 5.dp),
                         label = stringResource(R.string.Field_Login),
-                        value = TextFieldValue.fromMutableState(librusLogin),
+                        value = TextFieldValue.fromMutableState(viewModel.librusLogin),
                         clearButton = true,
                         singleLine = true,
                         leading = {
@@ -164,7 +138,7 @@ fun LoginScreen(
                     PasswordAnimatedTextField(
                         modifier = Modifier.padding(vertical = 5.dp),
                         label = stringResource(R.string.Field_Password),
-                        value = TextFieldValue.fromMutableState(librusPassword)
+                        value = TextFieldValue.fromMutableState(viewModel.librusPassword)
                     )
                 }
             }
@@ -174,57 +148,18 @@ fun LoginScreen(
             val dialogState = rememberDialogState()
             var error: Exception? by rememberMutable(null)
 
+            var loading by rememberMutable(false)
             LoadingButton(
                 onClick = {
                     runOnIOThread {
                         loading = true
 
-                        when (args.platform) {
-                            Platform.Vulcan -> {
-                                // For Vulcan we must create keystore first
-                                val keystore = HebeKeystore.create(
-                                    alias = HebeKeystore.generateKeystoreName(vulcanSymbol.value),
-                                    firebaseToken = "",
-                                    deviceModel = "${Build.MANUFACTURER} ${Build.MODEL} (Vulka)")
-
-                                requestData = VulcanLoginData(
-                                    symbol = vulcanSymbol.value,
-                                    token = vulcanToken.value,
-                                    pin = vulcanPin.value,
-                                    keystore = keystore
-                                )
-                            }
-
-                            Platform.Librus -> {
-                                requestData = LibrusLoginData(
-                                    login = librusLogin.value,
-                                    password = librusPassword.value
-                                )
-                            }
-                        }
-
                         try {
-                            // Credentials will be encrypted in ChooseStudents screen,
-                            // because Vulcan implementation must encrypt credentials for every student,
-                            // then can save it to Room database
-                            // Currently encrypts only one credential
-                            val response = client.login(requestData!!)
-
-                            val data = serializeCredentials(response)
-
-                            runOnUiThread {
-                                navController.navigate(
-                                    ChooseStudents(
-                                        platform = args.platform,
-                                        credentialsData = data
-                                    )
-                                )
-                            }
+                            viewModel.login(args.platform, navController)
                         } catch (e: Exception) {
                             error = e
                             dialogState.show()
                         }
-
                         loading = false
                     }
                 },
