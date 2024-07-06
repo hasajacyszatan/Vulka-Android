@@ -294,6 +294,7 @@ private enum class GradeColor(
     val containerColor: Color,
     val contentColor: Color
 ) {
+    ZERO(Color(0xFF960000), Color.White),
     ONE(Color(0xFFD32F2F), Color.Black),
     TWO(Color(0xFFFF774D), Color.Black),
     THREE(Color(0xFFFF9800), Color.Black),
@@ -306,6 +307,7 @@ private enum class GradeColor(
             val gradeValue = grade.value ?: return null
 
             return when {
+                gradeValue.startsWith("0") -> ZERO
                 gradeValue.startsWith("1") -> ONE
                 gradeValue.startsWith("2") -> TWO
                 gradeValue.startsWith("3") -> THREE
