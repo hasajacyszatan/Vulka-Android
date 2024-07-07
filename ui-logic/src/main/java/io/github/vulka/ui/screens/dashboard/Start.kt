@@ -133,7 +133,7 @@ fun HeaderCard(student: Student) {
                     fontSize = 18.sp,
                     text = student.fullName
                 )
-                Text(student.classId ?: "")
+                Text(student.classId.orEmpty())
             }
         }
     }
@@ -216,7 +216,7 @@ fun GradesCard(
                                     horizontalAlignment = Alignment.CenterHorizontally
                                 ) {
                                     Text(
-                                        text = grade.value ?: "",
+                                        text = grade.value.orEmpty(),
                                         fontSize = 15.sp
                                     )
                                 }

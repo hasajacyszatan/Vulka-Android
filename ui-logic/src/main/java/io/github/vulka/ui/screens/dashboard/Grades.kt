@@ -181,7 +181,7 @@ fun GradesTab(
                                     ) {
                                         val gradeColor = GradeColor.getColorByGrade(grade)
                                         Avatar(
-                                            text = grade.value ?: "",
+                                            text = grade.value.orEmpty(),
                                             shape = AvatarShape.Rounded,
                                             cardColors = if (gradeColor != null) {
                                                 CardDefaults.cardColors()
