@@ -16,29 +16,19 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateListOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
-import androidx.navigation.NavGraph.Companion.findStartDestination
-import dev.medzik.android.compose.rememberMutable
 import io.github.vulka.core.api.Platform
 import io.github.vulka.core.api.types.Student
 import io.github.vulka.ui.R
-import io.github.vulka.ui.VulkaViewModel
 import io.github.vulka.ui.common.Avatar
 import io.github.vulka.ui.screens.ChoosePlatform
-import io.github.vulka.ui.screens.Welcome
-import io.github.vulka.ui.screens.dashboard.Home
 import io.github.vulka.ui.utils.getInitials
 import kotlinx.serialization.Serializable
-import java.util.UUID
 
 @Serializable
 class AccountManager(
@@ -50,30 +40,19 @@ class AccountManager(
 fun AccountManagerScreen(
     args: AccountManager,
     navController: NavController,
-    viewModel: VulkaViewModel = hiltViewModel()
+    viewModel: AccountManagerViewModel = hiltViewModel()
 ) {
-    val credentials = remember { mutableStateListOf(*viewModel.credentialRepository.getAll().toTypedArray()) }
-
-    var selfDelete by rememberMutable(false)
-
     LazyColumn(
         modifier = Modifier.fillMaxSize(),
         verticalArrangement = Arrangement.SpaceBetween
     ) {
         item {
-            credentials.forEach { credential ->
+            viewModel.credentials.forEach { credentials ->
                 StudentCard(
-                    student = credential.student,
+                    student = credentials.student,
                     options = {
                         IconButton(
-                            onClick = {
-                                // TODO: Clear all account data from database
-                                viewModel.credentialRepository.delete(credential)
-                                selfDelete = UUID.fromString(args.userId) == credential.id
-                                credentials.remove(credential)
-
-                                check(viewModel,navController,false)
-                            }
+                            onClick = { viewModel.onDeleteClick(args, credentials, navController) }
                         ) {
                             Icon(Icons.Default.Delete, contentDescription = null)
                         }
@@ -84,9 +63,7 @@ fun AccountManagerScreen(
 
         item {
             Button(
-                onClick = {
-                    navController.navigate(ChoosePlatform)
-                },
+                onClick = { navController.navigate(ChoosePlatform) },
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(16.dp)
@@ -97,40 +74,7 @@ fun AccountManagerScreen(
     }
 
     BackHandler {
-        check(viewModel,navController,selfDelete)
-    }
-}
-
-fun check(
-    viewModel: VulkaViewModel,
-    navController: NavController,
-    selfDelete: Boolean,
-) {
-    if (viewModel.credentialRepository.count() == 0) {
-        navController.navigate(Welcome) {
-            popUpTo(navController.graph.findStartDestination().id) {
-                saveState = false
-                inclusive = true
-            }
-        }
-        return
-    }
-
-    // Navigate to first credential if current selected was deleted
-    if (selfDelete) {
-        val firstCredential = viewModel.credentialRepository.get()!!
-
-        navController.navigate(Home(
-            userId = firstCredential.id.toString(),
-            credentials = firstCredential.data,
-            platform = firstCredential.platform,
-            firstSync = false
-        )) {
-            popUpTo(navController.graph.findStartDestination().id) {
-                saveState = false
-                inclusive = true
-            }
-        }
+        viewModel.check(navController)
     }
 }
 
@@ -169,6 +113,5 @@ fun StudentCard(
             }
         }
         options()
-
     }
 }
