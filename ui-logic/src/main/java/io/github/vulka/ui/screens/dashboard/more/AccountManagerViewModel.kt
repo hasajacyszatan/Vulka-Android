@@ -9,7 +9,7 @@ import androidx.navigation.NavController
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.github.vulka.database.Credentials
-import io.github.vulka.database.CredentialsDao
+import io.github.vulka.database.Repository
 import io.github.vulka.ui.screens.Welcome
 import io.github.vulka.ui.screens.dashboard.Home
 import java.util.UUID
@@ -17,23 +17,33 @@ import javax.inject.Inject
 
 @HiltViewModel
 class AccountManagerViewModel @Inject constructor(
-    private val credentialRepository: CredentialsDao,
+    // TODO: Fix hilt/dagger errors
+    private val repository: Repository
 ) : ViewModel() {
-    val credentials = mutableStateListOf(*credentialRepository.getAll().toTypedArray())
+    val credentials = mutableStateListOf(*repository.credentials.getAll().toTypedArray())
 
     private var selfDelete by mutableStateOf(false)
 
     fun onDeleteClick(args: AccountManager, credentials: Credentials, navController: NavController) {
-        // TODO: Clear all account data from database
-        credentialRepository.delete(credentials)
+        clearAccountData(credentials)
+
         selfDelete = UUID.fromString(args.userId) == credentials.id
         this.credentials.remove(credentials)
 
         check(navController)
     }
 
+    private fun clearAccountData(credentials: Credentials) {
+        repository.grades.deleteByCredentialsId(credentials.id)
+        repository.timetable.deleteByCredentialsId(credentials.id)
+        repository.semesters.deleteByCredentialsId(credentials.id)
+        repository.luckyNumber.deleteByCredentialsId(credentials.id)
+
+        repository.credentials.delete(credentials)
+    }
+
     fun check(navController: NavController) {
-        if (credentialRepository.count() == 0) {
+        if (repository.credentials.count() == 0) {
             navController.navigate(Welcome) {
                 popUpTo(navController.graph.findStartDestination().id) {
                     saveState = false
@@ -45,15 +55,15 @@ class AccountManagerViewModel @Inject constructor(
 
         // Navigate to first credential if current selected was deleted
         if (selfDelete) {
-            val firstCredential = credentialRepository.get()!!
+            val firstCredential = repository.credentials.get()!!
 
             navController.navigate(
                 Home(
-                userId = firstCredential.id.toString(),
-                credentials = firstCredential.data,
-                platform = firstCredential.platform,
-                firstSync = false
-            )
+                    userId = firstCredential.id.toString(),
+                    credentials = firstCredential.data,
+                    platform = firstCredential.platform,
+                    firstSync = false
+                )
             ) {
                 popUpTo(navController.graph.findStartDestination().id) {
                     saveState = false

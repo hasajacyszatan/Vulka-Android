@@ -15,6 +15,9 @@ interface LuckyNumberDao {
     @Update
     suspend fun update(luckyNumber: LuckyNumber)
 
+    @Query("DELETE FROM luckynumber WHERE credentialsId = :id")
+    fun deleteByCredentialsId(id: UUID)
+
     @Query("SELECT * FROM luckynumber WHERE credentialsId = :credentialsId LIMIT 1")
     fun get(credentialsId: UUID): LuckyNumber?
 }
