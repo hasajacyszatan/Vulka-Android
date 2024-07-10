@@ -61,4 +61,9 @@
     <string name="More_Homework">Homework</string>
     <string name="More_Exams">Exams</string>
     <string name="More_NotesAndAchievements">Notes and achievements</string>
+    <string name="More_About_Version">App version</string>
+    <string name="More_About_Discord" translatable="false">Discord</string>
+    <string name="More_About_Discord_Subtitle">Join the Vulka community</string>
+    <string name="More_About_Github" translatable="false">GitHub</string>
+    <string name="More_About_Github_Subtitle">See GitHub profile</string>
 </resources>

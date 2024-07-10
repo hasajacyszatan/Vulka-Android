@@ -59,4 +59,7 @@
     <string name="More_Homework">Zadania domowe</string>
     <string name="More_Exams">Sprawdziany</string>
     <string name="More_NotesAndAchievements">Uwagi i osiągnięcia</string>
+    <string name="More_About_Version">Wersja aplikacji</string>
+    <string name="More_About_Discord_Subtitle">Dołącz do społeczności Vulka</string>
+    <string name="More_About_Github_Subtitle">Zobacz profil GitHub</string>
 </resources>
