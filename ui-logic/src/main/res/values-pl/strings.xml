@@ -53,4 +53,10 @@
     <string name="Details">Szczegóły</string>
     <string name="Attendance">Frekwencja</string>
     <string name="More">Więcej</string>
+    <string name="More_About">O aplikacji</string>
+    <string name="More_Settings">Ustawienia</string>
+    <string name="More_Messages">Wiadomości</string>
+    <string name="More_Homework">Zadania domowe</string>
+    <string name="More_Exams">Sprawdziany</string>
+    <string name="More_NotesAndAchievements">Uwagi i osiągnięcia</string>
 </resources>

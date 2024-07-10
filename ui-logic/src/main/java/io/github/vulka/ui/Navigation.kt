@@ -33,6 +33,7 @@ import io.github.vulka.ui.screens.dashboard.Home
 import io.github.vulka.ui.screens.dashboard.HomeScreen
 import io.github.vulka.ui.screens.dashboard.more.AccountManager
 import io.github.vulka.ui.screens.dashboard.more.AccountManagerScreen
+import io.github.vulka.ui.screens.dashboard.more.moreNavigation
 import io.github.vulka.ui.utils.navtype.PlatformType
 import javax.inject.Inject
 import kotlin.reflect.typeOf
@@ -150,6 +151,8 @@ fun VulkaNavigation(viewModel: NavigationViewModel = hiltViewModel()) {
                 AccountManagerScreen(args, navController)
             }
         }
+
+        moreNavigation(navController)
     }
 }
 

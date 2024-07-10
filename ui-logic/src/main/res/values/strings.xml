@@ -55,4 +55,10 @@
     <string name="Details">Details</string>
     <string name="Attendance">Attendance</string>
     <string name="More">More</string>
+    <string name="More_About">About</string>
+    <string name="More_Settings">Settings</string>
+    <string name="More_Messages">Messages</string>
+    <string name="More_Homework">Homework</string>
+    <string name="More_Exams">Exams</string>
+    <string name="More_NotesAndAchievements">Notes and achievements</string>
 </resources>
