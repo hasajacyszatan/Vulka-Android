@@ -17,7 +17,6 @@ import javax.inject.Inject
 
 @HiltViewModel
 class AccountManagerViewModel @Inject constructor(
-    // TODO: Fix hilt/dagger errors
     private val repository: Repository
 ) : ViewModel() {
     val credentials = mutableStateListOf(*repository.credentials.getAll().toTypedArray())

@@ -9,14 +9,17 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.ViewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
+import dagger.hilt.android.lifecycle.HiltViewModel
 import dev.medzik.android.compose.icons.TopAppBarBackIcon
 import dev.medzik.android.compose.navigation.NavigationAnimations
 import io.github.vulka.core.api.Platform
+import io.github.vulka.database.Repository
 import io.github.vulka.ui.common.DefaultScaffold
 import io.github.vulka.ui.common.MediumTopAppBarWithBack
 import io.github.vulka.ui.screens.ChoosePlatform
@@ -31,15 +34,16 @@ import io.github.vulka.ui.screens.dashboard.HomeScreen
 import io.github.vulka.ui.screens.dashboard.more.AccountManager
 import io.github.vulka.ui.screens.dashboard.more.AccountManagerScreen
 import io.github.vulka.ui.utils.navtype.PlatformType
+import javax.inject.Inject
 import kotlin.reflect.typeOf
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun VulkaNavigation(viewModel: VulkaViewModel = hiltViewModel()) {
+fun VulkaNavigation(viewModel: NavigationViewModel = hiltViewModel()) {
     val navController = rememberNavController()
 
     fun getStartDestination(): Any {
-        val credentials = viewModel.credentialRepository.get()
+        val credentials = viewModel.repository.credentials.get()
 
         return if (credentials != null) {
             Home(
@@ -157,3 +161,8 @@ fun TopBarWithBack(@StringRes title: Int, navController: NavController) {
         navigationIcon = { TopAppBarBackIcon(navController) }
     )
 }
+
+@HiltViewModel
+class NavigationViewModel @Inject constructor(
+    val repository: Repository
+) : ViewModel()
