@@ -77,6 +77,7 @@ fun HomeScreen(
 ) {
     val context = LocalContext.current
 
+    var scaffoldTitle: String? by rememberMutable(null)
     val pullToRefreshState = rememberPullToRefreshState()
     var bottomSelected: Any by rememberMutable(Start)
     val dialogState = rememberDialogState()
@@ -114,189 +115,196 @@ fun HomeScreen(
         )
     }
 
-        Scaffold(
-            topBar = {
-                TopAppBar(
-                    title = {
-                        Text(
-                            text = when (bottomSelected) {
-                                Start -> stringResource(R.string.Home)
-                                Grades -> stringResource(R.string.Grades)
-                                Attendance -> stringResource(R.string.Grades)
-                                Timetable -> stringResource(R.string.Timetable)
-                                More -> stringResource(R.string.More)
-                                else -> ""
-                            }
-                        )
-                    },
-                    actions = {
-                        Box(
-                            modifier = Modifier.padding(horizontal = 10.dp)
-                        ) {
-                            if (studentState != null) {
-                                Avatar(
-                                    modifier = Modifier.padding(),
-                                    text = studentState!!.getInitials(),
-                                    onClick = {
-                                        dialogState.show()
-                                    }
-                                )
-                            }
+    Scaffold(
+        topBar = {
+            TopAppBar(
+                title = {
+                    Text(
+                        text = scaffoldTitle ?: when (bottomSelected) {
+                            Start -> stringResource(R.string.Home)
+                            Grades -> stringResource(R.string.Grades)
+                            Attendance -> stringResource(R.string.Grades)
+                            Timetable -> stringResource(R.string.Timetable)
+                            More -> stringResource(R.string.More)
+                            else -> "Unknown"
+                        }
+                    )
+                },
+                actions = {
+                    Box(
+                        modifier = Modifier.padding(horizontal = 10.dp)
+                    ) {
+                        if (studentState != null) {
+                            Avatar(
+                                modifier = Modifier.padding(),
+                                text = studentState!!.getInitials(),
+                                onClick = {
+                                    dialogState.show()
+                                }
+                            )
                         }
                     }
-                )
-            },
-            snackbarHost = {
-                SnackbarHost(snackBarState) { data ->
-                    Snackbar(
-                        snackbarData = data,
-                        containerColor = MaterialTheme.colorScheme.surfaceContainer,
-                        contentColor = MaterialTheme.colorScheme.onSurface,
-                        actionColor = MaterialTheme.colorScheme.primary
-                    )
                 }
-            },
-            bottomBar = {
-                @Composable
-                fun NavigationBarItemLabel(@StringRes resId: Int) {
-                    Text(
-                        text = stringResource(resId),
-                        textAlign = TextAlign.Center,
-                        fontWeight = FontWeight.Bold
-                    )
-                }
-
-                NavigationBar {
-                    NavigationBarItem(
-                        icon = {
-                            IconBox(Icons.Default.Dashboard)
-                        },
-                        label = { NavigationBarItemLabel(R.string.Home) },
-                        selected = bottomSelected == Start ,
-                        onClick = {
-                            bottomSelected = Start
-                        },
-                        alwaysShowLabel = false
-                    )
-                    NavigationBarItem(
-                        icon = {
-                            IconBox(Icons.Default.Looks6)
-                        },
-                        label = { NavigationBarItemLabel(R.string.Grades) },
-                        selected = bottomSelected == Grades,
-                        onClick = {
-                            bottomSelected = Grades
-                        },
-                        alwaysShowLabel = false
-                    )
-                    NavigationBarItem(
-                        icon = {
-                            IconBox(Icons.AutoMirrored.Filled.EventNote)
-                        },
-                        label = { NavigationBarItemLabel(R.string.Attendance) },
-                        selected = bottomSelected == Attendance,
-                        onClick = {
-                            bottomSelected = Attendance
-                        },
-                        alwaysShowLabel = false,
-                    )
-                    NavigationBarItem(
-                        icon = {
-                            IconBox(Icons.Default.Backpack)
-                        },
-                        label = { NavigationBarItemLabel(R.string.Timetable) },
-                        selected = bottomSelected == Timetable,
-                        onClick = {
-                            bottomSelected = Timetable
-                        },
-                        alwaysShowLabel = false,
-                    )
-                    NavigationBarItem(
-                        icon = {
-                            IconBox(Icons.AutoMirrored.Filled.Notes)
-                        },
-                        label = { NavigationBarItemLabel(R.string.More) },
-                        selected = bottomSelected == More,
-                        onClick = {
-                            bottomSelected = More
-                        },
-                        alwaysShowLabel = false
-                    )
-                }
-            }
-        ) { innerPadding ->
-            AnimatedContent(
-                modifier = Modifier.padding(innerPadding),
-                targetState = bottomSelected,
-                label = "bottom navigation"
-            ) { target ->
-                when (target) {
-                    Start -> {
-                        StartScreen(
-                            args = Start(
-                                platform = args.platform,
-                                userId = args.userId
-                            ),
-                            pullToRefreshState = pullToRefreshState,
-                            pullRefresh = {
-                                pullToRefresh()
-                            },
-                            refreshed = viewModel.refreshed
-                        )
-                    }
-                    Grades -> {
-                        GradesScreen(
-                            args = Grades(
-                                platform = args.platform,
-                                userId = args.userId
-                            ),
-                            pullToRefreshState = pullToRefreshState,
-                            pullRefresh = {
-                                pullToRefresh()
-                            },
-                            refreshed = viewModel.refreshed
-                        )
-                    }
-                    Attendance -> {
-                        AttendanceScreen(
-                            args = Attendance(
-                                platform = args.platform,
-                                userId = args.userId,
-                                credentials = args.credentials
-                            )
-                        )
-                    }
-                    Timetable -> {
-                        TimetableScreen(
-                            args = Timetable(
-                                platform = args.platform,
-                                userId = args.userId,
-                                credentials = args.credentials
-                            )
-                        )
-                    }
-                    More -> {
-                        MoreScreen(
-                            navController = navController
-                        )
-                    }
-                }
-            }
-        }
-
-        if (studentState != null) {
-            SelectAccount(
-                state = dialogState,
-                credentials = viewModel.dbCredentials.value!!,
-                navController = navController,
-                args = args
             )
-        }
+        },
+        snackbarHost = {
+            SnackbarHost(snackBarState) { data ->
+                Snackbar(
+                    snackbarData = data,
+                    containerColor = MaterialTheme.colorScheme.surfaceContainer,
+                    contentColor = MaterialTheme.colorScheme.onSurface,
+                    actionColor = MaterialTheme.colorScheme.primary
+                )
+            }
+        },
+        bottomBar = {
+            @Composable
+            fun NavigationBarItemLabel(@StringRes resId: Int) {
+                Text(
+                    text = stringResource(resId),
+                    textAlign = TextAlign.Center,
+                    fontWeight = FontWeight.Bold
+                )
+            }
 
-        ErrorDialog(
-            dialogState = errorDialogState,
-            error = exception
+            NavigationBar {
+                NavigationBarItem(
+                    icon = {
+                        IconBox(Icons.Default.Dashboard)
+                    },
+                    label = { NavigationBarItemLabel(R.string.Home) },
+                    selected = bottomSelected == Start ,
+                    onClick = {
+                        bottomSelected = Start
+                    },
+                    alwaysShowLabel = false
+                )
+                NavigationBarItem(
+                    icon = {
+                        IconBox(Icons.Default.Looks6)
+                    },
+                    label = { NavigationBarItemLabel(R.string.Grades) },
+                    selected = bottomSelected == Grades,
+                    onClick = {
+                        bottomSelected = Grades
+                    },
+                    alwaysShowLabel = false
+                )
+                NavigationBarItem(
+                    icon = {
+                        IconBox(Icons.AutoMirrored.Filled.EventNote)
+                    },
+                    label = { NavigationBarItemLabel(R.string.Attendance) },
+                    selected = bottomSelected == Attendance,
+                    onClick = {
+                        bottomSelected = Attendance
+                    },
+                    alwaysShowLabel = false,
+                )
+                NavigationBarItem(
+                    icon = {
+                        IconBox(Icons.Default.Backpack)
+                    },
+                    label = { NavigationBarItemLabel(R.string.Timetable) },
+                    selected = bottomSelected == Timetable,
+                    onClick = {
+                        bottomSelected = Timetable
+                    },
+                    alwaysShowLabel = false,
+                )
+                NavigationBarItem(
+                    icon = {
+                        IconBox(Icons.AutoMirrored.Filled.Notes)
+                    },
+                    label = { NavigationBarItemLabel(R.string.More) },
+                    selected = bottomSelected == More,
+                    onClick = {
+                        bottomSelected = More
+                    },
+                    alwaysShowLabel = false
+                )
+            }
+        }
+    ) { innerPadding ->
+        AnimatedContent(
+            modifier = Modifier.padding(innerPadding),
+            targetState = bottomSelected,
+            label = "bottom navigation"
+        ) { target ->
+            if (target != More) {
+                scaffoldTitle = null
+            }
+
+            when (target) {
+                Start -> {
+                    StartScreen(
+                        args = Start(
+                            platform = args.platform,
+                            userId = args.userId
+                        ),
+                        pullToRefreshState = pullToRefreshState,
+                        pullRefresh = {
+                            pullToRefresh()
+                        },
+                        refreshed = viewModel.refreshed
+                    )
+                }
+                Grades -> {
+                    GradesScreen(
+                        args = Grades(
+                            platform = args.platform,
+                            userId = args.userId
+                        ),
+                        pullToRefreshState = pullToRefreshState,
+                        pullRefresh = {
+                            pullToRefresh()
+                        },
+                        refreshed = viewModel.refreshed
+                    )
+                }
+                Attendance -> {
+                    AttendanceScreen(
+                        args = Attendance(
+                            platform = args.platform,
+                            userId = args.userId,
+                            credentials = args.credentials
+                        )
+                    )
+                }
+                Timetable -> {
+                    TimetableScreen(
+                        args = Timetable(
+                            platform = args.platform,
+                            userId = args.userId,
+                            credentials = args.credentials
+                        )
+                    )
+                }
+                More -> {
+                    MoreScreen(
+                        navHostController = navController,
+                        changeScaffoldTitle = {
+                            scaffoldTitle = it
+                        }
+                    )
+                }
+            }
+        }
+    }
+
+    if (studentState != null) {
+        SelectAccount(
+            state = dialogState,
+            credentials = viewModel.dbCredentials.value!!,
+            navController = navController,
+            args = args
         )
+    }
+
+    ErrorDialog(
+        dialogState = errorDialogState,
+        error = exception
+    )
 }
 
 @Composable
