@@ -6,6 +6,7 @@ import com.google.gson.reflect.TypeToken
 import io.github.vulka.core.api.UserClient
 import io.github.vulka.core.api.types.Grade
 import io.github.vulka.core.api.types.Lesson
+import io.github.vulka.core.api.types.Note
 import io.github.vulka.core.api.types.Parent
 import io.github.vulka.core.api.types.Semester
 import io.github.vulka.core.api.types.Student
@@ -209,6 +210,23 @@ class LibrusUserClient(
             )
         )
         return summary.toTypedArray()
+    }
+
+    override suspend fun getNotes(student: Student): Array<Note> {
+        // Stub
+        val notes = ArrayList<Note>()
+        for (i in 0..5) {
+            notes.add(
+                Note(
+                    name = if (i % 2 == 0) "Negative note" else "Positive note",
+                    content = "Some stub content",
+                    points = null,
+                    creator = "Stub creator",
+                    date = LocalDate.of(2024,3,7)
+                )
+            )
+        }
+        return notes.toTypedArray()
     }
 
 

@@ -25,4 +25,5 @@ object ApiEndpoints {
     const val DATA_MESSAGEBOX = "messagebox"
     const val DATA_TIMETABLE = "schedule"
     const val DATA_TIMETABLE_CHANGES = "schedule/changes"
+    const val DATA_NOTES = "note"
 }

@@ -10,6 +10,7 @@ import io.github.vulka.impl.vulcan.hebe.types.HebeChangedLesson
 import io.github.vulka.impl.vulcan.hebe.types.HebeGrade
 import io.github.vulka.impl.vulcan.hebe.types.HebeLesson
 import io.github.vulka.impl.vulcan.hebe.types.HebeLuckyNumber
+import io.github.vulka.impl.vulcan.hebe.types.HebeNote
 import io.github.vulka.impl.vulcan.hebe.types.HebePeriod
 import io.github.vulka.impl.vulcan.hebe.types.HebeStudent
 import io.github.vulka.impl.vulcan.hebe.types.HebeSummaryGrade
@@ -92,24 +93,25 @@ class VulcanHebeApi {
         return client.get(fullUrl, Array<HebeStudent>::class.java)!!
     }
 
-    fun getLuckyNumber(student: HebeStudent, date: LocalDate): Int {
+    private fun <T> getByPupil(endpoint: String, student: HebeStudent, clazz: Class<T>) = runBlocking {
         val baseUrl = getRestUrl(student)
-        val response = client.get(
-            url = "$baseUrl/${ApiEndpoints.DATA_ROOT}/${ApiEndpoints.DATA_LUCKY_NUMBER}",
+        return@runBlocking client.get(
+            url = "$baseUrl/${ApiEndpoints.DATA_ROOT}/${endpoint}/${ApiEndpoints.DATA_BY_PUPIL}",
             query = mapOf(
-                "constituentId" to student.school.id.toString(),
-                "day" to DateTimeFormatter.ofPattern("yyyy-MM-dd").format(date)
+                "unitId" to student.unit.id.toString(),
+                "pupilId" to student.pupil.id.toString(),
+
+                "lastId" to "-2147483648",  // don't ask, it's just Vulcan
+                "pageSize" to 500.toString()
             ),
-            clazz = HebeLuckyNumber::class.java
-        )
-        return response!!.number
+            clazz = clazz
+        )!!
     }
 
-    fun getGrades(student: HebeStudent, period: HebePeriod): Array<HebeGrade> = runBlocking {
+    private fun <T> getByPupilAndPeriod(endpoint: String, student: HebeStudent, period: HebePeriod, clazz: Class<T>) = runBlocking {
         val baseUrl = getRestUrl(student)
-
-        val response = client.get(
-            url = "$baseUrl/${ApiEndpoints.DATA_ROOT}/${ApiEndpoints.DATA_GRADE}/${ApiEndpoints.DATA_BY_PUPIL}",
+        return@runBlocking client.get(
+            url = "$baseUrl/${ApiEndpoints.DATA_ROOT}/${endpoint}/${ApiEndpoints.DATA_BY_PUPIL}",
             query = mapOf(
                 "unitId" to student.unit.id.toString(),
                 "pupilId" to student.pupil.id.toString(),
@@ -118,99 +120,108 @@ class VulcanHebeApi {
                 "lastId" to "-2147483648",  // don't ask, it's just Vulcan
                 "pageSize" to 500.toString()
             ),
+            clazz = clazz
+        )!!
+    }
+
+    private fun <T> getByPupilPeriodAndDate(
+        endpoint: String,
+        student: HebeStudent,
+        period: HebePeriod,
+        dateFrom: LocalDate,
+        dateTo: LocalDate,
+        clazz: Class<T>
+    ) = runBlocking {
+        val baseUrl = getRestUrl(student)
+        val dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
+        return@runBlocking client.get(
+            url = "$baseUrl/${ApiEndpoints.DATA_ROOT}/${endpoint}/${ApiEndpoints.DATA_BY_PUPIL}",
+            query = mapOf(
+                "unitId" to student.unit.id.toString(),
+                "pupilId" to student.pupil.id.toString(),
+                "periodId" to period.id.toString(),
+
+                "lastId" to "-2147483648",  // don't ask, it's just Vulcan
+                "pageSize" to 500.toString(),
+
+                "dateFrom" to dateFrom.format(dateFormatter),
+                "dateTo" to dateTo.format(dateFormatter)
+            ),
+            clazz = clazz
+        )!!
+    }
+
+    fun getLuckyNumber(student: HebeStudent,date: LocalDate): Int {
+        val baseUrl = getRestUrl(student)
+        val response = client.get(
+            url = "$baseUrl/${ApiEndpoints.DATA_ROOT}/${ApiEndpoints.DATA_LUCKY_NUMBER}",
+            query = mapOf(
+                "constituentId" to student.school.id.toString(),
+                "day" to DateTimeFormatter.ISO_LOCAL_DATE.format(date)
+            ),
+            clazz = HebeLuckyNumber::class.java
+        )
+        return response!!.number
+    }
+
+    fun getGrades(student: HebeStudent,period: HebePeriod): Array<HebeGrade> {
+        return getByPupilAndPeriod(
+            endpoint = ApiEndpoints.DATA_GRADE,
+            student = student,
+            period = period,
             clazz = Array<HebeGrade>::class.java
-        )!!
-
-        return@runBlocking response
+        )
     }
 
-    fun getLessons(student: HebeStudent, dateFrom: LocalDate = LocalDate.now(), dateTo: LocalDate = dateFrom): Array<HebeLesson> = runBlocking {
-        val baseUrl = getRestUrl(student)
-
+    fun getLessons(student: HebeStudent,dateFrom: LocalDate,dateTo: LocalDate = dateFrom): Array<HebeLesson> {
         val currentPeriod = student.periods.find { it.current }!!
 
-        val dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
-
-        val response = client.get(
-            url = "$baseUrl/${ApiEndpoints.DATA_ROOT}/${ApiEndpoints.DATA_TIMETABLE}/${ApiEndpoints.DATA_BY_PUPIL}",
-            query = mapOf(
-                "unitId" to student.unit.id.toString(),
-                "pupilId" to student.pupil.id.toString(),
-                "periodId" to currentPeriod.id.toString(),
-
-                "lastId" to "-2147483648",  // don't ask, it's just Vulcan
-                "pageSize" to 500.toString(),
-
-                "dateFrom" to dateFrom.format(dateFormatter),
-                "dateTo" to dateTo.format(dateFormatter)
-            ),
-            clazz = Array<HebeLesson>::class.java
-        )!!
-
-        return@runBlocking response
+        return getByPupilPeriodAndDate(
+            endpoint = ApiEndpoints.DATA_TIMETABLE,
+            student = student,
+            period = currentPeriod,
+            dateFrom = dateFrom,
+            dateTo = dateTo,
+            clazz = Array<HebeLesson>::class.java,
+        )
     }
 
-    fun getChangedLessons(student: HebeStudent, dateFrom: LocalDate = LocalDate.now(), dateTo: LocalDate = dateFrom): Array<HebeChangedLesson> = runBlocking {
-        val baseUrl = getRestUrl(student)
-
+    fun getChangedLessons(student: HebeStudent,dateFrom: LocalDate,dateTo: LocalDate = dateFrom): Array<HebeChangedLesson> {
         val currentPeriod = student.periods.find { it.current }!!
 
-        val dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
-
-        val response = client.get(
-            url = "$baseUrl/${ApiEndpoints.DATA_ROOT}/${ApiEndpoints.DATA_TIMETABLE_CHANGES}/${ApiEndpoints.DATA_BY_PUPIL}",
-            query = mapOf(
-                "unitId" to student.unit.id.toString(),
-                "pupilId" to student.pupil.id.toString(),
-                "periodId" to currentPeriod.id.toString(),
-
-                "lastId" to "-2147483648",  // don't ask, it's just Vulcan
-                "pageSize" to 500.toString(),
-
-                "dateFrom" to dateFrom.format(dateFormatter),
-                "dateTo" to dateTo.format(dateFormatter)
-            ),
-            clazz = Array<HebeChangedLesson>::class.java
-        )!!
-
-        return@runBlocking response
+        return getByPupilPeriodAndDate(
+            endpoint = ApiEndpoints.DATA_TIMETABLE_CHANGES,
+            student = student,
+            period = currentPeriod,
+            dateFrom = dateFrom,
+            dateTo = dateTo,
+            clazz = Array<HebeChangedLesson>::class.java,
+        )
     }
 
-    fun getSummaryGrades(student: HebeStudent, period: HebePeriod) = runBlocking {
-        val baseUrl = getRestUrl(student)
-
-        val response = client.get(
-            url = "$baseUrl/${ApiEndpoints.DATA_ROOT}/${ApiEndpoints.DATA_GRADE_SUMMARY}/${ApiEndpoints.DATA_BY_PUPIL}",
-            query = mapOf(
-                "unitId" to student.unit.id.toString(),
-                "pupilId" to student.pupil.id.toString(),
-                "periodId" to period.id.toString(),
-
-                "lastId" to "-2147483648",  // don't ask, it's just Vulcan
-                "pageSize" to 500.toString(),
-            ),
+    fun getSummaryGrades(student: HebeStudent, period: HebePeriod): Array<HebeSummaryGrade> {
+        return getByPupilAndPeriod(
+            endpoint = ApiEndpoints.DATA_GRADE_SUMMARY,
+            student = student,
+            period = period,
             clazz = Array<HebeSummaryGrade>::class.java
-        )!!
-
-        return@runBlocking response
+        )
     }
 
-    fun getAverages(student: HebeStudent, period: HebePeriod) = runBlocking {
-        val baseUrl = getRestUrl(student)
-
-        val response = client.get(
-            url = "$baseUrl/${ApiEndpoints.DATA_ROOT}/${ApiEndpoints.DATA_GRADE_AVERAGE}/${ApiEndpoints.DATA_BY_PUPIL}",
-            query = mapOf(
-                "unitId" to student.unit.id.toString(),
-                "pupilId" to student.pupil.id.toString(),
-                "periodId" to period.id.toString(),
-
-                "lastId" to "-2147483648",  // don't ask, it's just Vulcan
-                "pageSize" to 500.toString(),
-            ),
+    fun getAverages(student: HebeStudent, period: HebePeriod): Array<HebeAverageGrade> {
+        return getByPupilAndPeriod(
+            endpoint = ApiEndpoints.DATA_GRADE_AVERAGE,
+            student = student,
+            period = period,
             clazz = Array<HebeAverageGrade>::class.java
-        )!!
+        )
+    }
 
-        return@runBlocking response
+    fun getNotes(student: HebeStudent): Array<HebeNote> {
+        return getByPupil(
+            endpoint = ApiEndpoints.DATA_NOTES,
+            student = student,
+            clazz = Array<HebeNote>::class.java
+        )
     }
 }

@@ -7,6 +7,7 @@ import io.github.vulka.core.api.types.Grade
 import io.github.vulka.core.api.types.Lesson
 import io.github.vulka.core.api.types.LessonChange
 import io.github.vulka.core.api.types.LessonChangeType
+import io.github.vulka.core.api.types.Note
 import io.github.vulka.core.api.types.Parent
 import io.github.vulka.core.api.types.Semester
 import io.github.vulka.core.api.types.Student
@@ -83,7 +84,7 @@ class VulcanUserClient(
     }
 
     override suspend fun getLessons(student: Student, dateFrom: LocalDate, dateTo: LocalDate): Array<Lesson> {
-        val hebeStudent = Gson().fromJson(student.customData, HebeStudent::class.java)
+        val hebeStudent = student.toHebe()
 
         val lessonsResponse = api.getLessons(hebeStudent,dateFrom,dateTo)
         val changedLesson = api.getChangedLessons(hebeStudent,dateFrom,dateTo)
@@ -136,7 +137,7 @@ class VulcanUserClient(
     }
 
     override suspend fun getSemesters(student: Student): Array<Semester> {
-        val hebeStudent = Gson().fromJson(student.customData, HebeStudent::class.java)
+        val hebeStudent = student.toHebe()
 
         val currentSemester = hebeStudent.periods.find { it.current }!!
         val currentYearSemesters = hebeStudent.periods.filter { it.level == currentSemester.level }
@@ -155,7 +156,7 @@ class VulcanUserClient(
     }
 
     override suspend fun getSummary(student: Student, semester: Semester): Array<Summary> {
-        val hebeStudent = Gson().fromJson(student.customData, HebeStudent::class.java)
+        val hebeStudent = student.toHebe()
         val currentHebePeriod = hebeStudent.periods.find { it.current }!!
 
         val currentPeriod = hebeStudent.periods.find { it.number == semester.number && it.level == currentHebePeriod.level }!!
@@ -195,8 +196,42 @@ class VulcanUserClient(
         return summaryMap.values.toTypedArray()
     }
 
+    override suspend fun getNotes(student: Student): Array<Note> {
+        val hebeStudent = student.toHebe()
+
+        val notes = ArrayList<Note>()
+        val response = api.getNotes(hebeStudent)
+
+        for (note in response) {
+            notes.add(
+                Note(
+                    name = note.category.name,
+                    content = note.content,
+                    points = note.points,
+                    creator = note.creator.displayName,
+                    date = LocalDate.parse(note.dateValid.date)
+                )
+            )
+        }
+
+        // Filter by this school year
+        lateinit var startDate: LocalDate
+        lateinit var endDate: LocalDate
+        val currentHebePeriod = hebeStudent.periods.find { it.current }!!
+        if (currentHebePeriod.number == 2) {
+            val beforeHebePeriod =  hebeStudent.periods.find { it.level == currentHebePeriod.level && it.number == 1 }!!
+            startDate = LocalDate.parse(beforeHebePeriod.start.date)
+            endDate = LocalDate.parse(currentHebePeriod.end.date)
+        } else {
+            startDate = LocalDate.parse(currentHebePeriod.start.date)
+            endDate = LocalDate.parse(currentHebePeriod.end.date)
+        }
+
+        return notes.filter { it.date.isBefore(endDate) && it.date.isAfter(startDate) }.toTypedArray()
+    }
+
     override fun shouldSyncSemesters(student: Student): Boolean {
-        val hebeStudent = Gson().fromJson(student.customData, HebeStudent::class.java)
+        val hebeStudent = student.toHebe()
 
         val currentSemester = hebeStudent.periods.find { it.current }!!
 
