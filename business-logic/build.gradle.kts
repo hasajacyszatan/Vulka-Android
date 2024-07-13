@@ -25,6 +25,8 @@ dependencies {
     implementation(libs.gson)
     implementation(libs.medzik.android.crypto)
 
+    implementation(libs.kotlinx.coroutines)
+
     implementation(projects.coreApi)
     implementation(projects.librusImpl)
     implementation(projects.vulcanImpl)

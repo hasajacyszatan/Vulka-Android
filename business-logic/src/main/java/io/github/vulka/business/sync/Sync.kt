@@ -11,6 +11,13 @@ import io.github.vulka.database.LuckyNumber
 import io.github.vulka.database.Semesters
 import io.github.vulka.database.Timetable
 import io.github.vulka.database.injection.RoomModule
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.job
+import kotlinx.coroutines.joinAll
+import kotlinx.coroutines.launch
 import java.time.Duration
 import java.time.LocalDate
 import java.time.LocalDateTime
@@ -25,68 +32,78 @@ suspend fun sync(
 ) {
     val client = getUserClient(platform, credentials)
 
+    val coroutineScope = CoroutineScope(Dispatchers.IO)
+
     // re-new login credentials if needed
     client.renewCredentials()
 
     val repository = RoomModule.providesRepository(context)
 
-    // sync lucky number
-    val newLuckyNumber = client.getLuckyNumber(student)
-    val luckyNumber = repository.luckyNumber.get(userId)
-    if (luckyNumber != null && luckyNumber.number != newLuckyNumber) {
-        repository.luckyNumber.update(
-            luckyNumber.copy(number = newLuckyNumber)
-        )
-    } else {
-        repository.luckyNumber.insert(
-            LuckyNumber(
-                credentialsId = userId,
-                number = newLuckyNumber
+    val luckyNumberJob = coroutineScope.launch {
+        // sync lucky number
+        val newLuckyNumber = client.getLuckyNumber(student)
+        val luckyNumber = repository.luckyNumber.get(userId)
+        if (luckyNumber != null && luckyNumber.number != newLuckyNumber) {
+            repository.luckyNumber.update(
+                luckyNumber.copy(number = newLuckyNumber)
             )
-        )
+        } else {
+            repository.luckyNumber.insert(
+                LuckyNumber(
+                    credentialsId = userId,
+                    number = newLuckyNumber
+                )
+            )
+        }
     }
 
-    // TODO: Add use of shouldSyncSemesters
-    // sync grades and semesters
-    val semesters = client.getSemesters(student)
-    repository.grades.deleteByCredentialsId(userId)
-    repository.semesters.deleteByCredentialsId(userId)
+    val gradesJob = coroutineScope.launch {
+        // TODO: Add use of shouldSyncSemesters
+        // sync grades and semesters
+        val semesters = client.getSemesters(student)
+        repository.grades.deleteByCredentialsId(userId)
+        repository.semesters.deleteByCredentialsId(userId)
 
-    for (semester in semesters) {
-        repository.semesters.insert(
-            Semesters(
-                semester = semester,
-                credentialsId = userId
+        for (semester in semesters) {
+            repository.semesters.insert(
+                Semesters(
+                    semester = semester,
+                    credentialsId = userId
+                )
             )
-        )
 
-        // sync grades
-        val grades = client.getGrades(student, semester)
-        for (grade in grades) {
-            repository.grades.insert(
-                Grades(
-                    grade = grade,
-                    semester = semester.number,
+            // sync grades
+            val grades = client.getGrades(student, semester)
+            for (grade in grades) {
+                repository.grades.insert(
+                    Grades(
+                        grade = grade,
+                        semester = semester.number,
+                        credentialsId = userId
+                    )
+                )
+            }
+        }
+    }
+
+    val timetableJob = coroutineScope.launch {
+        // Sync timetable
+        val now = LocalDateTime.now()
+        val lessons = client.getLessons(student, now.minusWeeks(2).toLocalDate(), now.plusWeeks(1).toLocalDate())
+        repository.timetable.deleteByCredentialsId(userId)
+
+        for (lesson in lessons) {
+            repository.timetable.insert(
+                Timetable(
+                    lesson = lesson,
+                    lastSync = now,
                     credentialsId = userId
                 )
             )
         }
     }
 
-    // Sync timetable
-    val now = LocalDateTime.now()
-    val lessons = client.getLessons(student, now.minusWeeks(2).toLocalDate(), now.plusWeeks(1).toLocalDate())
-    repository.timetable.deleteByCredentialsId(userId)
-
-    for (lesson in lessons) {
-        repository.timetable.insert(
-            Timetable(
-                lesson = lesson,
-                lastSync = now,
-                credentialsId = userId
-            )
-        )
-    }
+    joinAll(luckyNumberJob, gradesJob, timetableJob)
 }
 
 fun getUserClientFromCredentials(platform: Platform, credentials: String): UserClient {
