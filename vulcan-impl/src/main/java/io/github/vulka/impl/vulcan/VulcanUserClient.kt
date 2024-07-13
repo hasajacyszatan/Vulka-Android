@@ -51,12 +51,11 @@ class VulcanUserClient(
     }
 
     override suspend fun getLuckyNumber(student: Student): Int {
-        val hebeStudent = Gson().fromJson(student.customData, HebeStudent::class.java)
-        return api.getLuckyNumber(hebeStudent, LocalDate.now())
+        return api.getLuckyNumber(student.toHebe(), LocalDate.now())
     }
 
     override suspend fun getGrades(student: Student, semester: Semester): Array<Grade> {
-        val hebeStudent = Gson().fromJson(student.customData, HebeStudent::class.java)
+        val hebeStudent = student.toHebe()
         val currentHebePeriod = hebeStudent.periods.find { it.current }!!
 
         val currentPeriod = hebeStudent.periods.find { it.number == semester.number && it.level == currentHebePeriod.level }!!
@@ -205,7 +204,7 @@ class VulcanUserClient(
         for (note in response) {
             notes.add(
                 Note(
-                    name = note.category.name,
+                    name = note.category?.name,
                     content = note.content,
                     points = note.points,
                     creator = note.creator.displayName,

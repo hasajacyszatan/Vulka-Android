@@ -43,10 +43,12 @@ fun NotesScreen(
         notes.forEach { note ->
             item {
                 NotesCard {
-                    Text(
-                        text = note.name,
-                        fontWeight = FontWeight.Bold
-                    )
+                    note.name?.let {
+                        Text(
+                            text = it,
+                            fontWeight = FontWeight.Bold
+                        )
+                    }
                     Text(text = note.content)
                     Row(
                         modifier = Modifier.fillMaxWidth().padding(vertical = 5.dp),

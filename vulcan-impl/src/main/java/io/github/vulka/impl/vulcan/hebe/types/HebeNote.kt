@@ -18,7 +18,7 @@ data class HebeNote(
     @SerializedName("Creator")
     val creator: HebeTeacher,
     @SerializedName("Category")
-    val category: HebeCategory,
+    val category: HebeCategory?,
     @SerializedName("Content")
     val content: String,
     // Don't know type for this moment
@@ -32,7 +32,7 @@ data class HebeCategory(
     @SerializedName("Name")
     val name: String,
     @SerializedName("Type")
-    val type: Any,
+    val type: Any?,
     @SerializedName("DefaultPoints")
-    val defaultPoints: Any
+    val defaultPoints: Any?
 )
