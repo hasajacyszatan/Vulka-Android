@@ -8,6 +8,7 @@ import io.github.vulka.core.api.UserClient
 import io.github.vulka.core.api.types.Student
 import io.github.vulka.database.Grades
 import io.github.vulka.database.LuckyNumber
+import io.github.vulka.database.Notes
 import io.github.vulka.database.Semesters
 import io.github.vulka.database.Timetable
 import io.github.vulka.database.injection.RoomModule
@@ -103,7 +104,21 @@ suspend fun sync(
         }
     }
 
-    joinAll(luckyNumberJob, gradesJob, timetableJob)
+    val notesJob = coroutineScope.launch {
+        val notes = client.getNotes(student)
+        repository.notes.deleteByCredentialsId(userId)
+
+        for (note in notes) {
+            repository.notes.insert(
+                Notes(
+                    note = note,
+                    credentialsId = userId
+                )
+            )
+        }
+    }
+
+    joinAll(luckyNumberJob, gradesJob, timetableJob, notesJob)
 }
 
 fun getUserClientFromCredentials(platform: Platform, credentials: String): UserClient {

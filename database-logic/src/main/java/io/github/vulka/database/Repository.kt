@@ -8,6 +8,7 @@ interface RepositoryInterface {
     val grades: GradesDao
     val timetable: TimetableDao
     val semesters: SemestersDao
+    val notes: NotesDao
 }
 
 class Repository(context: Context) : RepositoryInterface {
@@ -18,4 +19,5 @@ class Repository(context: Context) : RepositoryInterface {
     override val grades = database.gradesDao()
     override val timetable = database.timetableDao()
     override val semesters = database.semestersDao()
+    override val notes = database.notesDao()
 }

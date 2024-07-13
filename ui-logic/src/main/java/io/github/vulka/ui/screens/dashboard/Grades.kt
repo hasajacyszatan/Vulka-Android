@@ -34,6 +34,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.intl.Locale
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -50,6 +51,7 @@ import io.github.vulka.ui.common.Avatar
 import io.github.vulka.ui.common.AvatarShape
 import io.github.vulka.ui.common.SegmentedButtonItem
 import io.github.vulka.ui.common.SegmentedButtons
+import io.github.vulka.ui.utils.formatByLocale
 import kotlinx.serialization.Serializable
 import java.util.UUID
 
@@ -204,7 +206,7 @@ fun GradesTab(
                                             )
                                             Text(
                                                 fontSize = 12.sp,
-                                                text = "${grade.date}  ${stringResource(R.string.Weight)}: ${grade.weight}"
+                                                text = "${grade.date.formatByLocale(Locale.current)}  ${stringResource(R.string.Weight)}: ${grade.weight}"
                                             )
                                         }
                                     }

@@ -282,6 +282,9 @@ fun HomeScreen(
                 }
                 More -> {
                     MoreScreen(
+                        args = More(
+                            userId = args.userId
+                        ),
                         navHostController = navController,
                         changeScaffoldTitle = {
                             scaffoldTitle = it

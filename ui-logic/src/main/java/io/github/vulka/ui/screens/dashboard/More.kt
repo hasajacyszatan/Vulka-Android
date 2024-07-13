@@ -23,6 +23,7 @@ import io.github.vulka.ui.R
 import io.github.vulka.ui.screens.dashboard.more.About
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.toRoute
 import io.github.vulka.ui.screens.dashboard.more.Exams
 import io.github.vulka.ui.screens.dashboard.more.ExamsScreen
 import io.github.vulka.ui.screens.dashboard.more.Homework
@@ -36,10 +37,13 @@ import io.github.vulka.ui.screens.dashboard.more.SettingsScreen
 import kotlinx.serialization.Serializable
 
 @Serializable
-object More
+class More(
+    val userId: String
+)
 
 @Composable
 fun MoreScreen(
+    args: More,
     navHostController: NavController,
     changeScaffoldTitle: @Composable (String?) -> Unit
 ) {
@@ -47,7 +51,9 @@ fun MoreScreen(
 
     NavHost(
         navController,
-        startDestination = More,
+        startDestination = More(
+            userId = args.userId
+        ),
         modifier = Modifier.imePadding(),
         enterTransition = {
             NavigationAnimations.enterTransition()
@@ -64,7 +70,7 @@ fun MoreScreen(
     ) {
         composable<More> {
             changeScaffoldTitle(null)
-            MoreContent(navHostController, navController)
+            MoreContent(navHostController, navController, args.userId)
         }
 
         composable<Messages> {
@@ -84,7 +90,9 @@ fun MoreScreen(
 
         composable<Notes> {
             changeScaffoldTitle(stringResource(R.string.More_NotesAndAchievements))
-            NotesScreen()
+            NotesScreen(
+                args = it.toRoute<Notes>()
+            )
         }
 
         composable<Settings> {
@@ -97,6 +105,7 @@ fun MoreScreen(
 fun MoreContent(
     navHostController: NavController,
     navController: NavController,
+    userId: String,
 ) {
     Column(
         modifier = Modifier.verticalScroll(rememberScrollState())
@@ -122,7 +131,13 @@ fun MoreContent(
         BasicPreference(
             leading = { Icon(Icons.Default.EmojiEvents, contentDescription = null) },
             title = stringResource(R.string.More_NotesAndAchievements),
-            onClick = { navController.navigate(Notes) }
+            onClick = {
+                navController.navigate(
+                    Notes(
+                        userId = userId
+                    )
+                )
+            }
         )
 
         BasicPreference(
