@@ -11,7 +11,7 @@ data class Lesson(
     val subjectName: String,
     val position: Int,
     val classRoom: String? = null,
-    val teacherName: String,
+    val teacherName: String?,
     val groupName: String? = null,
     val change: LessonChange? = null,
     val date: LocalDate,

@@ -127,7 +127,7 @@ class VulcanUserClient(
                         )
                     } else null,
                     date = LocalDate.parse(lesson.date.date),
-                    teacherName = lesson.teacher.displayName
+                    teacherName = lesson.teacher?.displayName
                 )
             )
         }

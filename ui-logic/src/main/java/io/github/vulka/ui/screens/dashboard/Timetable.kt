@@ -438,7 +438,7 @@ private fun LessonCard(
                                             lesson.change!!.newTeacher?.fullName
                             }
                         else
-                            (if (!lesson.classRoom.isNullOrEmpty()) "${lesson.classRoom.orEmpty()} " else "") + lesson.teacherName
+                            (if (!lesson.classRoom.isNullOrEmpty()) "${lesson.classRoom.orEmpty()} " else "") + lesson.teacherName.orEmpty()
                     )
                 }
 
@@ -480,19 +480,21 @@ private fun LessonDetails(lesson: Lesson) {
             }
         )
 
-        AnimatedTextField(
-            value = TextFieldValue(
-                value = when {
-                    lesson.change?.newTeacher != null -> lesson.change?.newTeacher!!.fullName
-                    else -> lesson.teacherName
-                },
-                editable = false
-            ),
-            label = stringResource(R.string.Teacher),
-            leading = {
-                IconBox(Icons.Default.Person)
-            }
-        )
+        if (lesson.teacherName != null) {
+            AnimatedTextField(
+                value = TextFieldValue(
+                    value = when {
+                        lesson.change?.newTeacher != null -> lesson.change?.newTeacher!!.fullName
+                        else -> lesson.teacherName!!
+                    },
+                    editable = false
+                ),
+                label = stringResource(R.string.Teacher),
+                leading = {
+                    IconBox(Icons.Default.Person)
+                }
+            )
+        }
 
         if (lesson.classRoom != null || lesson.change?.classRoom != null) {
             AnimatedTextField(

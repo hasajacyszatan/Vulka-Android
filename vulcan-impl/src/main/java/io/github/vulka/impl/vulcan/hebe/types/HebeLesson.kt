@@ -12,7 +12,7 @@ data class HebeLesson(
     @SerializedName("Room")
     val room: HebeLessonRoom?,
     @SerializedName("TeacherPrimary")
-    val teacher: HebeTeacher,
+    val teacher: HebeTeacher?,
     @SerializedName("TeacherSecondary")
     val secondTeacher: HebeTeacher? = null,
     @SerializedName("Subject")
