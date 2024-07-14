@@ -1,6 +1,7 @@
 package io.github.vulka.ui.screens.dashboard
 
 import android.content.Context
+import android.util.Log
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHostState
@@ -36,6 +37,7 @@ class HomeViewModel @Inject constructor(
     var credentials = mutableStateOf("")
     var dbCredentials: MutableState<Credentials?> = mutableStateOf(null)
 
+    // TODO: rework refreshing system
     // If data was synchronized when open app
     var wasRefreshed by mutableStateOf(false)
 
@@ -63,8 +65,6 @@ class HomeViewModel @Inject constructor(
         onError: (Exception) -> Unit = {}
     ) = runOnIOThread {
         // Sync database
-        refreshed = false
-
         try {
             sync(
                 context = context,
@@ -74,7 +74,6 @@ class HomeViewModel @Inject constructor(
                 student = student
             )
         } catch (e: Exception) {
-            refreshed = true
             runOnIOThread {
                 val snackBarResult = snackBarState.showSnackbar(
                     message = "${context.getText(R.string.Error)}: ${e.message}",
@@ -91,7 +90,6 @@ class HomeViewModel @Inject constructor(
         }
 
         pullToRefreshState.endRefresh()
-        refreshed = true
     }
 
     // TODO: migrate room to flow objects
