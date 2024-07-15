@@ -66,20 +66,6 @@ fun LoginScreen(
 
                     AnimatedTextField(
                         modifier = Modifier.padding(vertical = 5.dp),
-                        label = stringResource(R.string.Field_Symbol),
-                        value = TextFieldValue.fromMutableState(viewModel.vulcanSymbol),
-                        clearButton = true,
-                        singleLine = true,
-                        leading = {
-                            Icon(
-                                imageVector = Icons.Default.School,
-                                contentDescription = null
-                            )
-                        }
-                    )
-
-                    AnimatedTextField(
-                        modifier = Modifier.padding(vertical = 5.dp),
                         label = stringResource(R.string.Field_Token),
                         value = TextFieldValue.fromMutableState(viewModel.vulcanToken),
                         clearButton = true,
@@ -87,6 +73,20 @@ fun LoginScreen(
                         leading = {
                             Icon(
                                 imageVector = Icons.Default.DataObject,
+                                contentDescription = null
+                            )
+                        }
+                    )
+
+                    AnimatedTextField(
+                        modifier = Modifier.padding(vertical = 5.dp),
+                        label = stringResource(R.string.Field_Symbol),
+                        value = TextFieldValue.fromMutableState(viewModel.vulcanSymbol),
+                        clearButton = true,
+                        singleLine = true,
+                        leading = {
+                            Icon(
+                                imageVector = Icons.Default.School,
                                 contentDescription = null
                             )
                         }

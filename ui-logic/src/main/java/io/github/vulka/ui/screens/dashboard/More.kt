@@ -1,5 +1,7 @@
 package io.github.vulka.ui.screens.dashboard
 
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.rememberScrollState
@@ -17,7 +19,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.navigation.NavController
 import androidx.navigation.compose.NavHost
-import dev.medzik.android.compose.navigation.NavigationAnimations
 import dev.medzik.android.compose.ui.preference.BasicPreference
 import io.github.vulka.ui.R
 import io.github.vulka.ui.screens.dashboard.more.About
@@ -55,18 +56,10 @@ fun MoreScreen(
             userId = args.userId
         ),
         modifier = Modifier.imePadding(),
-        enterTransition = {
-            NavigationAnimations.enterTransition()
-        },
-        exitTransition = {
-            NavigationAnimations.exitTransition()
-        },
-        popEnterTransition = {
-            NavigationAnimations.popEnterTransition()
-        },
-        popExitTransition = {
-            NavigationAnimations.popExitTransition()
-        }
+        enterTransition = { fadeIn() },
+        exitTransition = { fadeOut() },
+        popEnterTransition = { fadeIn() },
+        popExitTransition = { fadeOut() }
     ) {
         composable<More> {
             changeScaffoldTitle(null)

@@ -1,7 +1,6 @@
 package io.github.vulka.ui.screens.dashboard
 
 import android.content.Context
-import android.util.Log
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHostState
@@ -88,6 +87,8 @@ class HomeViewModel @Inject constructor(
                 }
             }
         }
+
+        refreshed = true
 
         pullToRefreshState.endRefresh()
     }

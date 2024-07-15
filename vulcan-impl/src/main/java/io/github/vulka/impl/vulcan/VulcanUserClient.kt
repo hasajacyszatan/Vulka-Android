@@ -99,7 +99,7 @@ class VulcanUserClient(
 
             lessons.add(
                 Lesson(
-                    subjectName = lesson.subject?.name ?: "",
+                    subjectName = lesson.subject?.name ?: lesson.event.orEmpty(),
                     startTime = lesson.time.from,
                     endTime = lesson.time.to,
                     classRoom = lesson.room?.code,
@@ -107,16 +107,18 @@ class VulcanUserClient(
                     change = if (change != null) {
                         LessonChange(
                             type = when (change.changes?.type) {
+                                // Canceled at begin
                                 1 -> LessonChangeType.Canceled
+                                // Rescheduled
                                 2 -> LessonChangeType.Replacement
+                                // Canceled at end (Not sure)
                                 3 -> LessonChangeType.Canceled
+                                // Not sure
                                 4 -> LessonChangeType.Canceled
+                                // Fallback
                                 else -> LessonChangeType.Replacement
                             },
-                            message = when (change.changes?.type) {
-                                4 -> change.reason
-                                else -> change.teacherAbsenceEffectName ?: change.reason
-                            },
+                            message = change.reason ?: change.teacherAbsenceEffectName,
                             classRoom = change.room?.code,
                             newSubjectName = change.subject?.name,
                             newTeacher = change.teacherPrimary?.displayName?.let {
