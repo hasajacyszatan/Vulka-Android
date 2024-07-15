@@ -33,7 +33,7 @@ class VulcanHebeApi {
         this.credentials = credentials
     }
 
-    private fun getBaseUrl(token: String): String? = runBlocking {
+    private fun getBaseUrl(token: String): String = runBlocking {
         val client = HttpClient(OkHttp)
 
         val response = client.get("http://komponenty.vulcan.net.pl/UonetPlusMobile/RoutingRules.txt")
@@ -49,7 +49,7 @@ class VulcanHebeApi {
                 return@runBlocking line.substring(line.indexOf(",") + 1)
         }
 
-        return@runBlocking null
+        throw InvalidTokenException("Invalid token prefix")
     }
 
     private fun getRestUrl(student: HebeStudent): String {
@@ -62,7 +62,7 @@ class VulcanHebeApi {
 
         client = HebeHttpClient(keystore)
 
-        val baseUrl = getBaseUrl(token)
+        val baseUrl = getBaseUrl(upperToken)
 
         val fullUrl = "$baseUrl/$lowerSymbol/${ApiEndpoints.DEVICE_REGISTER}"
 
