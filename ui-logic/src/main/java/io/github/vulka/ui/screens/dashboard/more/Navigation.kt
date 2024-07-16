@@ -6,7 +6,6 @@ import androidx.navigation.compose.composable
 import io.github.vulka.ui.R
 import io.github.vulka.ui.TopBarWithBack
 import io.github.vulka.ui.common.DefaultScaffold
-import io.github.vulka.ui.common.MediumTopAppBarWithBack
 
 fun NavGraphBuilder.moreNavigation(navController: NavController) {
     composable<About> {

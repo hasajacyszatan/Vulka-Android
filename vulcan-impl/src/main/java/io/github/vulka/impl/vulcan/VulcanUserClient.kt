@@ -14,7 +14,6 @@ import io.github.vulka.core.api.types.Student
 import io.github.vulka.core.api.types.Summary
 import io.github.vulka.core.api.types.Teacher
 import io.github.vulka.impl.vulcan.hebe.VulcanHebeApi
-import io.github.vulka.impl.vulcan.hebe.types.HebeStudent
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.ZoneOffset
