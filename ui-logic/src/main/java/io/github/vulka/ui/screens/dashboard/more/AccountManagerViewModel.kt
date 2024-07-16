@@ -1,6 +1,9 @@
 package io.github.vulka.ui.screens.dashboard.more
 
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.navigation.NavController
 import androidx.navigation.NavGraph.Companion.findStartDestination
@@ -18,13 +21,15 @@ class AccountManagerViewModel @Inject constructor(
 ) : ViewModel() {
     val credentials = mutableStateListOf(*repository.credentials.getAll().toTypedArray())
 
+    private var selfDelete by mutableStateOf(false)
+
     fun onDeleteClick(args: AccountManager, credentials: Credentials, navController: NavController) {
         clearAccountData(credentials)
 
-        val selfDelete = UUID.fromString(args.userId) == credentials.id
+        selfDelete = UUID.fromString(args.userId) == credentials.id
         this.credentials.remove(credentials)
 
-        check(navController, selfDelete)
+        check(navController)
     }
 
     private fun clearAccountData(credentials: Credentials) {
@@ -37,7 +42,7 @@ class AccountManagerViewModel @Inject constructor(
         repository.credentials.delete(credentials)
     }
 
-    fun check(navController: NavController, selfDelete: Boolean) {
+    fun check(navController: NavController) {
         if (repository.credentials.count() == 0) {
             navController.navigate(Welcome) {
                 popUpTo(navController.graph.findStartDestination().id) {
