@@ -25,9 +25,9 @@ import java.util.regex.Pattern
 class HebeHttpClient(private val keystore: HebeKeystore) {
     companion object {
         const val APP_NAME = "DzienniczekPlus 2.0"
-        const val APP_VERSION = "1.4.2"
+        const val APP_VERSION = "24.06.03 (G)"
         const val APP_OS = "Android"
-        const val APP_USER_AGENT = "Dart/2.10 (dart:io)"
+        const val APP_USER_AGENT = "Dart/3.3 (dart:io)"
     }
 
     private val client = HttpClient(OkHttp)
