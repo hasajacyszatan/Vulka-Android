@@ -2,8 +2,6 @@ package io.github.vulka.impl.vulcan.hebe
 
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
-import io.github.vulka.impl.*
-import io.github.vulka.impl.vulcan.*
 import io.github.vulka.impl.vulcan.hebe.login.HebeKeystore
 import io.github.vulka.impl.vulcan.hebe.types.ApiRequest
 import io.github.vulka.impl.vulcan.hebe.types.ApiResponse
@@ -13,7 +11,6 @@ import io.ktor.client.request.*
 import io.ktor.client.statement.*
 import io.ktor.http.*
 import kotlinx.coroutines.runBlocking
-import java.io.IOException
 import java.net.URLEncoder
 import java.text.SimpleDateFormat
 import java.time.LocalDateTime
@@ -41,7 +38,6 @@ class HebeHttpClient(private val keystore: HebeKeystore) {
         return URLEncoder.encode(matcher.group(), "UTF-8").lowercase()
     }
 
-    @Throws(IOException::class)
     private fun buildHeaders(fullUrl: String, body: String? = null): Map<String, String> {
         val date = Date.from(ZonedDateTime.now().toInstant())
         val time = SimpleDateFormat("EEE, d MMM yyyy hh:mm:ss", Locale.ENGLISH).apply {
@@ -83,7 +79,6 @@ class HebeHttpClient(private val keystore: HebeKeystore) {
         )
     }
 
-    @Throws(IOException::class)
     fun <T> post(url: String, body: Any, clazz: Class<T>): T? = runBlocking {
         val payload = buildPayload(body)
         val payloadString = Gson().toJson(payload)
@@ -106,7 +101,6 @@ class HebeHttpClient(private val keystore: HebeKeystore) {
         return@runBlocking apiResponse.envelope
     }
 
-    @Throws(IOException::class)
     fun <T> get(url: String, clazz: Class<T>, query: Map<String, String>? = null): T? = runBlocking {
         val urlBuilder = URLBuilder(url)
 
