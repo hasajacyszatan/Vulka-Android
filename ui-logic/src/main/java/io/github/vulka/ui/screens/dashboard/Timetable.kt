@@ -1,6 +1,5 @@
 package io.github.vulka.ui.screens.dashboard
 
-import androidx.compose.animation.AnimatedContent
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -15,8 +14,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowLeft
-import androidx.compose.material.icons.automirrored.filled.ArrowRight
 import androidx.compose.material.icons.filled.Backpack
 import androidx.compose.material.icons.filled.Book
 import androidx.compose.material.icons.filled.CalendarMonth
@@ -26,13 +23,11 @@ import androidx.compose.material.icons.filled.Room
 import androidx.compose.material.icons.filled.Schedule
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.contentColorFor
-import androidx.compose.material3.surfaceColorAtElevation
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
@@ -42,7 +37,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextOverflow
@@ -68,6 +62,7 @@ import io.github.vulka.core.api.types.Lesson
 import io.github.vulka.core.api.types.LessonChangeType
 import io.github.vulka.ui.R
 import io.github.vulka.ui.VulkaViewModel
+import io.github.vulka.ui.common.DatePager
 import io.github.vulka.ui.common.ErrorDialog
 import kotlinx.coroutines.launch
 import kotlinx.serialization.Serializable
@@ -134,20 +129,56 @@ fun TimetableScreen(
         }
     }
 
-    Column {
-        AnimatedContent(
-            modifier = Modifier
-                .fillMaxSize()
-                .weight(1f),
-            targetState = currentDate,
-            label = "timetable date"
-        ) { date ->
-            val lessons = viewModel.timetableRepository.getByDateAndCredentialsId(
-                UUID.fromString(args.userId),
-                date
-            ).sortedBy { it.lesson.position }
+    DatePager(
+        date = currentDate,
+        onClickBack = {
+            currentDate = getPreviousWeekday(currentDate)
+            syncTimetable()
+        },
+        onClickForward = {
+            currentDate = getNextWeekday(currentDate)
+            syncTimetable()
+        }
+    ) { date ->
+        val lessons = viewModel.timetableRepository.getByDateAndCredentialsId(
+            UUID.fromString(args.userId),
+            date
+        ).sortedBy { it.lesson.position }
 
-            if (loadingError) {
+        if (loadingError) {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = 16.dp),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center
+            ) {
+                IconBox(
+                    imageVector = Icons.Default.Backpack,
+                    modifier = Modifier.size(100.dp)
+                )
+
+                Spacer(
+                    modifier = Modifier.height(10.dp)
+                )
+
+                Text(
+                    modifier = Modifier.padding(20.dp),
+                    text = "${stringResource(R.string.Error)}: ${exception?.message}",
+                    fontSize = 15.sp,
+                    textAlign = TextAlign.Center
+                )
+
+                OutlinedButton(
+                    onClick = {
+                        errorDialogState.show()
+                    }
+                ) {
+                    Text(text = stringResource(R.string.Details))
+                }
+            }
+        } else if (!timetableRefreshing) {
+            if (lessons.isEmpty()) {
                 Column(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -165,92 +196,20 @@ fun TimetableScreen(
                     )
 
                     Text(
-                        modifier = Modifier.padding(20.dp),
-                        text = "${stringResource(R.string.Error)}: ${exception?.message}",
-                        fontSize = 15.sp,
-                        textAlign = TextAlign.Center
+                        text = stringResource(R.string.NoLessons),
+                        fontSize = 20.sp,
                     )
-
-                    OutlinedButton(
-                        onClick = {
-                            errorDialogState.show()
-                        }
-                    ) {
-                        Text(text = stringResource(R.string.Details))
-                    }
-                }
-            } else if (!timetableRefreshing) {
-                if (lessons.isEmpty()) {
-                    Column(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(vertical = 16.dp),
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                        verticalArrangement = Arrangement.Center
-                    ) {
-                        IconBox(
-                            imageVector = Icons.Default.Backpack,
-                            modifier = Modifier.size(100.dp)
-                        )
-
-                        Spacer(
-                            modifier = Modifier.height(10.dp)
-                        )
-
-                        Text(
-                            text = stringResource(R.string.NoLessons),
-                            fontSize = 20.sp,
-                        )
-                    }
-                } else {
-                    LessonsCards(lessons)
                 }
             } else {
-                Column(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.Center
-                ) {
-                    CircularProgressIndicator()
-                }
+                LessonsCards(lessons)
             }
-        }
-
-        Surface(
-            modifier = Modifier.fillMaxWidth().height(50.dp),
-            color = MaterialTheme.colorScheme.surfaceColorAtElevation(3.dp)
-        ) {
-            Row(
-                modifier = Modifier.fillMaxSize(),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.SpaceBetween
+        } else {
+            Column(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center
             ) {
-                IconButton(
-                    onClick = {
-                        currentDate = getPreviousWeekday(currentDate)
-                        syncTimetable()
-                    }
-                ) {
-                    IconBox(
-                        imageVector = Icons.AutoMirrored.Filled.ArrowLeft,
-                    )
-                }
-
-                Text(
-                    fontWeight = FontWeight.Bold,
-                    text = formatDate(currentDate)
-                )
-
-                IconButton(
-                    onClick = {
-                        currentDate = getNextWeekday(currentDate)
-                        syncTimetable()
-                    }
-                ) {
-                    IconBox(
-                        imageVector = Icons.AutoMirrored.Filled.ArrowRight,
-                    )
-                }
+                CircularProgressIndicator()
             }
         }
     }
