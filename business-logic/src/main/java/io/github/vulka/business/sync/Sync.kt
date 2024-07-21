@@ -12,13 +12,13 @@ import io.github.vulka.database.Notes
 import io.github.vulka.database.Semesters
 import io.github.vulka.database.Timetable
 import io.github.vulka.database.injection.RoomModule
+import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.awaitAll
-import kotlinx.coroutines.job
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.joinAll
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import java.time.Duration
 import java.time.LocalDate
 import java.time.LocalDateTime
@@ -40,10 +40,16 @@ suspend fun sync(
 
     val repository = RoomModule.providesRepository(context)
 
-    val luckyNumberJob = coroutineScope.launch {
+    var error: Throwable? = null
+
+    val handler = CoroutineExceptionHandler { _, exception ->
+        error = exception
+    }
+
+    val luckyNumberJob = coroutineScope.launch(handler) {
         // sync lucky number
         val newLuckyNumber = client.getLuckyNumber(student)
-        val luckyNumber = repository.luckyNumber.get(userId)
+        val luckyNumber = repository.luckyNumber.get(userId).first()
         if (luckyNumber != null && luckyNumber.number != newLuckyNumber) {
             repository.luckyNumber.update(
                 luckyNumber.copy(number = newLuckyNumber)
@@ -58,7 +64,7 @@ suspend fun sync(
         }
     }
 
-    val gradesJob = coroutineScope.launch {
+    val gradesJob = coroutineScope.launch(handler) {
         // TODO: Add use of shouldSyncSemesters
         // sync grades and semesters
         val semesters = client.getSemesters(student)
@@ -87,7 +93,7 @@ suspend fun sync(
         }
     }
 
-    val timetableJob = coroutineScope.launch {
+    val timetableJob = coroutineScope.launch(handler) {
         // Sync timetable
         val now = LocalDateTime.now()
         val lessons = client.getLessons(student, now.minusWeeks(2).toLocalDate(), now.plusWeeks(1).toLocalDate())
@@ -104,7 +110,7 @@ suspend fun sync(
         }
     }
 
-    val notesJob = coroutineScope.launch {
+    val notesJob = coroutineScope.launch(handler) {
         val notes = client.getNotes(student)
         repository.notes.deleteByCredentialsId(userId)
 
@@ -119,6 +125,9 @@ suspend fun sync(
     }
 
     joinAll(luckyNumberJob, gradesJob, timetableJob, notesJob)
+
+    if (error != null)
+        throw error!!
 }
 
 fun getUserClientFromCredentials(platform: Platform, credentials: String): UserClient {
@@ -127,13 +136,14 @@ fun getUserClientFromCredentials(platform: Platform, credentials: String): UserC
     return client
 }
 
-fun getStudentFromCredentials(context: Context, userId: UUID): Student {
+// TODO: remove runBlocking
+fun getStudentFromCredentials(context: Context, userId: UUID): Student = runBlocking {
     val repository = RoomModule.providesRepository(context)
-    val dbCredentials = repository.credentials.getById(userId)!!
-    return dbCredentials.student
+    val dbCredentials = repository.credentials.getById(userId).first()!!
+    return@runBlocking dbCredentials.student
 }
 
-suspend fun syncTimetableAtSwitch(context: Context, client: UserClient, student: Student, selectedDate: LocalDate, userId: UUID) {
+fun syncTimetableAtSwitch(context: Context, client: UserClient, student: Student, selectedDate: LocalDate, userId: UUID) = runBlocking {
     val now = LocalDateTime.now()
 
     val repository = RoomModule.providesRepository(context)
@@ -149,17 +159,17 @@ suspend fun syncTimetableAtSwitch(context: Context, client: UserClient, student:
         )
     }
 }
-
-fun checkIfTimetableShouldBeSync(context: Context,selectedDateTime: LocalDate,userId: UUID): Boolean {
+// TODO: remove runBlocking
+fun checkIfTimetableShouldBeSync(context: Context, selectedDateTime: LocalDate, userId: UUID): Boolean = runBlocking {
     val repository = RoomModule.providesRepository(context)
 
-    val lessons = repository.timetable.getByDateAndCredentialsId(userId,selectedDateTime)
+    val lessons = repository.timetable.getByDateAndCredentialsId(userId,selectedDateTime).first()
 
     if (lessons.isNotEmpty()) {
         val lesson = lessons[0]
 
         val duration = Duration.between(lesson.lastSync, LocalDateTime.now())
-        return duration.toMinutes() >= 15
+        return@runBlocking duration.toMinutes() >= 15
     } else
-        return true
+        return@runBlocking true
 }

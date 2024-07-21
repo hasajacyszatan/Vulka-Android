@@ -32,6 +32,7 @@ import androidx.compose.material3.pulltorefresh.PullToRefreshContainer
 import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -85,7 +86,7 @@ fun HomeScreen(
     val errorDialogState = rememberDialogState()
     var exception: Exception? by rememberMutable(null)
 
-    val studentState by viewModel.student.collectAsStateWithLifecycle()
+    val studentState by viewModel.student.collectAsState()
 
     LaunchedEffect(Unit) {
         viewModel.init(args)

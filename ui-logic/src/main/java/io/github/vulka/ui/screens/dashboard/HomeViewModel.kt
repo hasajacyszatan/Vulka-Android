@@ -11,7 +11,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dev.medzik.android.utils.runOnIOThread
 import io.github.vulka.business.crypto.decryptCredentials
@@ -20,10 +19,12 @@ import io.github.vulka.core.api.types.Student
 import io.github.vulka.database.Credentials
 import io.github.vulka.database.Repository
 import io.github.vulka.ui.R
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.util.UUID
 import javax.inject.Inject
 
@@ -43,14 +44,14 @@ class HomeViewModel @Inject constructor(
     // If data was saved in DB and now can be safely loaded
     var refreshed by mutableStateOf(false)
 
-    fun init(args: Home) {
-        viewModelScope.launch {
+    suspend fun init(args: Home) {
+        withContext(Dispatchers.IO) {
             credentials.value = decryptCredentials(args.credentials)
-            dbCredentials.value = repository.credentials.getById(UUID.fromString(args.userId))!!
+            dbCredentials.value = repository.credentials.getById(UUID.fromString(args.userId)).first()!!
 
             refreshed = !args.firstSync
 
-            student.tryEmit(dbCredentials.value!!.student)
+            student.value = dbCredentials.value!!.student
         }
     }
 

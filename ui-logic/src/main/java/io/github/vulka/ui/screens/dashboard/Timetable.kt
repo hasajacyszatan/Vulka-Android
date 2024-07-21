@@ -43,6 +43,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import dev.medzik.android.compose.rememberMutable
 import dev.medzik.android.compose.theme.combineAlpha
 import dev.medzik.android.compose.theme.warningContainer
@@ -140,10 +141,12 @@ fun TimetableScreen(
             syncTimetable()
         }
     ) { date ->
-        val lessons = viewModel.timetableRepository.getByDateAndCredentialsId(
+        // TODO: fix
+        val lessonsState by viewModel.timetableRepository.getByDateAndCredentialsId(
             UUID.fromString(args.userId),
             date
-        ).sortedBy { it.lesson.position }
+        ).collectAsStateWithLifecycle(initialValue = emptyList())
+        val lessons = lessonsState.sortedBy { it.lesson.position }
 
         if (loadingError) {
             Column(

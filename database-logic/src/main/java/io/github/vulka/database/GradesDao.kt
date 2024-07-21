@@ -5,6 +5,7 @@ import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.Query
 import androidx.room.Update
+import kotlinx.coroutines.flow.Flow
 import java.time.LocalDate
 import java.util.UUID
 
@@ -29,5 +30,5 @@ interface GradesDao {
     fun countBySubjectSemesterAndCredentials(id: UUID, semester: Int, subjectName: String): Int
 
     @Query("SELECT * FROM Grades WHERE DATE(date) >= DATE(:weekAgoDate) AND credentialsId = :id")
-    fun getFromLastWeek(id: UUID, weekAgoDate: LocalDate): List<Grades>
+    fun getFromLastWeek(id: UUID, weekAgoDate: LocalDate): Flow<List<Grades>>
 }

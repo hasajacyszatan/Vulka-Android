@@ -5,6 +5,7 @@ import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.Query
 import androidx.room.Update
+import kotlinx.coroutines.flow.Flow
 import java.util.UUID
 
 @Dao
@@ -25,7 +26,7 @@ interface CredentialsDao {
     fun get(): Credentials?
 
     @Query("SELECT * FROM credentials WHERE id=:id LIMIT 1")
-    fun getById(id: UUID): Credentials?
+    fun getById(id: UUID): Flow<Credentials?>
 
     @Query("SELECT * FROM credentials")
     fun getAll(): List<Credentials>

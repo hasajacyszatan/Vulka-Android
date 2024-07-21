@@ -5,6 +5,7 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Update
+import kotlinx.coroutines.flow.Flow
 import java.util.UUID
 
 @Dao
@@ -19,5 +20,5 @@ interface LuckyNumberDao {
     fun deleteByCredentialsId(id: UUID)
 
     @Query("SELECT * FROM luckynumber WHERE credentialsId = :credentialsId LIMIT 1")
-    fun get(credentialsId: UUID): LuckyNumber?
+    fun get(credentialsId: UUID): Flow<LuckyNumber?>
 }

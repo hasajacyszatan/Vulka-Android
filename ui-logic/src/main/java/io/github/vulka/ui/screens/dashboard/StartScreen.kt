@@ -1,5 +1,6 @@
 package io.github.vulka.ui.screens.dashboard
 
+import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxScope
@@ -25,8 +26,9 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.pulltorefresh.PullToRefreshState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -37,20 +39,18 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
-import dev.medzik.android.compose.rememberMutable
+import androidx.lifecycle.compose.LocalLifecycleOwner
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import dev.medzik.android.compose.ui.IconBox
 import dev.medzik.android.compose.ui.bottomsheet.rememberBottomSheetState
 import io.github.vulka.core.api.Platform
 import io.github.vulka.core.api.types.Grade
 import io.github.vulka.core.api.types.Student
 import io.github.vulka.ui.R
-import io.github.vulka.ui.VulkaViewModel
 import io.github.vulka.ui.common.Avatar
 import io.github.vulka.ui.screens.dashboard.more.LuckyNumberBottomSheet
 import io.github.vulka.ui.utils.getInitials
 import kotlinx.serialization.Serializable
-import java.time.LocalDate
-import java.util.UUID
 
 @Serializable
 class Start(
@@ -65,18 +65,21 @@ fun StartScreen(
     pullRefresh: @Composable BoxScope.() -> Unit = {},
     pullToRefreshState: PullToRefreshState,
     refreshed: Boolean,
-    viewModel: VulkaViewModel = hiltViewModel()
+    viewModel: StartViewModel = hiltViewModel()
 ) {
-    var luckyNumber by rememberMutable(0)
+    val student by viewModel.student.collectAsStateWithLifecycle()
+    val luckyNumber by viewModel.luckyNumber.collectAsStateWithLifecycle()
 
-    val student by rememberMutable(viewModel.credentialRepository.getById(UUID.fromString(args.userId))!!.student)
-
-    fun updateUI() {
-        luckyNumber = viewModel.luckyNumberRepository.get(UUID.fromString(args.userId))?.number ?: 0
+    LaunchedEffect(Unit) {
+        viewModel.init(args)
     }
 
-    if (refreshed)
-        updateUI()
+    // refresh UI after sync
+    if (!pullToRefreshState.isRefreshing) {
+        LaunchedEffect(Unit) {
+            viewModel.init(args)
+        }
+    }
 
     Box(
         modifier = Modifier
@@ -87,22 +90,26 @@ fun StartScreen(
                 .fillMaxSize()
                 .padding(5.dp)
         ) {
-            item {
-                HeaderCard(student)
+            if (student != null) {
+                item {
+                    HeaderCard(student!!)
+                }
             }
 
-            item {
-                Row {
-                    LuckyCard(luckyNumber)
+            if (luckyNumber != null) {
+                item {
+                    Row {
+                        LuckyCard(luckyNumber!!.number)
+                    }
                 }
             }
 
             item {
-                GradesCard(UUID.fromString(args.userId))
+                GradesCard(viewModel)
             }
 
             item {
-                TimetableCard(UUID.fromString(args.userId))
+                TimetableCard(viewModel)
             }
         }
 
@@ -114,7 +121,8 @@ fun StartScreen(
 @Composable
 fun HeaderCard(student: Student) {
     Surface(
-        modifier = Modifier.fillMaxWidth()
+        modifier = Modifier
+            .fillMaxWidth()
             .padding(horizontal = 3.dp, vertical = 5.dp),
         shape = MaterialTheme.shapes.medium,
         color = MaterialTheme.colorScheme.surfaceContainer
@@ -175,10 +183,9 @@ fun LuckyCard(luckyNumber: Int) {
 
 @Composable
 fun GradesCard(
-    userId: UUID,
-    viewModel: VulkaViewModel = hiltViewModel()
+    viewModel: StartViewModel
 ) {
-    val gradesDb = viewModel.gradesRepository.getFromLastWeek(userId, LocalDate.now().minusWeeks(1))
+    val gradesDb by viewModel.grades.collectAsStateWithLifecycle()
 
     val gradeList: List<Grade> = gradesDb.map { it.grade }
     val uniqueSubjectNames: Set<String> = gradeList.map { it.subject }.sortedBy { it }.toSet()
@@ -191,7 +198,9 @@ fun GradesCard(
             uniqueSubjectNames.forEach { subject ->
                 Column {
                     Row(
-                        modifier = Modifier.padding(vertical = 3.dp).wrapContentSize()
+                        modifier = Modifier
+                            .padding(vertical = 3.dp)
+                            .wrapContentSize()
                     ) {
                         Text(
                             modifier = Modifier.padding(end = 5.dp),
@@ -236,15 +245,14 @@ fun GradesCard(
 
 @Composable
 fun TimetableCard(
-    userId: UUID,
-    viewModel: VulkaViewModel = hiltViewModel()
+    viewModel: StartViewModel
 ) {
     DashboardCard(
         icon = Icons.Default.Backpack,
         title = stringResource(R.string.Lessons)
     ) {
-        val lessons = viewModel.timetableRepository.getByDateAndCredentialsId(userId, LocalDate.now())
-            .map { it.lesson }.sortedBy { it.position }
+        val timetableState by viewModel.timetable.collectAsStateWithLifecycle()
+        val lessons = timetableState.map { it.lesson }.sortedBy { it.position }
         if (lessons.isNotEmpty()) {
             for (lesson in lessons) {
                 Text(text = "${lesson.position}. ${lesson.subjectName}" + (if (lesson.classRoom != null) " (${lesson.classRoom})" else ""))
@@ -262,7 +270,8 @@ fun DashboardCard(
     content: @Composable () -> Unit
 ) {
     Surface(
-        modifier = Modifier.fillMaxWidth()
+        modifier = Modifier
+            .fillMaxWidth()
             .padding(horizontal = 3.dp, vertical = 5.dp),
         shape = MaterialTheme.shapes.medium,
         color = MaterialTheme.colorScheme.surfaceContainer

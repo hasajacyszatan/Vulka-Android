@@ -6,6 +6,7 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Update
+import kotlinx.coroutines.flow.Flow
 import java.time.LocalDate
 import java.util.UUID
 
@@ -27,5 +28,5 @@ interface TimetableDao {
     fun deleteByCredentialsId(id: UUID)
 
     @Query("SELECT * FROM timetable WHERE credentialsId = :id AND date = :date")
-    fun getByDateAndCredentialsId(id: UUID, date: LocalDate): List<Timetable>
+    fun getByDateAndCredentialsId(id: UUID, date: LocalDate): Flow<List<Timetable>>
 }
