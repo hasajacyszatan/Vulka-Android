@@ -5,12 +5,10 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
@@ -64,6 +62,7 @@ import io.github.vulka.core.api.types.LessonChangeType
 import io.github.vulka.ui.R
 import io.github.vulka.ui.VulkaViewModel
 import io.github.vulka.ui.common.DatePager
+import io.github.vulka.ui.common.EmptyView
 import io.github.vulka.ui.common.ErrorDialog
 import kotlinx.coroutines.launch
 import kotlinx.serialization.Serializable
@@ -149,29 +148,13 @@ fun TimetableScreen(
         val lessons = lessonsState.sortedBy { it.lesson.position }
 
         if (loadingError) {
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(vertical = 16.dp),
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.Center
+            EmptyView(
+                icon = Icons.Default.Backpack,
+                title = "${stringResource(R.string.Error)}: ${exception?.message}",
+                fontSize = 15.sp,
+                textPadding = 20.dp,
+                textAlign = TextAlign.Center
             ) {
-                IconBox(
-                    imageVector = Icons.Default.Backpack,
-                    modifier = Modifier.size(100.dp)
-                )
-
-                Spacer(
-                    modifier = Modifier.height(10.dp)
-                )
-
-                Text(
-                    modifier = Modifier.padding(20.dp),
-                    text = "${stringResource(R.string.Error)}: ${exception?.message}",
-                    fontSize = 15.sp,
-                    textAlign = TextAlign.Center
-                )
-
                 OutlinedButton(
                     onClick = {
                         errorDialogState.show()
@@ -182,27 +165,10 @@ fun TimetableScreen(
             }
         } else if (!timetableRefreshing) {
             if (lessons.isEmpty()) {
-                Column(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(vertical = 16.dp),
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.Center
-                ) {
-                    IconBox(
-                        imageVector = Icons.Default.Backpack,
-                        modifier = Modifier.size(100.dp)
-                    )
-
-                    Spacer(
-                        modifier = Modifier.height(10.dp)
-                    )
-
-                    Text(
-                        text = stringResource(R.string.NoLessons),
-                        fontSize = 20.sp,
-                    )
-                }
+                EmptyView(
+                    icon = Icons.Default.Backpack,
+                    title = stringResource(R.string.NoLessons)
+                )
             } else {
                 LessonsCards(lessons)
             }

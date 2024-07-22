@@ -16,6 +16,7 @@ import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.ArrowDropUp
+import androidx.compose.material.icons.filled.Looks6
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
@@ -49,6 +50,7 @@ import io.github.vulka.ui.R
 import io.github.vulka.ui.VulkaViewModel
 import io.github.vulka.ui.common.Avatar
 import io.github.vulka.ui.common.AvatarShape
+import io.github.vulka.ui.common.EmptyView
 import io.github.vulka.ui.common.SegmentedButtonItem
 import io.github.vulka.ui.common.SegmentedButtons
 import io.github.vulka.ui.utils.formatByLocale
@@ -144,89 +146,97 @@ fun GradesTab(
         Box(
             modifier = Modifier.nestedScroll(connection = pullToRefreshState.nestedScrollConnection)
         ) {
-            LazyColumn(
-                modifier = Modifier.fillMaxSize()
-            ) {
-                item {
-                    Row(
-                        modifier = Modifier
-                            .padding(horizontal = 50.dp)
-                            .padding(top = 10.dp)
-                            .fillMaxWidth()
-                            .height(35.dp),
-                        horizontalArrangement = Arrangement.Center
-                    ) {
-                        SegmentedButtons {
-                            for (s in semesters) {
-                                SegmentedButtonItem(
-                                    selected = semester.semester.number == s.semester.number,
-                                    onClick = { semester = s },
-                                    label = { Text("${stringResource(R.string.Semester)} ${s.semester.number}") }
+            if (gradeList.isNotEmpty()) {
+                LazyColumn(
+                    modifier = Modifier.fillMaxSize()
+                ) {
+                    item {
+                        Row(
+                            modifier = Modifier
+                                .padding(horizontal = 50.dp)
+                                .padding(top = 10.dp)
+                                .fillMaxWidth()
+                                .height(35.dp),
+                            horizontalArrangement = Arrangement.Center
+                        ) {
+                            SegmentedButtons {
+                                for (s in semesters) {
+                                    SegmentedButtonItem(
+                                        selected = semester.semester.number == s.semester.number,
+                                        onClick = { semester = s },
+                                        label = { Text("${stringResource(R.string.Semester)} ${s.semester.number}") }
+                                    )
+                                }
+                            }
+                        }
+                    }
+                    item {
+                        uniqueSubjectNames.forEach { subjectName ->
+                            SubjectCard(
+                                more = {
+                                    val filterGrades =
+                                        gradeList.filter { it.subject == subjectName }
+
+                                    filterGrades.forEach { grade ->
+                                        Row(
+                                            modifier = Modifier
+                                                .fillMaxWidth()
+                                                .heightIn(min = 32.dp)
+                                                .padding(vertical = 2.dp),
+                                        ) {
+                                            val gradeColor = GradeColor.getColorByGrade(grade)
+                                            Avatar(
+                                                text = grade.value.orEmpty(),
+                                                shape = AvatarShape.Rounded,
+                                                cardColors = if (gradeColor != null) {
+                                                    CardDefaults.cardColors()
+                                                        .copy(
+                                                            containerColor = gradeColor.containerColor,
+                                                            contentColor = gradeColor.contentColor
+                                                        )
+                                                } else CardDefaults.cardColors()
+                                            )
+
+                                            Column(
+                                                Modifier
+                                                    .fillMaxWidth()
+                                                    .weight(1f)
+                                                    .padding(horizontal = 10.dp)
+                                            ) {
+                                                Text(
+                                                    text = grade.name,
+                                                    maxLines = 1,
+                                                    overflow = TextOverflow.Ellipsis
+                                                )
+                                                Text(
+                                                    fontSize = 12.sp,
+                                                    text = "${grade.date.formatByLocale(Locale.current)}  ${stringResource(R.string.Weight)}: ${grade.weight}"
+                                                )
+                                            }
+                                        }
+                                    }
+                                }
+                            ) {
+                                Text(subjectName)
+
+                                val gradesAmount = viewModel.gradesRepository.countBySubjectSemesterAndCredentials(
+                                    id = UUID.fromString(args.userId),
+                                    semester = semester.semester.number,
+                                    subjectName = subjectName,
+                                )
+                                Text(
+                                    fontSize = 12.sp,
+                                    text = "$gradesAmount ${pluralStringResource(R.plurals.GradesAmount,gradesAmount)}"
                                 )
                             }
                         }
                     }
                 }
-                item {
-                    uniqueSubjectNames.forEach { subjectName ->
-                        SubjectCard(
-                            more = {
-                                val filterGrades =
-                                    gradeList.filter { it.subject == subjectName }
-
-                                filterGrades.forEach { grade ->
-                                    Row(
-                                        modifier = Modifier
-                                            .fillMaxWidth()
-                                            .heightIn(min = 32.dp)
-                                            .padding(vertical = 2.dp),
-                                    ) {
-                                        val gradeColor = GradeColor.getColorByGrade(grade)
-                                        Avatar(
-                                            text = grade.value.orEmpty(),
-                                            shape = AvatarShape.Rounded,
-                                            cardColors = if (gradeColor != null) {
-                                                CardDefaults.cardColors()
-                                                    .copy(
-                                                        containerColor = gradeColor.containerColor,
-                                                        contentColor = gradeColor.contentColor
-                                                    )
-                                            } else CardDefaults.cardColors()
-                                        )
-
-                                        Column(
-                                            Modifier.fillMaxWidth()
-                                                .weight(1f)
-                                                .padding(horizontal = 10.dp)
-                                        ) {
-                                            Text(
-                                                text = grade.name,
-                                                maxLines = 1,
-                                                overflow = TextOverflow.Ellipsis
-                                            )
-                                            Text(
-                                                fontSize = 12.sp,
-                                                text = "${grade.date.formatByLocale(Locale.current)}  ${stringResource(R.string.Weight)}: ${grade.weight}"
-                                            )
-                                        }
-                                    }
-                                }
-                            }
-                        ) {
-                            Text(subjectName)
-
-                            val gradesAmount = viewModel.gradesRepository.countBySubjectSemesterAndCredentials(
-                                id = UUID.fromString(args.userId),
-                                semester = semester.semester.number,
-                                subjectName = subjectName,
-                            )
-                            Text(
-                                fontSize = 12.sp,
-                                text = "$gradesAmount ${pluralStringResource(R.plurals.GradesAmount,gradesAmount)}"
-                            )
-                        }
-                    }
-                }
+            } else {
+                EmptyView(
+                    icon = Icons.Default.Looks6,
+                    title = stringResource(R.string.Grades_Empty)
+                )
             }
         }
     }
@@ -259,7 +269,8 @@ fun SubjectCard(
                     .padding(12.dp),
             ) {
                 Column(
-                    Modifier.fillMaxWidth()
+                    Modifier
+                        .fillMaxWidth()
                         .weight(1f)
                 ) {
                     content()

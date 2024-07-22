@@ -67,4 +67,7 @@
     <string name="More_About_Github" translatable="false">GitHub</string>
     <string name="More_About_Github_Subtitle">See GitHub profile</string>
     <string name="More_Meetings">Meetings</string>
+    <string name="More_NotesAndAchievements_Empty">No notes and achievements</string>
+    <string name="More_Meetings_Empty">No meetings</string>
+    <string name="Grades_Empty">No grades</string>
 </resources>
