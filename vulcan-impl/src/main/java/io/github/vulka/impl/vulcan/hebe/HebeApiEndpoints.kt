@@ -1,6 +1,6 @@
 package io.github.vulka.impl.vulcan.hebe
 
-object ApiEndpoints {
+object HebeApiEndpoints {
     const val DEVICE_REGISTER = "api/mobile/register/new"
     const val STUDENT_LIST = "api/mobile/register/hebe"
 
@@ -26,4 +26,5 @@ object ApiEndpoints {
     const val DATA_TIMETABLE = "schedule"
     const val DATA_TIMETABLE_CHANGES = "schedule/changes"
     const val DATA_NOTES = "note"
+    const val DATA_MEETINGS = "meetings"
 }

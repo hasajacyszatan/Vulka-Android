@@ -7,6 +7,7 @@ import io.github.vulka.core.api.types.Grade
 import io.github.vulka.core.api.types.Lesson
 import io.github.vulka.core.api.types.LessonChange
 import io.github.vulka.core.api.types.LessonChangeType
+import io.github.vulka.core.api.types.Meeting
 import io.github.vulka.core.api.types.Note
 import io.github.vulka.core.api.types.Parent
 import io.github.vulka.core.api.types.Semester
@@ -14,6 +15,7 @@ import io.github.vulka.core.api.types.Student
 import io.github.vulka.core.api.types.Summary
 import io.github.vulka.core.api.types.Teacher
 import io.github.vulka.impl.vulcan.hebe.VulcanHebeApi
+import io.github.vulka.impl.vulcan.hebe.types.HebeStudent
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.ZoneOffset
@@ -202,6 +204,7 @@ class VulcanUserClient(
         val notes = ArrayList<Note>()
         val response = api.getNotes(hebeStudent)
 
+
         for (note in response) {
             notes.add(
                 Note(
@@ -214,6 +217,32 @@ class VulcanUserClient(
             )
         }
 
+        val (startDate,endDate) = getSchoolYearDates(hebeStudent)
+        return notes.filter { it.date.isBefore(endDate) && it.date.isAfter(startDate) }.toTypedArray()
+    }
+
+    override suspend fun getMeetings(student: Student): Array<Meeting> {
+        val hebeStudent = student.toHebe()
+        val (startDate,_) = getSchoolYearDates(hebeStudent)
+
+        val meetings = ArrayList<Meeting>()
+        val response = api.getMeetings(hebeStudent,startDate)
+
+        for (meeting in response) {
+            meetings.add(
+                Meeting(
+                    topic = meeting.why,
+                    date = LocalDate.parse(meeting.`when`.date),
+                    place = meeting.where,
+                    agenda = meeting.agenda
+                )
+            )
+        }
+
+        return meetings.toTypedArray()
+    }
+
+    private fun getSchoolYearDates(hebeStudent: HebeStudent): Pair<LocalDate,LocalDate> {
         // Filter by this school year
         lateinit var startDate: LocalDate
         lateinit var endDate: LocalDate
@@ -226,8 +255,7 @@ class VulcanUserClient(
             startDate = LocalDate.parse(currentHebePeriod.start.date)
             endDate = LocalDate.parse(currentHebePeriod.end.date)
         }
-
-        return notes.filter { it.date.isBefore(endDate) && it.date.isAfter(startDate) }.toTypedArray()
+        return startDate to endDate
     }
 
     override fun shouldSyncSemesters(student: Student): Boolean {

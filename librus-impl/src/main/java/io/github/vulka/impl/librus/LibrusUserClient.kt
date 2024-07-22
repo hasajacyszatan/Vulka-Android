@@ -6,6 +6,7 @@ import com.google.gson.reflect.TypeToken
 import io.github.vulka.core.api.UserClient
 import io.github.vulka.core.api.types.Grade
 import io.github.vulka.core.api.types.Lesson
+import io.github.vulka.core.api.types.Meeting
 import io.github.vulka.core.api.types.Note
 import io.github.vulka.core.api.types.Parent
 import io.github.vulka.core.api.types.Semester
@@ -227,6 +228,22 @@ class LibrusUserClient(
             )
         }
         return notes.toTypedArray()
+    }
+
+    override suspend fun getMeetings(student: Student): Array<Meeting> {
+        // Stub
+        val meetings = ArrayList<Meeting>()
+        for (i in 0..5) {
+            meetings.add(
+                Meeting(
+                    topic = "Meeting",
+                    place = "Stub place",
+                    agenda = null,
+                    date = LocalDate.of(2024,3,7)
+                )
+            )
+        }
+        return meetings.toTypedArray()
     }
 
 

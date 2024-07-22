@@ -2,6 +2,7 @@ package io.github.vulka.core.api
 
 import io.github.vulka.core.api.types.Grade
 import io.github.vulka.core.api.types.Lesson
+import io.github.vulka.core.api.types.Meeting
 import io.github.vulka.core.api.types.Note
 import io.github.vulka.core.api.types.Semester
 import io.github.vulka.core.api.types.Student
@@ -27,6 +28,7 @@ interface UserClient {
     suspend fun getSemesters(student: Student): Array<Semester>
     suspend fun getSummary(student: Student,semester: Semester): Array<Summary>
     suspend fun getNotes(student: Student): Array<Note>
+    suspend fun getMeetings(student: Student): Array<Meeting>
 
     /**
      * Return if semester should be sync e.g when new school year begins, used to prevent API rate limit in Vulcan
