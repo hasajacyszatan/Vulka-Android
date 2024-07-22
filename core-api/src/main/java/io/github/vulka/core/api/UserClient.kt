@@ -30,6 +30,8 @@ interface UserClient {
     suspend fun getNotes(student: Student): Array<Note>
     suspend fun getMeetings(student: Student): Array<Meeting>
 
+    fun featuresSet(): Features
+
     /**
      * Return if semester should be sync e.g when new school year begins, used to prevent API rate limit in Vulcan
      */

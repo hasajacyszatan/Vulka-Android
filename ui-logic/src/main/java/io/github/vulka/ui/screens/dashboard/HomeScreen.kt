@@ -284,6 +284,7 @@ fun HomeScreen(
                 More -> {
                     MoreScreen(
                         args = More(
+                            platform = args.platform,
                             userId = args.userId
                         ),
                         navHostController = navController,

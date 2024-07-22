@@ -26,6 +26,8 @@ import io.github.vulka.ui.screens.dashboard.more.About
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
+import io.github.vulka.business.utils.getFeaturesByPlatform
+import io.github.vulka.core.api.Platform
 import io.github.vulka.ui.screens.dashboard.more.Exams
 import io.github.vulka.ui.screens.dashboard.more.ExamsScreen
 import io.github.vulka.ui.screens.dashboard.more.Homework
@@ -38,10 +40,13 @@ import io.github.vulka.ui.screens.dashboard.more.Notes
 import io.github.vulka.ui.screens.dashboard.more.NotesScreen
 import io.github.vulka.ui.screens.dashboard.more.Settings
 import io.github.vulka.ui.screens.dashboard.more.SettingsScreen
+import io.github.vulka.ui.utils.navtype.PlatformType
 import kotlinx.serialization.Serializable
+import kotlin.reflect.typeOf
 
 @Serializable
 class More(
+    val platform: Platform,
     val userId: String
 )
 
@@ -56,6 +61,7 @@ fun MoreScreen(
     NavHost(
         navController,
         startDestination = More(
+            platform = args.platform,
             userId = args.userId
         ),
         modifier = Modifier.imePadding(),
@@ -64,9 +70,11 @@ fun MoreScreen(
         popEnterTransition = { fadeIn() },
         popExitTransition = { fadeOut() }
     ) {
-        composable<More> {
+        composable<More>(
+            typeMap = mapOf(typeOf<Platform>() to PlatformType)
+        ) {
             changeScaffoldTitle(null)
-            MoreContent(navHostController, navController, args.userId)
+            MoreContent(navHostController, navController, args.userId, args.platform)
         }
 
         composable<Messages> {
@@ -109,6 +117,7 @@ fun MoreContent(
     navHostController: NavController,
     navController: NavController,
     userId: String,
+    platform: Platform,
 ) {
     Column(
         modifier = Modifier.verticalScroll(rememberScrollState())
@@ -143,17 +152,19 @@ fun MoreContent(
             }
         )
 
-        BasicPreference(
-            leading = { Icon(Icons.Default.Group, contentDescription = null) },
-            title = stringResource(R.string.More_Meetings),
-            onClick = {
-                navController.navigate(
-                    Meetings(
-                        userId = userId
+        if (getFeaturesByPlatform(platform).isMeetingsSupported) {
+            BasicPreference(
+                leading = { Icon(Icons.Default.Group, contentDescription = null) },
+                title = stringResource(R.string.More_Meetings),
+                onClick = {
+                    navController.navigate(
+                        Meetings(
+                            userId = userId
+                        )
                     )
-                )
-            }
-        )
+                }
+            )
+        }
 
         BasicPreference(
             leading = { Icon(Icons.Default.Settings, contentDescription = null) },

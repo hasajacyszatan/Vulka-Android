@@ -35,7 +35,6 @@ import io.ktor.http.HttpHeaders
 import io.ktor.http.renderCookieHeader
 import java.time.DayOfWeek
 import java.time.LocalDate
-import java.time.LocalDateTime
 
 class LibrusUserClient(
     internal var credentials: LibrusLoginCredentials
@@ -232,34 +231,16 @@ class LibrusUserClient(
     }
 
     override suspend fun getMeetings(student: Student): Array<Meeting> {
-        // Stub
-        val meetings = ArrayList<Meeting>()
-        for (i in 0..5) {
-            meetings.add(
-                Meeting(
-                    topic = "Meeting",
-                    place = "Stub place",
-                    // Agenda is not needed, exists in Vulcan
-                    agenda = """
-                        1. Introduction
-                        2. Some things
-                        3. End
-                    """.trimIndent(),
-                    dateTime = if (i == 4)
-                        LocalDateTime.of(2024,10,10,15,45,0)
-                    else
-                        LocalDateTime.of(2024,7,10,15,45,0)
-                )
-            )
-        }
-        return meetings.toTypedArray()
+        // Not available on this platform
+        return emptyArray()
     }
-
 
     override fun shouldSyncSemesters(student: Student): Boolean {
         // Stub, but maybe in Librus should stay always true
         return true
     }
+
+    override fun featuresSet() = LibrusFeatures()
 }
 
 fun HttpRequestBuilder.applyCookie(cookie: Cookie) = cookie.run {

@@ -126,16 +126,18 @@ suspend fun sync(
     }
 
     val meetingsJob = coroutineScope.launch(handler) {
-        val meetings = client.getMeetings(student)
-        repository.meetings.deleteByCredentialsId(userId)
+        if (client.featuresSet().isMeetingsSupported) {
+            val meetings = client.getMeetings(student)
+            repository.meetings.deleteByCredentialsId(userId)
 
-        for (meeting in meetings) {
-            repository.meetings.insert(
-                Meetings(
-                    meeting = meeting,
-                    credentialsId = userId
+            for (meeting in meetings) {
+                repository.meetings.insert(
+                    Meetings(
+                        meeting = meeting,
+                        credentialsId = userId
+                    )
                 )
-            )
+            }
         }
     }
 

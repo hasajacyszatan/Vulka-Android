@@ -207,7 +207,6 @@ class VulcanUserClient(
         val notes = ArrayList<Note>()
         val response = api.getNotes(hebeStudent)
 
-
         for (note in response) {
             notes.add(
                 Note(
@@ -253,7 +252,7 @@ class VulcanUserClient(
         lateinit var endDate: LocalDate
         val currentHebePeriod = hebeStudent.periods.find { it.current }!!
         if (currentHebePeriod.number == 2) {
-            val beforeHebePeriod =  hebeStudent.periods.find { it.level == currentHebePeriod.level && it.number == 1 }!!
+            val beforeHebePeriod = hebeStudent.periods.find { it.level == currentHebePeriod.level && it.number == 1 }!!
             startDate = LocalDate.parse(beforeHebePeriod.start.date)
             endDate = LocalDate.parse(currentHebePeriod.end.date)
         } else {
@@ -271,4 +270,6 @@ class VulcanUserClient(
         val date = LocalDateTime.now()
         return (date.toEpochSecond(ZoneOffset.UTC) * 1000 + date.nano / 1000000) > currentSemester.end.timestamp
     }
+
+    override fun featuresSet() = HebeFeatures()
 }
