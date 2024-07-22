@@ -8,6 +8,7 @@ import io.github.vulka.core.api.UserClient
 import io.github.vulka.core.api.types.Student
 import io.github.vulka.database.Grades
 import io.github.vulka.database.LuckyNumber
+import io.github.vulka.database.Meetings
 import io.github.vulka.database.Notes
 import io.github.vulka.database.Semesters
 import io.github.vulka.database.Timetable
@@ -124,7 +125,21 @@ suspend fun sync(
         }
     }
 
-    joinAll(luckyNumberJob, gradesJob, timetableJob, notesJob)
+    val meetingsJob = coroutineScope.launch(handler) {
+        val meetings = client.getMeetings(student)
+        repository.meetings.deleteByCredentialsId(userId)
+
+        for (meeting in meetings) {
+            repository.meetings.insert(
+                Meetings(
+                    meeting = meeting,
+                    credentialsId = userId
+                )
+            )
+        }
+    }
+
+    joinAll(luckyNumberJob, gradesJob, timetableJob, notesJob, meetingsJob)
 
     if (error != null)
         throw error!!

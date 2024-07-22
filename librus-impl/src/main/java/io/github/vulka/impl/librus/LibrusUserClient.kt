@@ -35,6 +35,7 @@ import io.ktor.http.HttpHeaders
 import io.ktor.http.renderCookieHeader
 import java.time.DayOfWeek
 import java.time.LocalDate
+import java.time.LocalDateTime
 
 class LibrusUserClient(
     internal var credentials: LibrusLoginCredentials
@@ -238,8 +239,16 @@ class LibrusUserClient(
                 Meeting(
                     topic = "Meeting",
                     place = "Stub place",
-                    agenda = null,
-                    date = LocalDate.of(2024,3,7)
+                    // Agenda is not needed, exists in Vulcan
+                    agenda = """
+                        1. Introduction
+                        2. Some things
+                        3. End
+                    """.trimIndent(),
+                    dateTime = if (i == 4)
+                        LocalDateTime.of(2024,10,10,15,45,0)
+                    else
+                        LocalDateTime.of(2024,7,10,15,45,0)
                 )
             )
         }

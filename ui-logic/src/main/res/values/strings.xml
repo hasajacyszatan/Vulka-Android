@@ -66,4 +66,5 @@
     <string name="More_About_Discord_Subtitle">Join the Vulka community</string>
     <string name="More_About_Github" translatable="false">GitHub</string>
     <string name="More_About_Github_Subtitle">See GitHub profile</string>
+    <string name="More_Meetings">Meetings</string>
 </resources>

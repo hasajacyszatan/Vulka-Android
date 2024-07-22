@@ -19,6 +19,9 @@ import io.github.vulka.impl.vulcan.hebe.types.HebeStudent
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.ZoneOffset
+import java.time.format.DateTimeFormatter
+
+
 
 class VulcanUserClient(
     credentials: LoginCredentials
@@ -225,6 +228,8 @@ class VulcanUserClient(
         val hebeStudent = student.toHebe()
         val (startDate,_) = getSchoolYearDates(hebeStudent)
 
+        val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
+
         val meetings = ArrayList<Meeting>()
         val response = api.getMeetings(hebeStudent,startDate)
 
@@ -232,7 +237,7 @@ class VulcanUserClient(
             meetings.add(
                 Meeting(
                     topic = meeting.why,
-                    date = LocalDate.parse(meeting.`when`.date),
+                    dateTime = LocalDateTime.parse("${meeting.`when`.date} ${meeting.`when`.time}",formatter),
                     place = meeting.where,
                     agenda = meeting.agenda
                 )

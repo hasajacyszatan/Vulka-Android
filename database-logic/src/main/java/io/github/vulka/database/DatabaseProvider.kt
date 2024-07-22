@@ -14,7 +14,8 @@ import androidx.room.TypeConverters
         Grades::class,
         Timetable::class,
         Semesters::class,
-        Notes::class
+        Notes::class,
+        Meetings::class
     ],
     exportSchema = false
 )
@@ -26,6 +27,7 @@ abstract class VulkaDatabase : RoomDatabase() {
     abstract fun timetableDao(): TimetableDao
     abstract fun semestersDao(): SemestersDao
     abstract fun notesDao(): NotesDao
+    abstract fun meetingsDao(): MeetingsDao
 }
 
 /**

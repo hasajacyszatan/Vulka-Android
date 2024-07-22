@@ -10,6 +10,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Book
 import androidx.compose.material.icons.filled.CalendarToday
 import androidx.compose.material.icons.filled.EmojiEvents
+import androidx.compose.material.icons.filled.Group
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Mail
 import androidx.compose.material.icons.filled.Settings
@@ -29,6 +30,8 @@ import io.github.vulka.ui.screens.dashboard.more.Exams
 import io.github.vulka.ui.screens.dashboard.more.ExamsScreen
 import io.github.vulka.ui.screens.dashboard.more.Homework
 import io.github.vulka.ui.screens.dashboard.more.HomeworkScreen
+import io.github.vulka.ui.screens.dashboard.more.Meetings
+import io.github.vulka.ui.screens.dashboard.more.MeetingsScreen
 import io.github.vulka.ui.screens.dashboard.more.Messages
 import io.github.vulka.ui.screens.dashboard.more.MessagesScreen
 import io.github.vulka.ui.screens.dashboard.more.Notes
@@ -88,6 +91,13 @@ fun MoreScreen(
             )
         }
 
+        composable<Meetings> {
+            changeScaffoldTitle(stringResource(R.string.More_Meetings))
+            MeetingsScreen(
+                args = it.toRoute<Meetings>()
+            )
+        }
+
         composable<Settings> {
             changeScaffoldTitle(stringResource(R.string.More_Settings))
             SettingsScreen()
@@ -127,6 +137,18 @@ fun MoreContent(
             onClick = {
                 navController.navigate(
                     Notes(
+                        userId = userId
+                    )
+                )
+            }
+        )
+
+        BasicPreference(
+            leading = { Icon(Icons.Default.Group, contentDescription = null) },
+            title = stringResource(R.string.More_Meetings),
+            onClick = {
+                navController.navigate(
+                    Meetings(
                         userId = userId
                     )
                 )

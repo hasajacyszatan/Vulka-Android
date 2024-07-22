@@ -10,16 +10,15 @@ import java.util.UUID
 import javax.inject.Inject
 
 @HiltViewModel
-class NotesViewModel @Inject constructor(
+class MeetingsViewModel @Inject constructor(
     private val repository: Repository
 ) : ViewModel() {
+    val meetings = MutableStateFlow<List<io.github.vulka.database.Meetings>>(emptyList())
 
-    val notes = MutableStateFlow<List<io.github.vulka.database.Notes>>(emptyList())
-
-    fun refresh(args: Notes) {
+    fun refresh(args: Meetings) {
         viewModelScope.launch {
-            repository.notes.getByCredentialsId(UUID.fromString(args.userId)).collect {
-                notes.value = it
+            repository.meetings.getByCredentialsId(UUID.fromString(args.userId)).collect {
+                meetings.value = it
             }
         }
     }
