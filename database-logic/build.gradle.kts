@@ -14,6 +14,7 @@ android {
     }
 
     compileOptions {
+        isCoreLibraryDesugaringEnabled = true
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
     }
@@ -42,4 +43,6 @@ dependencies {
     // credential type converter
     implementation(libs.gson)
     implementation(libs.gson.extras)
+
+    coreLibraryDesugaring(libs.desugar.jdk.libs)
 }

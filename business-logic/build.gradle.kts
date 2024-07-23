@@ -12,6 +12,7 @@ android {
     }
 
     compileOptions {
+        isCoreLibraryDesugaringEnabled = true
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
     }
@@ -31,4 +32,6 @@ dependencies {
     implementation(projects.librusImpl)
     implementation(projects.vulcanImpl)
     implementation(projects.databaseLogic)
+
+    coreLibraryDesugaring(libs.desugar.jdk.libs)
 }

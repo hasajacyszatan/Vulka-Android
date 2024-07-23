@@ -3,8 +3,6 @@ plugins {
     alias(libs.plugins.kotlin.android)
 }
 
-
-
 android {
     namespace = "io.github.vulka.impl.vulcan"
     compileSdk = libs.versions.android.sdk.compile.get().toInt()
@@ -14,6 +12,7 @@ android {
     }
 
     compileOptions {
+        isCoreLibraryDesugaringEnabled = true
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
     }
@@ -29,4 +28,6 @@ dependencies {
     implementation(libs.ktor.okhttp)
     implementation(libs.migbase64)
     implementation(projects.coreApi)
+
+    coreLibraryDesugaring(libs.desugar.jdk.libs)
 }
