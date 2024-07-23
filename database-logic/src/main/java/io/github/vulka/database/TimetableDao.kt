@@ -11,16 +11,7 @@ import java.time.LocalDate
 import java.util.UUID
 
 @Dao
-interface TimetableDao {
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insert(timetable: Timetable)
-
-    @Update
-    suspend fun update(timetable: Timetable)
-
-    @Delete
-    fun delete(timetable: Timetable)
-
+interface TimetableDao : BaseDao<Timetable> {
     @Query("DELETE FROM timetable WHERE credentialsId = :id AND DATE(date) BETWEEN DATE(:dateFrom) AND DATE(:dateTo)")
     fun deleteRangeByCredentialsId(dateFrom: LocalDate, dateTo: LocalDate, id: UUID)
 

@@ -1,25 +1,13 @@
 package io.github.vulka.database
 
 import androidx.room.Dao
-import androidx.room.Delete
-import androidx.room.Insert
 import androidx.room.Query
-import androidx.room.Update
 import kotlinx.coroutines.flow.Flow
 import java.time.LocalDate
 import java.util.UUID
 
 @Dao
-interface GradesDao {
-    @Insert
-    suspend fun insert(grades: Grades)
-
-    @Update
-    suspend fun update(grades: Grades)
-
-    @Delete
-    fun delete(grades: Grades)
-
+interface GradesDao : BaseDao<Grades> {
     @Query("DELETE FROM grades WHERE credentialsId = :id")
     fun deleteByCredentialsId(id: UUID)
 

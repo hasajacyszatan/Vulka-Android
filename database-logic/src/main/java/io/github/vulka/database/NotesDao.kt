@@ -1,21 +1,12 @@
 package io.github.vulka.database
 
 import androidx.room.Dao
-import androidx.room.Insert
-import androidx.room.OnConflictStrategy
 import androidx.room.Query
-import androidx.room.Update
 import kotlinx.coroutines.flow.Flow
 import java.util.UUID
 
 @Dao
-interface NotesDao {
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insert(notes: Notes)
-
-    @Update
-    suspend fun update(notes: Notes)
-
+interface NotesDao : BaseDao<Notes> {
     @Query("DELETE FROM notes WHERE credentialsId = :id")
     fun deleteByCredentialsId(id: UUID)
 
