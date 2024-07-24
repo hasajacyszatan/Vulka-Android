@@ -28,7 +28,9 @@ import androidx.compose.material3.TabRowDefaults.tabIndicatorOffset
 import androidx.compose.material3.Text
 import androidx.compose.material3.pulltorefresh.PullToRefreshState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.produceState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -40,6 +42,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import dev.medzik.android.compose.rememberMutable
 import dev.medzik.android.compose.ui.ExpandedIfNotEmpty
 import dev.medzik.android.compose.ui.IconBox
@@ -47,15 +50,14 @@ import dev.medzik.android.utils.runOnUiThread
 import io.github.vulka.core.api.Platform
 import io.github.vulka.core.api.types.Grade
 import io.github.vulka.ui.R
-import io.github.vulka.ui.VulkaViewModel
 import io.github.vulka.ui.common.Avatar
 import io.github.vulka.ui.common.AvatarShape
 import io.github.vulka.ui.common.EmptyView
+import io.github.vulka.ui.common.EmptyViewProgress
 import io.github.vulka.ui.common.SegmentedButtonItem
 import io.github.vulka.ui.common.SegmentedButtons
 import io.github.vulka.ui.utils.formatByLocale
 import kotlinx.serialization.Serializable
-import java.util.UUID
 
 @Serializable
 class Grades(
@@ -69,7 +71,6 @@ fun GradesScreen(
     args: Grades,
     pullRefresh: @Composable BoxScope.() -> Unit = {},
     pullToRefreshState: PullToRefreshState,
-    refreshed: Boolean
 ) {
     val pagerState = rememberPagerState { 2 }
     val tabs = listOf(
@@ -112,7 +113,6 @@ fun GradesScreen(
                         GradesTab(
                             pullToRefreshState = pullToRefreshState,
                             args = args,
-                            refreshed = refreshed
                         )
                     }
 
@@ -130,18 +130,25 @@ fun GradesScreen(
 fun GradesTab(
     pullToRefreshState: PullToRefreshState,
     args: Grades,
-    viewModel: VulkaViewModel = hiltViewModel(),
-
-    refreshed: Boolean
+    viewModel: GradesViewModel = hiltViewModel()
 ) {
-    if (refreshed) {
-        val semesters = viewModel.semestersRepository.getByCredentialsId(UUID.fromString(args.userId))
+    LaunchedEffect(Unit) {
+        viewModel.refresh(args)
+    }
 
-        var semester by rememberMutable(semesters.find { it.semester.current }!!)
+    // refresh UI after sync
+    if (!pullToRefreshState.isRefreshing) {
+        LaunchedEffect(Unit) {
+            viewModel.refresh(args)
+        }
+    }
 
-        val gradesDb = viewModel.gradesRepository.getBySemesterAndCredentialsId(semester.semester.number, UUID.fromString(args.userId))
-        val gradeList: List<Grade> = gradesDb.map { it.grade }
-        val uniqueSubjectNames: Set<String> = gradeList.map { it.subject }.sortedBy { it }.toSet()
+    val semesters by viewModel.semesters.collectAsStateWithLifecycle()
+    val semester by viewModel.semester.collectAsStateWithLifecycle()
+
+    if (semesters.isNotEmpty() && semester != null) {
+        val gradeList by viewModel.gradesList.collectAsStateWithLifecycle()
+        val uniqueSubjectNames by viewModel.uniqueSubjectNames.collectAsStateWithLifecycle()
 
         Box(
             modifier = Modifier.nestedScroll(connection = pullToRefreshState.nestedScrollConnection)
@@ -162,8 +169,11 @@ fun GradesTab(
                             SegmentedButtons {
                                 for (s in semesters) {
                                     SegmentedButtonItem(
-                                        selected = semester.semester.number == s.semester.number,
-                                        onClick = { semester = s },
+                                        selected = semester!!.semester.number == s.semester.number,
+                                        onClick = {
+                                            viewModel.setSemester(s)
+                                            viewModel.refreshGrades(args)
+                                        },
                                         label = { Text("${stringResource(R.string.Semester)} ${s.semester.number}") }
                                     )
                                 }
@@ -219,11 +229,14 @@ fun GradesTab(
                             ) {
                                 Text(subjectName)
 
-                                val gradesAmount = viewModel.gradesRepository.countBySubjectSemesterAndCredentials(
-                                    id = UUID.fromString(args.userId),
-                                    semester = semester.semester.number,
-                                    subjectName = subjectName,
-                                )
+                                val gradesAmount by produceState(initialValue = 0, subjectName, semester) {
+                                    viewModel.countGrades(
+                                        userId = args.userId,
+                                        semester = semester!!.semester.number,
+                                        subjectName = subjectName
+                                    ).collect { value = it }
+                                }
+
                                 Text(
                                     fontSize = 12.sp,
                                     text = "$gradesAmount ${pluralStringResource(R.plurals.GradesAmount,gradesAmount)}"
@@ -239,7 +252,7 @@ fun GradesTab(
                 )
             }
         }
-    }
+    } else EmptyViewProgress()
 }
 
 @Composable

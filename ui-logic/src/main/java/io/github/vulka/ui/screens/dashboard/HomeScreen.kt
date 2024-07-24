@@ -247,7 +247,6 @@ fun HomeScreen(
                         pullRefresh = {
                             pullToRefresh()
                         },
-                        refreshed = viewModel.refreshed
                     )
                 }
                 Grades -> {
@@ -260,7 +259,6 @@ fun HomeScreen(
                         pullRefresh = {
                             pullToRefresh()
                         },
-                        refreshed = viewModel.refreshed
                     )
                 }
                 Attendance -> {

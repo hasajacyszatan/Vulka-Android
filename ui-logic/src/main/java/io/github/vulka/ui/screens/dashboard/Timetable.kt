@@ -19,7 +19,6 @@ import androidx.compose.material.icons.filled.Groups
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Room
 import androidx.compose.material.icons.filled.Schedule
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
@@ -63,6 +62,7 @@ import io.github.vulka.ui.R
 import io.github.vulka.ui.VulkaViewModel
 import io.github.vulka.ui.common.DatePager
 import io.github.vulka.ui.common.EmptyView
+import io.github.vulka.ui.common.EmptyViewProgress
 import io.github.vulka.ui.common.ErrorDialog
 import kotlinx.coroutines.launch
 import kotlinx.serialization.Serializable
@@ -172,15 +172,7 @@ fun TimetableScreen(
             } else {
                 LessonsCards(lessons)
             }
-        } else {
-            Column(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.Center
-            ) {
-                CircularProgressIndicator()
-            }
-        }
+        } else EmptyViewProgress()
     }
 
     ErrorDialog(

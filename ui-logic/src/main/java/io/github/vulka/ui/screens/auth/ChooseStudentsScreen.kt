@@ -7,7 +7,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Checkbox
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -22,6 +21,7 @@ import dev.medzik.android.compose.ui.LoadingButton
 import io.github.vulka.core.api.Platform
 import io.github.vulka.core.api.types.Student
 import io.github.vulka.ui.R
+import io.github.vulka.ui.common.EmptyViewProgress
 import kotlinx.serialization.Serializable
 
 @Serializable
@@ -67,15 +67,7 @@ fun ChooseStudentsScreen(
                 Text(stringResource(R.string.Done))
             }
         }
-    } else {
-        Column(
-            modifier = Modifier.fillMaxSize(),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center
-        ) {
-            CircularProgressIndicator()
-        }
-    }
+    } else EmptyViewProgress()
 }
 
 @Composable

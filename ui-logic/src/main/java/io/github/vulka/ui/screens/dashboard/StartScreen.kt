@@ -64,7 +64,6 @@ fun StartScreen(
     args: Start,
     pullRefresh: @Composable BoxScope.() -> Unit = {},
     pullToRefreshState: PullToRefreshState,
-    refreshed: Boolean,
     viewModel: StartViewModel = hiltViewModel()
 ) {
     val student by viewModel.student.collectAsStateWithLifecycle()
@@ -96,9 +95,9 @@ fun StartScreen(
                 }
             }
 
-            if (luckyNumber != null) {
-                item {
-                    Row {
+            item {
+                Row {
+                    if (luckyNumber != null) {
                         LuckyCard(luckyNumber!!.number)
                     }
                 }
