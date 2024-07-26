@@ -93,16 +93,16 @@ fun TimetableScreen(
         return date.minusDays(1)
     }
 
-    var currentDate by rememberMutable(LocalDate.now())
+    var currentDate by rememberMutable { LocalDate.now() }
 
-    var timetableRefreshing by rememberMutable(false)
+    var timetableRefreshing by rememberMutable { false }
 
-    val client by rememberMutable(getUserClientFromCredentials(args.platform, args.credentials))
-    var userClientCredentialsRenewed by rememberMutable(false)
-    val student by rememberMutable(getStudentFromCredentials(context,UUID.fromString(args.userId)))
+    val client by rememberMutable { getUserClientFromCredentials(args.platform, args.credentials) }
+    var userClientCredentialsRenewed by rememberMutable { false }
+    val student by rememberMutable { getStudentFromCredentials(context, UUID.fromString(args.userId)) }
 
-    var exception: Exception? by rememberMutable(null)
-    var loadingError by rememberMutable(false)
+    var exception: Exception? by rememberMutable { null }
+    var loadingError by rememberMutable { false }
     val errorDialogState = rememberDialogState()
 
     fun syncTimetable() {

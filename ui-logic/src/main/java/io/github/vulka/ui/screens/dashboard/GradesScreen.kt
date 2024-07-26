@@ -260,7 +260,7 @@ fun SubjectCard(
     more: @Composable () -> Unit = {},
     content: @Composable () -> Unit
 ) {
-    var showMore by rememberMutable(false)
+    var showMore by rememberMutable { false }
 
     Surface(
         onClick = {

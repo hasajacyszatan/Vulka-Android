@@ -146,9 +146,9 @@ fun LoginScreen(
 
         item {
             val dialogState = rememberDialogState()
-            var error: Exception? by rememberMutable(null)
+            var error: Exception? by rememberMutable { null }
 
-            var loading by rememberMutable(false)
+            var loading by rememberMutable { false }
             LoadingButton(
                 onClick = {
                     runOnIOThread {

@@ -78,13 +78,13 @@ fun HomeScreen(
 ) {
     val context = LocalContext.current
 
-    var scaffoldTitle: String? by rememberMutable(null)
+    var scaffoldTitle: String? by rememberMutable { null }
     val pullToRefreshState = rememberPullToRefreshState()
-    var bottomSelected: Any by rememberMutable(Start)
+    var bottomSelected: Any by rememberMutable { Start }
     val dialogState = rememberDialogState()
-    val snackBarState by rememberMutable(SnackbarHostState())
+    val snackBarState by rememberMutable { SnackbarHostState() }
     val errorDialogState = rememberDialogState()
-    var exception: Exception? by rememberMutable(null)
+    var exception: Exception? by rememberMutable { null }
 
     val studentState by viewModel.student.collectAsState()
 
