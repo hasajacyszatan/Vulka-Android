@@ -276,7 +276,11 @@ fun HomeScreen(
                             platform = args.platform,
                             userId = args.userId,
                             credentials = args.credentials
-                        )
+                        ),
+                        pullToRefreshState = pullToRefreshState,
+                        pullRefresh = {
+                            pullToRefresh()
+                        },
                     )
                 }
                 More -> {

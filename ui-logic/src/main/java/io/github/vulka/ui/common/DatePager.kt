@@ -26,12 +26,15 @@ import java.time.format.DateTimeFormatter
 
 @Composable
 fun DatePager(
+    modifier: Modifier = Modifier,
     date: LocalDate,
     onClickBack: () -> Unit = {},
     onClickForward: () -> Unit = {},
     content: @Composable (LocalDate) -> Unit
 ) {
-    Column {
+    Column(
+        modifier = modifier
+    ) {
         AnimatedContent(
             modifier = Modifier
                 .fillMaxSize()

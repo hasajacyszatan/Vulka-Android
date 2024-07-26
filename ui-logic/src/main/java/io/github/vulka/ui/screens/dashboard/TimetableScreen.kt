@@ -2,6 +2,8 @@ package io.github.vulka.ui.screens.dashboard
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
@@ -25,13 +27,14 @@ import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.contentColorFor
+import androidx.compose.material3.pulltorefresh.PullToRefreshState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
@@ -41,7 +44,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import dev.medzik.android.compose.rememberMutable
 import dev.medzik.android.compose.theme.combineAlpha
 import dev.medzik.android.compose.theme.warningContainer
 import dev.medzik.android.compose.ui.IconBox
@@ -51,15 +53,10 @@ import dev.medzik.android.compose.ui.dialog.rememberDialogState
 import dev.medzik.android.compose.ui.textfield.AnimatedTextField
 import dev.medzik.android.compose.ui.textfield.TextFieldValue
 import dev.medzik.android.utils.runOnIOThread
-import io.github.vulka.business.sync.checkIfTimetableShouldBeSync
-import io.github.vulka.business.sync.getStudentFromCredentials
-import io.github.vulka.business.sync.getUserClientFromCredentials
-import io.github.vulka.business.sync.syncTimetableAtSwitch
 import io.github.vulka.core.api.Platform
 import io.github.vulka.core.api.types.Lesson
 import io.github.vulka.core.api.types.LessonChangeType
 import io.github.vulka.ui.R
-import io.github.vulka.ui.VulkaViewModel
 import io.github.vulka.ui.common.DatePager
 import io.github.vulka.ui.common.EmptyView
 import io.github.vulka.ui.common.EmptyViewProgress
@@ -69,7 +66,6 @@ import kotlinx.serialization.Serializable
 import java.time.LocalDate
 import java.time.LocalTime
 import java.time.format.DateTimeFormatter
-import java.util.UUID
 
 @Serializable
 class Timetable(
@@ -78,107 +74,80 @@ class Timetable(
     val credentials: String
 )
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TimetableScreen(
     args: Timetable,
-    viewModel: VulkaViewModel = hiltViewModel()
+    pullRefresh: @Composable BoxScope.() -> Unit = {},
+    pullToRefreshState: PullToRefreshState,
+
+    viewModel: TimetableViewModel = hiltViewModel()
 ) {
-    val context = LocalContext.current
+    val currentDate by viewModel.currentDate.collectAsStateWithLifecycle()
+    val timetableRefreshing by viewModel.timetableRefreshing.collectAsStateWithLifecycle()
+    val exception by viewModel.exception.collectAsStateWithLifecycle()
+    val loadingError by viewModel.loadingError.collectAsStateWithLifecycle()
 
-    fun getNextWeekday(date: LocalDate): LocalDate {
-        return date.plusDays(1)
-    }
-
-    fun getPreviousWeekday(date: LocalDate): LocalDate {
-        return date.minusDays(1)
-    }
-
-    var currentDate by rememberMutable { LocalDate.now() }
-
-    var timetableRefreshing by rememberMutable { false }
-
-    val client by rememberMutable { getUserClientFromCredentials(args.platform, args.credentials) }
-    var userClientCredentialsRenewed by rememberMutable { false }
-    val student by rememberMutable { getStudentFromCredentials(context, UUID.fromString(args.userId)) }
-
-    var exception: Exception? by rememberMutable { null }
-    var loadingError by rememberMutable { false }
     val errorDialogState = rememberDialogState()
 
-    fun syncTimetable() {
-        if (!checkIfTimetableShouldBeSync(context, currentDate,UUID.fromString(args.userId)))
-            return
+    LaunchedEffect(Unit) {
+        viewModel.init(args)
+    }
 
-        runOnIOThread {
-            if (!userClientCredentialsRenewed) {
-                client.renewCredentials()
-                userClientCredentialsRenewed = true
+    // refresh UI after sync
+    if (!pullToRefreshState.isRefreshing) {
+        LaunchedEffect(Unit) {
+            runOnIOThread {
+                viewModel.updateLessons()
             }
-
-            timetableRefreshing = true
-
-            try {
-                loadingError = false
-                syncTimetableAtSwitch(context,client,student,currentDate,UUID.fromString(args.userId))
-            } catch (e: Exception) {
-                loadingError = true
-                exception = e
-            }
-
-            timetableRefreshing = false
         }
     }
 
-    DatePager(
-        date = currentDate,
-        onClickBack = {
-            currentDate = getPreviousWeekday(currentDate)
-            syncTimetable()
-        },
-        onClickForward = {
-            currentDate = getNextWeekday(currentDate)
-            syncTimetable()
-        }
-    ) { date ->
-        // TODO: fix
-        val lessonsState by viewModel.timetableRepository.getByDateAndCredentialsId(
-            UUID.fromString(args.userId),
-            date
-        ).collectAsStateWithLifecycle(initialValue = emptyList())
-        val lessons = lessonsState.sortedBy { it.lesson.position }
+    Box {
+        DatePager(
+            modifier = Modifier
+                .nestedScroll(connection = pullToRefreshState.nestedScrollConnection),
+            date = currentDate,
+            onClickBack = { viewModel.onBackClick() },
+            onClickForward = { viewModel.onForwardClick() }
+        ) { _ ->
+            val lessons by viewModel.lessons.collectAsStateWithLifecycle()
 
-        if (loadingError) {
-            EmptyView(
-                icon = Icons.Default.Backpack,
-                title = "${stringResource(R.string.Error)}: ${exception?.message}",
-                fontSize = 15.sp,
-                textPadding = 20.dp,
-                textAlign = TextAlign.Center
-            ) {
-                OutlinedButton(
-                    onClick = {
-                        errorDialogState.show()
-                    }
-                ) {
-                    Text(text = stringResource(R.string.Details))
-                }
-            }
-        } else if (!timetableRefreshing) {
-            if (lessons.isEmpty()) {
+            if (loadingError) {
                 EmptyView(
                     icon = Icons.Default.Backpack,
-                    title = stringResource(R.string.NoLessons)
-                )
-            } else {
-                LessonsCards(lessons)
-            }
-        } else EmptyViewProgress()
-    }
+                    title = "${stringResource(R.string.Error)}: ${exception?.message}",
+                    fontSize = 15.sp,
+                    textPadding = 20.dp,
+                    textAlign = TextAlign.Center
+                ) {
+                    OutlinedButton(
+                        onClick = {
+                            errorDialogState.show()
+                        }
+                    ) {
+                        Text(text = stringResource(R.string.Details))
+                    }
+                }
+            } else if (!timetableRefreshing) {
+                if (lessons.isEmpty()) {
+                    EmptyView(
+                        icon = Icons.Default.Backpack,
+                        title = stringResource(R.string.NoLessons)
+                    )
+                } else {
+                    LessonsCards(lessons)
+                }
+            } else EmptyViewProgress()
+        }
 
-    ErrorDialog(
-        dialogState = errorDialogState,
-        error = exception
-    )
+        ErrorDialog(
+            dialogState = errorDialogState,
+            error = exception
+        )
+
+        pullRefresh()
+    }
 }
 
 @Composable

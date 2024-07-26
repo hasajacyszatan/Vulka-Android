@@ -19,9 +19,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.joinAll
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
-import java.time.Duration
-import java.time.LocalDate
 import java.time.LocalDateTime
 import java.util.UUID
 
@@ -98,7 +95,7 @@ suspend fun sync(
         // Sync timetable
         val now = LocalDateTime.now()
         val lessons = client.getLessons(student, now.minusWeeks(2).toLocalDate(), now.plusWeeks(1).toLocalDate())
-        repository.timetable.deleteByCredentialsId(userId)
+        repository.timetable.deleteRangeByCredentialsId(now.minusWeeks(2).toLocalDate(), now.plusWeeks(1).toLocalDate(), userId)
 
         for (lesson in lessons) {
             repository.timetable.insert(
@@ -153,40 +150,8 @@ fun getUserClientFromCredentials(platform: Platform, credentials: String): UserC
     return client
 }
 
-// TODO: remove runBlocking
-fun getStudentFromCredentials(context: Context, userId: UUID): Student = runBlocking {
+suspend fun getStudentFromCredentials(context: Context, userId: UUID): Student {
     val repository = RoomModule.providesRepository(context)
     val dbCredentials = repository.credentials.getById(userId).first()!!
-    return@runBlocking dbCredentials.student
-}
-
-fun syncTimetableAtSwitch(context: Context, client: UserClient, student: Student, selectedDate: LocalDate, userId: UUID) = runBlocking {
-    val now = LocalDateTime.now()
-
-    val repository = RoomModule.providesRepository(context)
-    val lessons = client.getLessons(student,selectedDate)
-    repository.timetable.deleteRangeByCredentialsId(selectedDate,selectedDate,userId)
-    for (lesson in lessons) {
-        repository.timetable.insert(
-            Timetable(
-                lesson = lesson,
-                lastSync = now,
-                credentialsId = userId
-            )
-        )
-    }
-}
-// TODO: remove runBlocking
-fun checkIfTimetableShouldBeSync(context: Context, selectedDateTime: LocalDate, userId: UUID): Boolean = runBlocking {
-    val repository = RoomModule.providesRepository(context)
-
-    val lessons = repository.timetable.getByDateAndCredentialsId(userId,selectedDateTime).first()
-
-    if (lessons.isNotEmpty()) {
-        val lesson = lessons[0]
-
-        val duration = Duration.between(lesson.lastSync, LocalDateTime.now())
-        return@runBlocking duration.toMinutes() >= 15
-    } else
-        return@runBlocking true
+    return dbCredentials.student
 }

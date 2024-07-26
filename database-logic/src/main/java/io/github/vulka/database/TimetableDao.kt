@@ -14,6 +14,6 @@ interface TimetableDao : BaseDao<Timetable> {
     @Query("DELETE FROM timetable WHERE credentialsId = :id")
     fun deleteByCredentialsId(id: UUID)
 
-    @Query("SELECT * FROM timetable WHERE credentialsId = :id AND date = :date")
+    @Query("SELECT * FROM timetable WHERE credentialsId = :id AND DATE(date) = DATE(:date)")
     fun getByDateAndCredentialsId(id: UUID, date: LocalDate): Flow<List<Timetable>>
 }
