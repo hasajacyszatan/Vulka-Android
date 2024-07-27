@@ -8,6 +8,7 @@ import io.github.vulka.impl.vulcan.hebe.types.HebeAccount
 import io.github.vulka.impl.vulcan.hebe.types.HebeAverageGrade
 import io.github.vulka.impl.vulcan.hebe.types.HebeChangedLesson
 import io.github.vulka.impl.vulcan.hebe.types.HebeGrade
+import io.github.vulka.impl.vulcan.hebe.types.HebeHomework
 import io.github.vulka.impl.vulcan.hebe.types.HebeLesson
 import io.github.vulka.impl.vulcan.hebe.types.HebeLuckyNumber
 import io.github.vulka.impl.vulcan.hebe.types.HebeMeeting
@@ -214,6 +215,17 @@ class VulcanHebeApi {
             query = mapOf(
                 "from" to dateFormatter.format(dateFrom)
             )
+        )
+    }
+
+    fun getHomeworks(student: HebeStudent,dateFrom: LocalDate,dateTo: LocalDate = dateFrom): Array<HebeHomework> {
+        return getByPupil(
+            endpoint = HebeApiEndpoints.DATA_HOMEWORK,
+            student = student,
+            clazz = Array<HebeHomework>::class.java,
+
+            dateFrom = dateFrom,
+            dateTo = dateTo,
         )
     }
 }

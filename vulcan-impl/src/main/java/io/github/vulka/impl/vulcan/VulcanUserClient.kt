@@ -4,6 +4,8 @@ import com.google.gson.Gson
 import io.github.vulka.core.api.LoginCredentials
 import io.github.vulka.core.api.UserClient
 import io.github.vulka.core.api.types.Grade
+import io.github.vulka.core.api.types.Homework
+import io.github.vulka.core.api.types.HomeworkAttachment
 import io.github.vulka.core.api.types.Lesson
 import io.github.vulka.core.api.types.LessonChange
 import io.github.vulka.core.api.types.LessonChangeType
@@ -20,8 +22,6 @@ import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.ZoneOffset
 import java.time.format.DateTimeFormatter
-
-
 
 class VulcanUserClient(
     credentials: LoginCredentials
@@ -244,6 +244,34 @@ class VulcanUserClient(
         }
 
         return meetings.toTypedArray()
+    }
+
+    override suspend fun getHomework(student: Student, dateFrom: LocalDate, dateTo: LocalDate): Array<Homework> {
+        val hebeStudent = student.toHebe()
+
+        val homeworks = ArrayList<Homework>()
+        val response = api.getHomeworks(hebeStudent,dateFrom, dateTo)
+
+        for (homework in response) {
+            homeworks.add(
+                Homework(
+                    content = homework.content,
+                    dateCreated = LocalDate.parse(homework.dateCreated.date),
+                    deadline = LocalDate.parse(homework.deadline.date),
+                    creator = homework.creator.displayName,
+                    subject = homework.subject.name,
+                    attachments = homework.attachments.map {
+                        HomeworkAttachment(
+                            name = it.name,
+                            data = it.link
+                        )
+                    },
+                    isAnswerRequired = homework.isAnswerRequired
+                )
+            )
+        }
+
+        return homeworks.toTypedArray()
     }
 
     private fun getSchoolYearDates(hebeStudent: HebeStudent): Pair<LocalDate,LocalDate> {

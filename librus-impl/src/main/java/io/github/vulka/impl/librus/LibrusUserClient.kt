@@ -5,6 +5,8 @@ import com.google.gson.JsonObject
 import com.google.gson.reflect.TypeToken
 import io.github.vulka.core.api.UserClient
 import io.github.vulka.core.api.types.Grade
+import io.github.vulka.core.api.types.Homework
+import io.github.vulka.core.api.types.HomeworkAttachment
 import io.github.vulka.core.api.types.Lesson
 import io.github.vulka.core.api.types.Meeting
 import io.github.vulka.core.api.types.Note
@@ -233,6 +235,36 @@ class LibrusUserClient(
     override suspend fun getMeetings(student: Student): Array<Meeting> {
         // Not available on this platform
         return emptyArray()
+    }
+
+    override suspend fun getHomework(
+        student: Student,
+        dateFrom: LocalDate,
+        dateTo: LocalDate
+    ): Array<Homework> {
+        // Stub
+        val homeworks = ArrayList<Homework>()
+        val date = LocalDate.now()
+        for (i in 0..5) {
+            homeworks.add(
+                Homework(
+                    content = "Stub homework $i",
+                    dateCreated = date,
+                    deadline = date.plusWeeks(1),
+                    creator = "Stub creator",
+                    subject = "Stub subject",
+                    attachments = if (i % 2 == 0) listOf(
+                        HomeworkAttachment(
+                            name = "Stub attachment",
+                            data = "https://exmaple.com"
+                        )
+                    ) else emptyList(),
+                    isAnswerRequired = false
+                )
+            )
+            date.plusDays(1)
+        }
+        return homeworks.toTypedArray()
     }
 
     override fun shouldSyncSemesters(student: Student): Boolean {
