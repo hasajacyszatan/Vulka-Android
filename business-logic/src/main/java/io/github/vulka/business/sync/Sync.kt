@@ -7,6 +7,7 @@ import io.github.vulka.core.api.Platform
 import io.github.vulka.core.api.UserClient
 import io.github.vulka.core.api.types.Student
 import io.github.vulka.database.Grades
+import io.github.vulka.database.Homeworks
 import io.github.vulka.database.LuckyNumber
 import io.github.vulka.database.Meetings
 import io.github.vulka.database.Notes
@@ -138,7 +139,25 @@ suspend fun sync(
         }
     }
 
-    joinAll(luckyNumberJob, gradesJob, timetableJob, notesJob, meetingsJob)
+    val homeworksJob = coroutineScope.launch(handler) {
+        if (client.featuresSet().isHomeworkSupported) {
+            val now = LocalDateTime.now()
+            val homeworks = client.getHomework(student,now.toLocalDate(), now.plusWeeks(2).toLocalDate())
+            repository.homeworks.deleteRangeByCredentialsId(now.toLocalDate(), now.plusWeeks(2).toLocalDate(), userId)
+
+            for (homework in homeworks) {
+                repository.homeworks.insert(
+                    Homeworks(
+                        homework = homework,
+                        lastSync = now,
+                        credentialsId = userId
+                    )
+                )
+            }
+        }
+    }
+
+    joinAll(luckyNumberJob, gradesJob, timetableJob, notesJob, meetingsJob, homeworksJob)
 
     if (error != null)
         throw error!!

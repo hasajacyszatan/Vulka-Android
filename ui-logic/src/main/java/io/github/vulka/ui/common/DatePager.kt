@@ -28,8 +28,8 @@ import java.time.format.DateTimeFormatter
 fun DatePager(
     modifier: Modifier = Modifier,
     date: LocalDate,
-    onClickBack: () -> Unit = {},
-    onClickForward: () -> Unit = {},
+    onClickBack: DatePagerScope.() -> Unit = {},
+    onClickForward: DatePagerScope.() -> Unit = {},
     content: @Composable (LocalDate) -> Unit
 ) {
     Column(
@@ -46,7 +46,9 @@ fun DatePager(
         }
 
         Surface(
-            modifier = Modifier.fillMaxWidth().height(50.dp),
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(50.dp),
             color = MaterialTheme.colorScheme.surfaceColorAtElevation(3.dp)
         ) {
             Row(
@@ -55,7 +57,7 @@ fun DatePager(
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 IconButton(
-                    onClick = { onClickBack() }
+                    onClick = { onClickBack(DatePagerScope()) }
                 ) {
                     IconBox(
                         imageVector = Icons.AutoMirrored.Filled.ArrowLeft,
@@ -68,7 +70,7 @@ fun DatePager(
                 )
 
                 IconButton(
-                    onClick = { onClickForward() }
+                    onClick = { onClickForward(DatePagerScope()) }
                 ) {
                     IconBox(
                         imageVector = Icons.AutoMirrored.Filled.ArrowRight,
@@ -77,6 +79,87 @@ fun DatePager(
             }
         }
     }
+}
+
+@Composable
+fun DatePagerRange(
+    modifier: Modifier = Modifier,
+    dateFrom: LocalDate,
+    dateTo: LocalDate,
+    onClickBack: DatePagerScope.() -> Unit = {},
+    onClickForward: DatePagerScope.() -> Unit = {},
+    content: @Composable (LocalDate,LocalDate) -> Unit
+) {
+    Column(
+        modifier = modifier
+    ) {
+        AnimatedContent(
+            modifier = Modifier
+                .fillMaxSize()
+                .weight(1f),
+            targetState = dateFrom,
+            label = "timetable date"
+        ) { date ->
+            content(date,dateTo)
+        }
+
+        Surface(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(50.dp),
+            color = MaterialTheme.colorScheme.surfaceColorAtElevation(3.dp)
+        ) {
+            Row(
+                modifier = Modifier.fillMaxSize(),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                IconButton(
+                    onClick = { onClickBack(DatePagerScope()) }
+                ) {
+                    IconBox(
+                        imageVector = Icons.AutoMirrored.Filled.ArrowLeft,
+                    )
+                }
+
+                Text(
+                    fontWeight = FontWeight.Bold,
+                    text = formatDateWeek(dateFrom,dateTo)
+                )
+
+                IconButton(
+                    onClick = { onClickForward(DatePagerScope()) }
+                ) {
+                    IconBox(
+                        imageVector = Icons.AutoMirrored.Filled.ArrowRight,
+                    )
+                }
+            }
+        }
+    }
+}
+
+class DatePagerScope {
+    private fun getNextWeekday(date: LocalDate): LocalDate {
+        return date.plusDays(1)
+    }
+
+    private fun getPreviousWeekday(date: LocalDate): LocalDate {
+        return date.minusDays(1)
+    }
+
+    fun nextWeek(date: LocalDate): LocalDate {
+        return date.plusWeeks(1)
+    }
+
+    fun previousWeek(date: LocalDate): LocalDate {
+        return date.minusWeeks(1)
+    }
+}
+
+private fun formatDateWeek(date: LocalDate,date2: LocalDate): String {
+    val formatter = DateTimeFormatter.ofPattern("dd.MM")
+    return "${date.format(formatter)} - ${date2.format(formatter)}"
 }
 
 private fun formatDate(date: LocalDate): String {

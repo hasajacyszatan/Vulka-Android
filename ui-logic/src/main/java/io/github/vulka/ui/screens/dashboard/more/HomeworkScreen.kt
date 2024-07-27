@@ -1,15 +1,27 @@
 package io.github.vulka.ui.screens.dashboard.more
 
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.res.stringResource
-import io.github.vulka.ui.R
+import androidx.compose.runtime.getValue
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import io.github.vulka.ui.common.DatePagerRange
 import kotlinx.serialization.Serializable
 
 @Serializable
 object Homework
 
 @Composable
-fun HomeworkScreen() {
-    Text(text = stringResource(R.string.More_Homework))
+fun HomeworkScreen(
+    viewModel: HomeworkViewModel = hiltViewModel()
+) {
+    val dateFrom by viewModel.dateFrom.collectAsStateWithLifecycle()
+    val dateTo by viewModel.dateTo.collectAsStateWithLifecycle()
+    DatePagerRange(
+        dateFrom = dateFrom,
+        dateTo = dateTo,
+        onClickForward = { viewModel.onForward() },
+        onClickBack = { viewModel.onBack() }
+    ) { _,_ ->
+
+    }
 }

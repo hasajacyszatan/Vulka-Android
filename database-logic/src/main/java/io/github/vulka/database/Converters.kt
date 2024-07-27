@@ -3,6 +3,7 @@ package io.github.vulka.database
 import androidx.room.TypeConverter
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
+import io.github.vulka.core.api.types.HomeworkAttachment
 import io.github.vulka.core.api.types.Lesson
 import io.github.vulka.core.api.types.LessonChange
 import java.time.LocalDate
@@ -56,5 +57,15 @@ class Converters {
     @TypeConverter
     fun toLessonChange(changeString: String?): LessonChange? {
         return Gson().fromJson(changeString, object : TypeToken<LessonChange>() {}.type)
+    }
+
+    @TypeConverter
+    fun fromListHomeworkAttachment(change: List<HomeworkAttachment>): String? {
+        return Gson().toJson(change)
+    }
+
+    @TypeConverter
+    fun toListHomeworkAttachment(changeString: String?): List<HomeworkAttachment> {
+        return Gson().fromJson(changeString, object : TypeToken<List<HomeworkAttachment>>() {}.type)
     }
 }

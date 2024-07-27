@@ -1,6 +1,5 @@
 package io.github.vulka.ui.screens.dashboard
 
-import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -18,7 +17,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import java.time.Duration
 import java.time.LocalDate
 import java.time.LocalDateTime
@@ -30,7 +28,7 @@ class TimetableViewModel @Inject constructor(
     private val repository: Repository
 ) : ViewModel() {
 
-    val currentDate = MutableStateFlow<LocalDate>(LocalDate.of(2024,5,16))
+    val currentDate = MutableStateFlow<LocalDate>(LocalDate.now())
     private var client by mutableStateOf<UserClient?>(null)
     private var userClientCredentialsRenewed by mutableStateOf(false)
     private var student by mutableStateOf<Student?>(null)
@@ -95,11 +93,8 @@ class TimetableViewModel @Inject constructor(
 
     suspend fun updateLessons() {
         if (userId != null) {
-            Log.d("Test",userId.toString())
-            Log.d("Test",currentDate.value.toString())
             val lessonsState = repository.timetable.getByDateAndCredentialsId(userId!!, currentDate.value).first()
             lessons.value = lessonsState.sortedBy { it.lesson.position }
-            Log.d("Test",lessons.value.size.toString())
         }
     }
 
