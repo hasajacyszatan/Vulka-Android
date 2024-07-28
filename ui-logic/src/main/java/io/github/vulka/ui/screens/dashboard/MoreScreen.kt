@@ -47,7 +47,8 @@ import kotlin.reflect.typeOf
 @Serializable
 class More(
     val platform: Platform,
-    val userId: String
+    val userId: String,
+    val credentials: String
 )
 
 @Composable
@@ -62,7 +63,8 @@ fun MoreScreen(
         navController,
         startDestination = More(
             platform = args.platform,
-            userId = args.userId
+            userId = args.userId,
+            credentials = args.credentials
         ),
         modifier = Modifier.imePadding(),
         enterTransition = { fadeIn() },
@@ -74,7 +76,7 @@ fun MoreScreen(
             typeMap = mapOf(typeOf<Platform>() to PlatformType)
         ) {
             changeScaffoldTitle(null)
-            MoreContent(navHostController, navController, args.userId, args.platform)
+            MoreContent(navHostController, navController, args.userId, args.platform, args.credentials)
         }
 
         composable<Messages> {
@@ -87,9 +89,13 @@ fun MoreScreen(
             ExamsScreen()
         }
 
-        composable<Homework> {
+        composable<Homework>(
+            typeMap = mapOf(typeOf<Platform>() to PlatformType)
+        ) {
             changeScaffoldTitle(stringResource(R.string.More_Homework))
-            HomeworkScreen()
+            HomeworkScreen(
+                args = it.toRoute<Homework>()
+            )
         }
 
         composable<Notes> {
@@ -118,6 +124,7 @@ fun MoreContent(
     navController: NavController,
     userId: String,
     platform: Platform,
+    credentials: String
 ) {
     Column(
         modifier = Modifier.verticalScroll(rememberScrollState())
@@ -137,7 +144,15 @@ fun MoreContent(
         BasicPreference(
             leading = { Icon(Icons.Default.Book, contentDescription = null) },
             title = stringResource(R.string.More_Homework),
-            onClick = { navController.navigate(Homework) }
+            onClick = {
+                navController.navigate(
+                    Homework(
+                        userId = userId,
+                        platform = platform,
+                        credentials = credentials
+                    )
+                )
+            }
         )
 
         BasicPreference(

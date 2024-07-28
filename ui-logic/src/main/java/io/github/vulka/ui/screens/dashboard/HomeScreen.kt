@@ -287,7 +287,8 @@ fun HomeScreen(
                     MoreScreen(
                         args = More(
                             platform = args.platform,
-                            userId = args.userId
+                            userId = args.userId,
+                            credentials = args.credentials
                         ),
                         navHostController = navController,
                         changeScaffoldTitle = {

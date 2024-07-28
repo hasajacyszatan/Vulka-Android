@@ -141,7 +141,7 @@ suspend fun sync(
 
     val homeworksJob = coroutineScope.launch(handler) {
         if (client.featuresSet().isHomeworkSupported) {
-            val now = LocalDateTime.now()
+            val now = LocalDateTime.of(2024,3,3,1,1,1)
             val homeworks = client.getHomework(student,now.toLocalDate(), now.plusWeeks(2).toLocalDate())
             repository.homeworks.deleteRangeByCredentialsId(now.toLocalDate(), now.plusWeeks(2).toLocalDate(), userId)
 

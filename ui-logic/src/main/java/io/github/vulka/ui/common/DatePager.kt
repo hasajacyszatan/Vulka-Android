@@ -40,7 +40,7 @@ fun DatePager(
                 .fillMaxSize()
                 .weight(1f),
             targetState = date,
-            label = "timetable date"
+            label = "date pager"
         ) { date ->
             content(date)
         }
@@ -88,7 +88,8 @@ fun DatePagerRange(
     dateTo: LocalDate,
     onClickBack: DatePagerScope.() -> Unit = {},
     onClickForward: DatePagerScope.() -> Unit = {},
-    content: @Composable (LocalDate,LocalDate) -> Unit
+    targetState: Any? = null,
+    content: @Composable (Any?) -> Unit
 ) {
     Column(
         modifier = modifier
@@ -97,10 +98,10 @@ fun DatePagerRange(
             modifier = Modifier
                 .fillMaxSize()
                 .weight(1f),
-            targetState = dateFrom,
-            label = "timetable date"
-        ) { date ->
-            content(date,dateTo)
+            targetState = targetState ?: dateFrom,
+            label = "date pager"
+        ) { target ->
+            content(target)
         }
 
         Surface(

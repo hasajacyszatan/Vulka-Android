@@ -27,3 +27,4 @@ fun LocalDateTime.formatByLocale(locale: Locale): String {
     val formatter = DateTimeFormatter.ofLocalizedDateTime(FormatStyle.SHORT).withLocale(javaLocale)
     return this.format(formatter)
 }
+fun Locale.toJavaLocale() = JavaLocale(language, region)
