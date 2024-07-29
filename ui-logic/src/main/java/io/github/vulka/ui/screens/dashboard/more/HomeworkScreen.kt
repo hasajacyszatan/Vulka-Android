@@ -26,7 +26,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import dev.medzik.android.compose.theme.combineAlpha
 import dev.medzik.android.compose.ui.dialog.rememberDialogState
 import io.github.vulka.core.api.Platform
 import io.github.vulka.database.Homeworks
@@ -35,6 +34,7 @@ import io.github.vulka.ui.common.DatePagerRange
 import io.github.vulka.ui.common.EmptyView
 import io.github.vulka.ui.common.EmptyViewProgress
 import io.github.vulka.ui.common.ErrorDialog
+import io.github.vulka.ui.common.WeekDayHeading
 import io.github.vulka.ui.utils.toJavaLocale
 import kotlinx.serialization.Serializable
 import java.time.format.TextStyle
@@ -125,29 +125,6 @@ fun HomeworkCards(
     }
 }
 
-@Composable
-fun WeekDayHeading(
-    weekday: String
-) {
-    Surface(
-        modifier = Modifier
-            .padding(vertical = 8.dp)
-            .fillMaxWidth()
-            .padding(3.dp),
-        shape = MaterialTheme.shapes.small,
-        color = MaterialTheme.colorScheme.primaryContainer.combineAlpha(0.5f)
-    ) {
-        Text(
-            modifier = Modifier.padding(
-                horizontal = 10.dp,
-                vertical = 8.dp
-            ),
-            fontWeight = FontWeight.Bold,
-            color = MaterialTheme.colorScheme.primary,
-            text = weekday
-        )
-    }
-}
 
 @Composable
 fun HomeworkCard(
@@ -155,6 +132,7 @@ fun HomeworkCard(
 ) {
     Surface(
         modifier = Modifier
+            .padding(vertical = 2.dp)
             .fillMaxWidth()
             .padding(3.dp),
         shape = MaterialTheme.shapes.medium,

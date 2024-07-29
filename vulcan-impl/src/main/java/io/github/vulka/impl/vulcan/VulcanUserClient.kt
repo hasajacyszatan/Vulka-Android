@@ -3,6 +3,7 @@ package io.github.vulka.impl.vulcan
 import com.google.gson.Gson
 import io.github.vulka.core.api.LoginCredentials
 import io.github.vulka.core.api.UserClient
+import io.github.vulka.core.api.types.Exam
 import io.github.vulka.core.api.types.Grade
 import io.github.vulka.core.api.types.Homework
 import io.github.vulka.core.api.types.HomeworkAttachment
@@ -272,6 +273,26 @@ class VulcanUserClient(
         }
 
         return homeworks.toTypedArray()
+    }
+
+    override suspend fun getExam(student: Student, dateFrom: LocalDate, dateTo: LocalDate): Array<Exam> {
+        val exams = ArrayList<Exam>()
+        val response = api.getExams(student.toHebe(), dateFrom, dateTo)
+
+        for (exam in response) {
+            exams.add(
+                Exam(
+                    type = exam.type,
+                    content = exam.content,
+                    dateCreated = LocalDate.parse(exam.dateCreated.date),
+                    deadline = LocalDate.parse(exam.deadline.date),
+                    creator = exam.creator.displayName,
+                    subject = exam.subject.name
+                )
+            )
+        }
+
+        return exams.toTypedArray()
     }
 
     private fun getSchoolYearDates(hebeStudent: HebeStudent): Pair<LocalDate,LocalDate> {

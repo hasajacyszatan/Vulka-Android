@@ -70,5 +70,6 @@
     <string name="More_NotesAndAchievements_Empty">No notes and achievements</string>
     <string name="More_Meetings_Empty">No meetings</string>
     <string name="Grades_Empty">No grades</string>
-    <string name="More_Homework_Empty">No homeworks</string>
+    <string name="More_Homework_Empty">No homeworks in this week</string>
+    <string name="More_Exams_Empty">No exams in this week</string>
 </resources>

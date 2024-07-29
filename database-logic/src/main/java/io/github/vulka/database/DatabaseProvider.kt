@@ -5,6 +5,8 @@ import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
+import androidx.room.migration.Migration
+import androidx.sqlite.db.SupportSQLiteDatabase
 
 @Database(
     version = 1,
@@ -16,7 +18,8 @@ import androidx.room.TypeConverters
         Semesters::class,
         Notes::class,
         Meetings::class,
-        Homeworks::class
+        Homeworks::class,
+        Exams::class
     ],
     exportSchema = false
 )
@@ -30,6 +33,7 @@ abstract class VulkaDatabase : RoomDatabase() {
     abstract fun notesDao(): NotesDao
     abstract fun meetingsDao(): MeetingsDao
     abstract fun homeworksDao(): HomeworksDao
+    abstract fun examsDao(): ExamsDao
 }
 
 /**

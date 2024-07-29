@@ -6,6 +6,7 @@ import io.github.vulka.business.utils.getUserClient
 import io.github.vulka.core.api.Platform
 import io.github.vulka.core.api.UserClient
 import io.github.vulka.core.api.types.Student
+import io.github.vulka.database.Exams
 import io.github.vulka.database.Grades
 import io.github.vulka.database.Homeworks
 import io.github.vulka.database.LuckyNumber
@@ -141,7 +142,7 @@ suspend fun sync(
 
     val homeworksJob = coroutineScope.launch(handler) {
         if (client.featuresSet().isHomeworkSupported) {
-            val now = LocalDateTime.of(2024,3,3,1,1,1)
+            val now = LocalDateTime.now()
             val homeworks = client.getHomework(student,now.toLocalDate(), now.plusWeeks(2).toLocalDate())
             repository.homeworks.deleteRangeByCredentialsId(now.toLocalDate(), now.plusWeeks(2).toLocalDate(), userId)
 
@@ -157,7 +158,33 @@ suspend fun sync(
         }
     }
 
-    joinAll(luckyNumberJob, gradesJob, timetableJob, notesJob, meetingsJob, homeworksJob)
+    val examsJob = coroutineScope.launch(handler) {
+        if (client.featuresSet().isExamsSupported) {
+            val now = LocalDateTime.now()
+            val exams = client.getExam(student,now.toLocalDate(), now.plusWeeks(2).toLocalDate())
+            repository.exams.deleteRangeByCredentialsId(now.toLocalDate(), now.plusWeeks(2).toLocalDate(), userId)
+
+            for (exam in exams) {
+                repository.exams.insert(
+                    Exams(
+                        exam = exam,
+                        lastSync = now,
+                        credentialsId = userId
+                    )
+                )
+            }
+        }
+    }
+
+    joinAll(
+        luckyNumberJob,
+        gradesJob,
+        timetableJob,
+        notesJob,
+        meetingsJob,
+        homeworksJob,
+        examsJob
+    )
 
     if (error != null)
         throw error!!

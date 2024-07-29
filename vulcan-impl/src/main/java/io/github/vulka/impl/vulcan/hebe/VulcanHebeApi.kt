@@ -7,6 +7,7 @@ import io.github.vulka.impl.vulcan.hebe.login.RegisterRequest
 import io.github.vulka.impl.vulcan.hebe.types.HebeAccount
 import io.github.vulka.impl.vulcan.hebe.types.HebeAverageGrade
 import io.github.vulka.impl.vulcan.hebe.types.HebeChangedLesson
+import io.github.vulka.impl.vulcan.hebe.types.HebeExam
 import io.github.vulka.impl.vulcan.hebe.types.HebeGrade
 import io.github.vulka.impl.vulcan.hebe.types.HebeHomework
 import io.github.vulka.impl.vulcan.hebe.types.HebeLesson
@@ -131,7 +132,7 @@ class VulcanHebeApi {
         )!!
     }
 
-    fun getLuckyNumber(student: HebeStudent,date: LocalDate): Int {
+    fun getLuckyNumber(student: HebeStudent, date: LocalDate): Int {
         val baseUrl = getRestUrl(student)
         val response = client.get(
             url = "$baseUrl/${HebeApiEndpoints.DATA_ROOT}/${HebeApiEndpoints.DATA_LUCKY_NUMBER}",
@@ -144,7 +145,7 @@ class VulcanHebeApi {
         return response!!.number
     }
 
-    fun getGrades(student: HebeStudent,period: HebePeriod): Array<HebeGrade> {
+    fun getGrades(student: HebeStudent, period: HebePeriod): Array<HebeGrade> {
         return getByPupil(
             endpoint = HebeApiEndpoints.DATA_GRADE,
             student = student,
@@ -153,7 +154,7 @@ class VulcanHebeApi {
         )
     }
 
-    fun getLessons(student: HebeStudent,dateFrom: LocalDate,dateTo: LocalDate = dateFrom): Array<HebeLesson> {
+    fun getLessons(student: HebeStudent, dateFrom: LocalDate, dateTo: LocalDate = dateFrom): Array<HebeLesson> {
         val currentPeriod = student.periods.find { it.current }!!
 
         return getByPupil(
@@ -166,7 +167,7 @@ class VulcanHebeApi {
         )
     }
 
-    fun getChangedLessons(student: HebeStudent,dateFrom: LocalDate,dateTo: LocalDate = dateFrom): Array<HebeChangedLesson> {
+    fun getChangedLessons(student: HebeStudent, dateFrom: LocalDate, dateTo: LocalDate = dateFrom): Array<HebeChangedLesson> {
         val currentPeriod = student.periods.find { it.current }!!
 
         return getByPupil(
@@ -218,11 +219,22 @@ class VulcanHebeApi {
         )
     }
 
-    fun getHomeworks(student: HebeStudent,dateFrom: LocalDate,dateTo: LocalDate = dateFrom): Array<HebeHomework> {
+    fun getHomeworks(student: HebeStudent, dateFrom: LocalDate, dateTo: LocalDate = dateFrom): Array<HebeHomework> {
         return getByPupil(
             endpoint = HebeApiEndpoints.DATA_HOMEWORK,
             student = student,
             clazz = Array<HebeHomework>::class.java,
+
+            dateFrom = dateFrom,
+            dateTo = dateTo,
+        )
+    }
+
+    fun getExams(student: HebeStudent, dateFrom: LocalDate, dateTo: LocalDate = dateFrom): Array<HebeExam> {
+        return getByPupil(
+            endpoint = HebeApiEndpoints.DATA_EXAM,
+            student = student,
+            clazz = Array<HebeExam>::class.java,
 
             dateFrom = dateFrom,
             dateTo = dateTo,

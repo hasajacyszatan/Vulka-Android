@@ -84,9 +84,13 @@ fun MoreScreen(
             MessagesScreen()
         }
 
-        composable<Exams> {
+        composable<Exams>(
+            typeMap = mapOf(typeOf<Platform>() to PlatformType)
+        ) {
             changeScaffoldTitle(stringResource(R.string.More_Exams))
-            ExamsScreen()
+            ExamsScreen(
+                args = it.toRoute<Exams>()
+            )
         }
 
         composable<Homework>(
@@ -129,43 +133,59 @@ fun MoreContent(
     Column(
         modifier = Modifier.verticalScroll(rememberScrollState())
     ) {
-        BasicPreference(
-            leading = { Icon(Icons.Default.Mail, contentDescription = null) },
-            title = stringResource(R.string.More_Messages),
-            onClick = { navController.navigate(Messages) }
-        )
+        if (getFeaturesByPlatform(platform).isMessagesSupported) {
+            BasicPreference(
+                leading = { Icon(Icons.Default.Mail, contentDescription = null) },
+                title = stringResource(R.string.More_Messages),
+                onClick = { navController.navigate(Messages) }
+            )
+        }
 
-        BasicPreference(
-            leading = { Icon(Icons.Default.CalendarToday, contentDescription = null) },
-            title = stringResource(R.string.More_Exams),
-            onClick = { navController.navigate(Exams) }
-        )
-
-        BasicPreference(
-            leading = { Icon(Icons.Default.Book, contentDescription = null) },
-            title = stringResource(R.string.More_Homework),
-            onClick = {
-                navController.navigate(
-                    Homework(
-                        userId = userId,
-                        platform = platform,
-                        credentials = credentials
+        if (getFeaturesByPlatform(platform).isExamsSupported) {
+            BasicPreference(
+                leading = { Icon(Icons.Default.CalendarToday, contentDescription = null) },
+                title = stringResource(R.string.More_Exams),
+                onClick = {
+                    navController.navigate(
+                        Exams(
+                            userId = userId,
+                            platform = platform,
+                            credentials = credentials
+                        )
                     )
-                )
-            }
-        )
+                }
+            )
+        }
 
-        BasicPreference(
-            leading = { Icon(Icons.Default.EmojiEvents, contentDescription = null) },
-            title = stringResource(R.string.More_NotesAndAchievements),
-            onClick = {
-                navController.navigate(
-                    Notes(
-                        userId = userId
+        if (getFeaturesByPlatform(platform).isHomeworkSupported) {
+            BasicPreference(
+                leading = { Icon(Icons.Default.Book, contentDescription = null) },
+                title = stringResource(R.string.More_Homework),
+                onClick = {
+                    navController.navigate(
+                        Homework(
+                            userId = userId,
+                            platform = platform,
+                            credentials = credentials
+                        )
                     )
-                )
-            }
-        )
+                }
+            )
+        }
+
+        if (getFeaturesByPlatform(platform).isNotesSupported) {
+            BasicPreference(
+                leading = { Icon(Icons.Default.EmojiEvents, contentDescription = null) },
+                title = stringResource(R.string.More_NotesAndAchievements),
+                onClick = {
+                    navController.navigate(
+                        Notes(
+                            userId = userId
+                        )
+                    )
+                }
+            )
+        }
 
         if (getFeaturesByPlatform(platform).isMeetingsSupported) {
             BasicPreference(
