@@ -72,4 +72,6 @@
     <string name="Grades_Empty">No grades</string>
     <string name="More_Homework_Empty">No homeworks in this week</string>
     <string name="More_Exams_Empty">No exams in this week</string>
+    <string name="Subject">Subject</string>
+    <string name="Name">Name</string>
 </resources>

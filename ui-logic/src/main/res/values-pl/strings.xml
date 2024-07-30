@@ -68,4 +68,6 @@
     <string name="Grades_Empty">Brak ocen</string>
     <string name="More_Homework_Empty">Brak zadań domowych w tym tygodniu</string>
     <string name="More_Exams_Empty">Brak sprawdzianów w tym tygodniu</string>
+    <string name="Subject">Przedmiot</string>
+    <string name="Name">" Nazwa"</string>
 </resources>
