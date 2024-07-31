@@ -69,5 +69,17 @@
     <string name="More_Homework_Empty">Brak zadań domowych w tym tygodniu</string>
     <string name="More_Exams_Empty">Brak sprawdzianów w tym tygodniu</string>
     <string name="Subject">Przedmiot</string>
-    <string name="Name">" Nazwa"</string>
+    <string name="Name">Nazwa</string>
+    <string name="ProposedGrade">Ocena proponowana</string>
+    <string name="EndGrade">Ocena końcowa</string>
+    <string name="CalculatedAverage">Obliczona średnia</string>
+    <string name="EndAverage">Końcowa średnia</string>
+    <plurals name="SummarySubjectsCount">
+        <item quantity="one">z %1$d na %2$d przedmiot</item>
+        <item quantity="few">z %1$d na %2$d przedmioty</item>
+        <item quantity="many">z %1$d na %2$d przedmiotów</item>
+        <item quantity="other">z %1$d na %2$d przedmiotów</item>
+    </plurals>
+    <string name="Average">Średnia</string>
+
 </resources>

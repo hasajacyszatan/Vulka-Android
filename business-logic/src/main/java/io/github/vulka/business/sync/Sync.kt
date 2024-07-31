@@ -6,6 +6,7 @@ import io.github.vulka.business.utils.getUserClient
 import io.github.vulka.core.api.Platform
 import io.github.vulka.core.api.UserClient
 import io.github.vulka.core.api.types.Student
+import io.github.vulka.core.api.types.Summary
 import io.github.vulka.database.Exams
 import io.github.vulka.database.Grades
 import io.github.vulka.database.Homeworks
@@ -70,6 +71,7 @@ suspend fun sync(
         val semesters = client.getSemesters(student)
         repository.grades.deleteByCredentialsId(userId)
         repository.semesters.deleteByCredentialsId(userId)
+        repository.summary.deleteByCredentialsId(userId)
 
         for (semester in semesters) {
             repository.semesters.insert(
@@ -79,17 +81,35 @@ suspend fun sync(
                 )
             )
 
-            // sync grades
-            val grades = client.getGrades(student, semester)
-            for (grade in grades) {
-                repository.grades.insert(
-                    Grades(
-                        grade = grade,
-                        semester = semester.number,
-                        credentialsId = userId
+            val gradesJob = coroutineScope.launch(handler) {
+                // sync grades
+                val grades = client.getGrades(student, semester)
+                for (grade in grades) {
+                    repository.grades.insert(
+                        Grades(
+                            grade = grade,
+                            semester = semester.number,
+                            credentialsId = userId
+                        )
                     )
-                )
+                }
             }
+
+            val summaryJob = coroutineScope.launch(handler) {
+                // sync summaries
+                val summaries = client.getSummary(student, semester)
+                for (summary in summaries) {
+                    repository.summary.insert(
+                        io.github.vulka.database.Summary(
+                            summary = summary,
+                            semester = semester.number,
+                            credentialsId = userId
+                        )
+                    )
+                }
+            }
+
+            joinAll(gradesJob, summaryJob)
         }
     }
 

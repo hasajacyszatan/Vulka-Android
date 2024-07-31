@@ -194,7 +194,11 @@ class VulcanHebeApi {
             endpoint = HebeApiEndpoints.DATA_GRADE_AVERAGE,
             student = student,
             period = period,
-            clazz = Array<HebeAverageGrade>::class.java
+            clazz = Array<HebeAverageGrade>::class.java,
+
+            query = mapOf(
+                "scope" to "auto"
+            )
         )
     }
 

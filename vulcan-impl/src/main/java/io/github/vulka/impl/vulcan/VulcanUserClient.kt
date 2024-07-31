@@ -1,5 +1,6 @@
 package io.github.vulka.impl.vulcan
 
+import android.util.Log
 import com.google.gson.Gson
 import io.github.vulka.core.api.LoginCredentials
 import io.github.vulka.core.api.UserClient
@@ -74,7 +75,7 @@ class VulcanUserClient(
                 Grade(
                     value = grade.content.replace("\\.0$".toRegex(), ""),
                     weight = grade.column.weight,
-                    name = grade.column.name,
+                    name = grade.column.name.ifBlank { grade.column.code },
                     date = LocalDate.parse(grade.dateCreated.date),
                     subject = grade.column.subject.name,
                     teacher = Teacher(
@@ -168,15 +169,16 @@ class VulcanUserClient(
         val currentPeriod = hebeStudent.periods.find { it.number == semester.number && it.level == currentHebePeriod.level }!!
 
         val endGradesResponse = api.getSummaryGrades(hebeStudent,currentPeriod)
-        val averagesResponse = api.getAverages(hebeStudent,currentPeriod)
+        // TODO: support for year average
+        val averagesResponse = api.getAverages(hebeStudent,currentPeriod).filter { it.scope == "periodic" }
 
         val summaryMap = mutableMapOf<String, Summary>()
 
         endGradesResponse.forEach { endGrade ->
             val subjectName = endGrade.subject.name
             summaryMap[subjectName] = Summary(
-                proposedGrade = endGrade.entry1,
-                endGrade = endGrade.entry2,
+                proposedGrade = getGradeNumberFromShortcut(endGrade.entry1),
+                endGrade = getGradeNumberFromShortcut(endGrade.entry2),
                 average = null,
                 subject = subjectName
             )
@@ -309,6 +311,18 @@ class VulcanUserClient(
             endDate = LocalDate.parse(currentHebePeriod.end.date)
         }
         return startDate to endDate
+    }
+
+    private fun getGradeNumberFromShortcut(shortcut: String?): String? {
+        return when (shortcut) {
+            "cel" -> "6"
+            "bdb" -> "5"
+            "db" -> "4"
+            "dst" -> "3"
+            "dop" -> "2"
+            "ndst" -> "1"
+            else -> shortcut
+        }
     }
 
     override fun shouldSyncSemesters(student: Student): Boolean {

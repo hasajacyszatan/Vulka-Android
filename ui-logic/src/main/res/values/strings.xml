@@ -74,4 +74,16 @@
     <string name="More_Exams_Empty">No exams in this week</string>
     <string name="Subject">Subject</string>
     <string name="Name">Name</string>
+    <string name="ProposedGrade">Proposed grade</string>
+    <string name="EndGrade">End grade</string>
+    <string name="CalculatedAverage">Calculated average</string>
+    <string name="EndAverage">End average</string>
+    <plurals name="SummarySubjectsCount">
+        <item quantity="one">from %1$d of %2$d subject</item>
+        <item quantity="few">from %1$d of %2$d subjects</item>
+        <item quantity="many">from %1$d of %2$d subjects</item>
+        <item quantity="other">from %1$d of %2$d subjects</item>
+    </plurals>
+    <string name="Average">Average</string>
+
 </resources>
