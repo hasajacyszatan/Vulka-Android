@@ -74,7 +74,7 @@ fun AccountManagerScreen(
     }
 
     BackHandler {
-        viewModel.check(navController)
+        viewModel.checkAndBack(navController)
     }
 }
 

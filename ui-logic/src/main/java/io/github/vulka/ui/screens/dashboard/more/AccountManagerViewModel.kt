@@ -42,7 +42,11 @@ class AccountManagerViewModel @Inject constructor(
         repository.credentials.delete(credentials)
     }
 
-    fun check(navController: NavController) {
+    /**
+     * Returns true when current credentials was deleted or all credentials was deleted,
+     * otherwise false
+     */
+    private fun check(navController: NavController): Boolean {
         if (repository.credentials.count() == 0) {
             navController.navigate(Welcome) {
                 popUpTo(navController.graph.findStartDestination().id) {
@@ -50,7 +54,7 @@ class AccountManagerViewModel @Inject constructor(
                     inclusive = true
                 }
             }
-            return
+            return true
         }
 
         // Navigate to first credential if current selected was deleted
@@ -70,6 +74,15 @@ class AccountManagerViewModel @Inject constructor(
                     inclusive = true
                 }
             }
+
+            return true
         }
+
+        return false
+    }
+
+    fun checkAndBack(navController: NavController) {
+        if (!check(navController))
+            navController.popBackStack()
     }
 }
