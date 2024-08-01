@@ -80,13 +80,13 @@ fun HomeScreen(
 
     var scaffoldTitle: String? by rememberMutable { null }
     val pullToRefreshState = rememberPullToRefreshState()
-    var bottomSelected: Any by rememberMutable { Start }
     val dialogState = rememberDialogState()
     val snackBarState by rememberMutable { SnackbarHostState() }
     val errorDialogState = rememberDialogState()
     var exception: Exception? by rememberMutable { null }
 
     val studentState by viewModel.student.collectAsState()
+    val bottomSelected by viewModel.bottomSelected.collectAsState()
 
     LaunchedEffect(Unit) {
         viewModel.init(args)
@@ -97,7 +97,6 @@ fun HomeScreen(
         }
     }
 
-
     if (pullToRefreshState.isRefreshing) {
         LaunchedEffect(Unit) {
             viewModel.syncUi(context, args, studentState!!, snackBarState, pullToRefreshState) {
@@ -106,7 +105,6 @@ fun HomeScreen(
             }
         }
     }
-
 
     @Composable
     fun BoxScope.pullToRefresh() {
@@ -176,7 +174,7 @@ fun HomeScreen(
                     label = { NavigationBarItemLabel(R.string.Home) },
                     selected = bottomSelected == Start ,
                     onClick = {
-                        bottomSelected = Start
+                        viewModel.setBottomSelected(Start)
                     },
                     alwaysShowLabel = false
                 )
@@ -187,7 +185,7 @@ fun HomeScreen(
                     label = { NavigationBarItemLabel(R.string.Grades) },
                     selected = bottomSelected == Grades,
                     onClick = {
-                        bottomSelected = Grades
+                        viewModel.setBottomSelected(Grades)
                     },
                     alwaysShowLabel = false
                 )
@@ -198,7 +196,7 @@ fun HomeScreen(
                     label = { NavigationBarItemLabel(R.string.Attendance) },
                     selected = bottomSelected == Attendance,
                     onClick = {
-                        bottomSelected = Attendance
+                        viewModel.setBottomSelected(Attendance)
                     },
                     alwaysShowLabel = false,
                 )
@@ -209,7 +207,7 @@ fun HomeScreen(
                     label = { NavigationBarItemLabel(R.string.Timetable) },
                     selected = bottomSelected == Timetable,
                     onClick = {
-                        bottomSelected = Timetable
+                        viewModel.setBottomSelected(Timetable)
                     },
                     alwaysShowLabel = false,
                 )
@@ -220,7 +218,7 @@ fun HomeScreen(
                     label = { NavigationBarItemLabel(R.string.More) },
                     selected = bottomSelected == More,
                     onClick = {
-                        bottomSelected = More
+                        viewModel.setBottomSelected(More)
                     },
                     alwaysShowLabel = false
                 )

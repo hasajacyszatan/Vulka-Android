@@ -44,6 +44,8 @@ class HomeViewModel @Inject constructor(
     // If data was saved in DB and now can be safely loaded
     var refreshed by mutableStateOf(false)
 
+    val bottomSelected = MutableStateFlow<Any>(Start)
+
     suspend fun init(args: Home) {
         withContext(Dispatchers.IO) {
             credentials.value = decryptCredentials(args.credentials)
@@ -97,5 +99,9 @@ class HomeViewModel @Inject constructor(
     // TODO: migrate room to flow objects
     fun getAllStudents(): Flow<List<Credentials>> = flow {
         emit(repository.credentials.getAll())
+    }
+
+    fun setBottomSelected(bottomSelected: Any) {
+        this.bottomSelected.value = bottomSelected
     }
 }
