@@ -1,5 +1,6 @@
 plugins {
     alias(libs.plugins.android.library)
+    alias(libs.plugins.androidx.room)
     alias(libs.plugins.dagger.hilt)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.ksp)
@@ -45,4 +46,8 @@ dependencies {
     implementation(libs.gson.extras)
 
     coreLibraryDesugaring(libs.desugar.jdk.libs)
+}
+
+room {
+    schemaDirectory("$projectDir/schemas")
 }

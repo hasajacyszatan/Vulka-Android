@@ -19,8 +19,7 @@ import androidx.room.TypeConverters
         Homeworks::class,
         Exams::class,
         Summary::class
-    ],
-    exportSchema = false
+    ]
 )
 @TypeConverters(Converters::class)
 abstract class VulkaDatabase : RoomDatabase() {
