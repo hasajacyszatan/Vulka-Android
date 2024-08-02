@@ -7,6 +7,7 @@ import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import io.github.vulka.database.Repository
+import io.github.vulka.database.RepositoryImpl
 import javax.inject.Singleton
 
 @Module
@@ -17,6 +18,6 @@ object RoomModule {
     fun providesRepository(
         @ApplicationContext context: Context
     ): Repository {
-        return Repository(context)
+        return RepositoryImpl(context)
     }
 }

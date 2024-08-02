@@ -2,7 +2,7 @@ package io.github.vulka.database
 
 import android.content.Context
 
-interface RepositoryInterface {
+interface Repository {
     val credentials: CredentialsDao
     val luckyNumber: LuckyNumberDao
     val grades: GradesDao
@@ -15,7 +15,7 @@ interface RepositoryInterface {
     val summary: SummaryDao
 }
 
-class Repository(context: Context) : RepositoryInterface {
+class RepositoryImpl(context: Context) : Repository {
     private val database = DatabaseProvider.getInstance(context)
 
     override val credentials = database.credentialsDao()
