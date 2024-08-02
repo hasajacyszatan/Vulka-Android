@@ -367,7 +367,7 @@ private fun GradesDetails(grade: Grade) {
                 value = grade.value.orEmpty(),
                 editable = false
             ),
-            label = stringResource(R.string.Grades),
+            label = stringResource(R.string.Grade),
             leading = {
                 IconBox(Icons.Default.Looks6)
             }

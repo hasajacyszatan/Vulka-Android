@@ -81,5 +81,6 @@
         <item quantity="other">z %1$d na %2$d przedmiotów</item>
     </plurals>
     <string name="Average">Średnia</string>
+    <string name="Grade">Ocena</string>
 
 </resources>
