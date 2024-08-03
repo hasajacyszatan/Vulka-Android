@@ -78,7 +78,7 @@ class LibrusUserClient(
 
     override suspend fun getLuckyNumber(student: Student): Int {
         val response = internalRequestLuckyNumber()
-        return response.luckyNumber
+        return response?.luckyNumber ?: 0
     }
 
     override suspend fun getGrades(student: Student, semester: Semester): Array<Grade> {
