@@ -94,4 +94,4 @@ fun AboutScreen() {
 }
 
 // Can't use BuildConfig in another modules
-fun Context.getAppVersion(): String = packageManager.getPackageInfo(packageName, 0).versionName
+fun Context.getAppVersion(): String = packageManager.getPackageInfo(packageName, 0).versionName!!
