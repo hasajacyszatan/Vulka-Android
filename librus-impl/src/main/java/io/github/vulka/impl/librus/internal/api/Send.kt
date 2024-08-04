@@ -1,10 +1,10 @@
 package io.github.vulka.impl.librus.internal.api
 
-import com.google.gson.Gson
 import io.github.vulka.impl.librus.LibrusUserClient
 import io.github.vulka.impl.librus.applyCookie
 import io.ktor.client.request.get
 import io.ktor.client.statement.bodyAsText
+import kotlinx.serialization.json.Json
 
 internal suspend inline fun <reified T> LibrusUserClient.apiGET(
     endpoint: String
@@ -14,6 +14,6 @@ internal suspend inline fun <reified T> LibrusUserClient.apiGET(
             applyCookie(it)
         }
     }
-
-    return Gson().fromJson(response.bodyAsText(), T::class.java)
+    val body = response.bodyAsText()
+    return Json.decodeFromString(body)
 }

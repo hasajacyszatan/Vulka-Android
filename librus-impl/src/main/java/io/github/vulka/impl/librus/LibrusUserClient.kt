@@ -1,8 +1,5 @@
 package io.github.vulka.impl.librus
 
-import com.google.gson.Gson
-import com.google.gson.JsonObject
-import com.google.gson.reflect.TypeToken
 import io.github.vulka.core.api.UserClient
 import io.github.vulka.core.api.types.Exam
 import io.github.vulka.core.api.types.Grade
@@ -16,6 +13,7 @@ import io.github.vulka.core.api.types.Semester
 import io.github.vulka.core.api.types.Student
 import io.github.vulka.core.api.types.Summary
 import io.github.vulka.core.api.types.Teacher
+import io.github.vulka.impl.librus.internal.api.LibrusUserProfileResponse
 import io.github.vulka.impl.librus.internal.api.internalRequestClass
 import io.github.vulka.impl.librus.internal.api.internalRequestClassrooms
 import io.github.vulka.impl.librus.internal.api.internalRequestGrades
@@ -26,8 +24,7 @@ import io.github.vulka.impl.librus.internal.api.internalRequestSubjects
 import io.github.vulka.impl.librus.internal.api.internalRequestTimetable
 import io.github.vulka.impl.librus.internal.api.internalRequestUserProfile
 import io.github.vulka.impl.librus.internal.api.internalRequestUsers
-import io.github.vulka.impl.librus.internal.api.types.TimetablesDay
-import io.github.vulka.impl.librus.internal.api.types.UserProfile
+import io.github.vulka.impl.librus.internal.api.types.TimetableDay
 import io.ktor.client.HttpClient
 import io.ktor.client.engine.okhttp.OkHttp
 import io.ktor.client.plugins.cookies.ConstantCookiesStorage
@@ -36,6 +33,9 @@ import io.ktor.client.request.HttpRequestBuilder
 import io.ktor.http.Cookie
 import io.ktor.http.HttpHeaders
 import io.ktor.http.renderCookieHeader
+import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.JsonObject
+import kotlinx.serialization.json.decodeFromJsonElement
 import java.time.DayOfWeek
 import java.time.LocalDate
 
@@ -61,13 +61,13 @@ class LibrusUserClient(
     override suspend fun getStudents(): Array<Student> {
         val userProfile = internalRequestUserProfile()
         val me = internalRequestMe()
-        val classInfo = internalRequestClass(me.class_.id)
+        val classInfo = internalRequestClass(me.`class`.id)
 
         return arrayOf(
             Student(
                 // maybe "user" for parent account and "account" for student account
                 fullName = "${me.user.firstName} ${me.user.lastName}",
-                isParent = userProfile.accountType == UserProfile.AccountType.PARENT,
+                isParent = userProfile.accountType == LibrusUserProfileResponse.AccountType.Parent,
                 parent = Parent(
                     fullName = "${me.account.firstName} ${me.account.lastName}"
                 ),
@@ -78,7 +78,7 @@ class LibrusUserClient(
 
     override suspend fun getLuckyNumber(student: Student): Int {
         val response = internalRequestLuckyNumber()
-        return response?.luckyNumber ?: 0
+        return response.number ?: 0
     }
 
     override suspend fun getGrades(student: Student, semester: Semester): Array<Grade> {
@@ -98,7 +98,7 @@ class LibrusUserClient(
                 Grade(
                     value = grade.grade,
                     weight = category.weight ?: 0f,
-                    name = category.name,
+                    name = category.name ?: "",
                     date = LocalDate.parse(grade.date),
                     subject = subject.name,
                     teacher = Teacher(
@@ -122,12 +122,11 @@ class LibrusUserClient(
 
         lateinit var timetable: JsonObject
 
-        fun getTimetableDay(date: LocalDate): Array<Array<TimetablesDay>?>? {
+        fun getTimetableDay(date: LocalDate): Array<Array<TimetableDay>?>? {
             println(date.toString())
 
             return try {
-                val type = object : TypeToken<Array<Array<TimetablesDay>?>?>() {}.type
-                return Gson().fromJson(timetable[date.toString()], type)
+                return Json.decodeFromJsonElement(timetable[date.toString()]!!)
             } catch (e: Exception) {
                 null
             }
@@ -151,8 +150,8 @@ class LibrusUserClient(
                             subjectName = lesson.subject.name,
                             position = lesson.lessonNo.toInt(),
                             teacherName = "${lesson.teacher.firstName} ${lesson.teacher.lastName}",
-                            classRoom = classRooms.find { x -> x.id.toString() == lesson.classroom.id }?.name,
-                            groupName = lesson.virtualClassName ?: null,
+                            classRoom = classRooms.find { x -> x.id == lesson.classroom.id }?.name,
+                            groupName = lesson.virtualClassName,
                             date = currentDate,
                             startTime = lesson.hourFrom,
                             endTime = lesson.hourTo

@@ -1,7 +1,15 @@
 package io.github.vulka.impl.librus.internal.api
 
 import io.github.vulka.impl.librus.LibrusUserClient
-import io.github.vulka.impl.librus.internal.api.types.TimetableResponse
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.json.JsonObject
 
 internal suspend fun LibrusUserClient.internalRequestTimetable(weekStart: String) =
-    apiGET<TimetableResponse>("Timetables?weekStart=$weekStart").timetable
+    apiGET<LibrusTimetableResponse>("Timetables?weekStart=$weekStart").timetable
+
+@Serializable
+internal data class LibrusTimetableResponse(
+    @SerialName("Timetable")
+    val timetable: JsonObject
+)
