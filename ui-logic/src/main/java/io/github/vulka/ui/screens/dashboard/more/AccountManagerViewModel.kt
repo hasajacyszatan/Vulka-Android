@@ -38,6 +38,7 @@ class AccountManagerViewModel @Inject constructor(
         repository.semesters.deleteByCredentialsId(credentials.id)
         repository.luckyNumber.deleteByCredentialsId(credentials.id)
         repository.notes.deleteByCredentialsId(credentials.id)
+        repository.meetings.deleteByCredentialsId(credentials.id)
 
         repository.credentials.delete(credentials)
     }
