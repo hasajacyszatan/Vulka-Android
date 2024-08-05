@@ -1,5 +1,6 @@
 package io.github.vulka.impl.librus.internal.api
 
+import android.util.Log
 import io.github.vulka.impl.librus.LibrusUserClient
 import io.github.vulka.impl.librus.applyCookie
 import io.ktor.client.request.get
@@ -17,11 +18,13 @@ private val json = Json {
 internal suspend inline fun <reified T> LibrusUserClient.apiGET(
     endpoint: String
 ): T {
+    Log.d("LIBRUS API", "GET: /$endpoint")
     val response = client.get("https://synergia.librus.pl/gateway/api/2.0/$endpoint") {
         credentials.cookies.forEach {
             applyCookie(it)
         }
     }
     val body = response.bodyAsText()
+    Log.d("LIBRUS API", "Response: $body")
     return json.decodeFromString(body)
 }
