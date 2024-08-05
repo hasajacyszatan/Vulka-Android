@@ -6,6 +6,8 @@ import io.ktor.client.request.get
 import io.ktor.client.statement.bodyAsText
 import kotlinx.serialization.json.Json
 
+private val json = Json { ignoreUnknownKeys = true }
+
 internal suspend inline fun <reified T> LibrusUserClient.apiGET(
     endpoint: String
 ): T {
@@ -15,5 +17,5 @@ internal suspend inline fun <reified T> LibrusUserClient.apiGET(
         }
     }
     val body = response.bodyAsText()
-    return Json.decodeFromString(body)
+    return json.decodeFromString(body)
 }
