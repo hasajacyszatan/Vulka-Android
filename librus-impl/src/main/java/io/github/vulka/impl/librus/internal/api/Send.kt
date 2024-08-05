@@ -6,7 +6,13 @@ import io.ktor.client.request.get
 import io.ktor.client.statement.bodyAsText
 import kotlinx.serialization.json.Json
 
-private val json = Json { ignoreUnknownKeys = true }
+private val json = Json {
+    // we don't use all keys returned by the API, so we can ignore the rest
+    ignoreUnknownKeys = true
+    // Removes JSON specification restriction
+    // e.g. allow String type for numbers in json
+    isLenient = true
+}
 
 internal suspend inline fun <reified T> LibrusUserClient.apiGET(
     endpoint: String
