@@ -31,9 +31,10 @@ import io.github.vulka.ui.screens.auth.Login
 import io.github.vulka.ui.screens.auth.LoginScreen
 import io.github.vulka.ui.screens.dashboard.Home
 import io.github.vulka.ui.screens.dashboard.HomeScreen
+import io.github.vulka.ui.screens.dashboard.more.About
+import io.github.vulka.ui.screens.dashboard.more.AboutScreen
 import io.github.vulka.ui.screens.dashboard.more.AccountManager
 import io.github.vulka.ui.screens.dashboard.more.AccountManagerScreen
-import io.github.vulka.ui.screens.dashboard.more.moreNavigation
 import io.github.vulka.ui.utils.navtype.PlatformType
 import javax.inject.Inject
 import kotlin.reflect.typeOf
@@ -152,7 +153,18 @@ fun VulkaNavigation(viewModel: NavigationViewModel = hiltViewModel()) {
             }
         }
 
-        moreNavigation(navController)
+        composable<About> {
+            DefaultScaffold(
+                topBar = {
+                    TopBarWithBack(
+                        title = R.string.More_About,
+                        navController
+                    )
+                }
+            ) {
+                AboutScreen()
+            }
+        }
     }
 }
 
