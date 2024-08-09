@@ -181,10 +181,12 @@ fun GradesTab(
                                     text = "$gradesAmount ${pluralStringResource(R.plurals.GradesAmount,gradesAmount)}"
                                 )
 
-                                Text(
-                                    fontSize = 12.sp,
-                                    text = "${stringResource(R.string.Average)}: ${summary?.average ?: "0.0"}"
-                                )
+                                if (summary?.average != null) {
+                                    Text(
+                                        fontSize = 12.sp,
+                                        text = "${stringResource(R.string.Average)}: ${summary.average}"
+                                    )
+                                }
                             }
                         }
                     }
