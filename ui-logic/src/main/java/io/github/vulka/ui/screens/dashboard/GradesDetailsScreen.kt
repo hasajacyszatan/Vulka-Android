@@ -413,17 +413,29 @@ private enum class GradeColor(
     SIX(Color(0xFF4CAF50), Color.Black);
 
     companion object {
+        fun recognizeGrade(actual: String, expected: String): Boolean {
+            val cleanedActual = actual.replace(" ","")
+            val gradeRegex = Regex("^[0-6](\\.5|,5)?$")
+            if (!gradeRegex.matches(cleanedActual)) {
+                return false
+            }
+            return if (cleanedActual.endsWith(".5") || cleanedActual.endsWith(",5")) {
+                cleanedActual.startsWith(expected)
+            } else {
+                cleanedActual == expected
+            }
+        }
         fun getColorByValue(gradeValue: String?): GradeColor? {
             if (gradeValue == null) return null
 
             return when {
-                gradeValue.startsWith("0") -> ZERO
-                gradeValue.startsWith("1") -> ONE
-                gradeValue.startsWith("2") -> TWO
-                gradeValue.startsWith("3") -> THREE
-                gradeValue.startsWith("4") -> FOUR
-                gradeValue.startsWith("5") -> FIVE
-                gradeValue.startsWith("6") -> SIX
+                recognizeGrade(gradeValue,"0") -> ZERO
+                recognizeGrade(gradeValue,"1") -> ONE
+                recognizeGrade(gradeValue,"2") -> TWO
+                recognizeGrade(gradeValue,"3") -> THREE
+                recognizeGrade(gradeValue,"4") -> FOUR
+                recognizeGrade(gradeValue,"5") -> FIVE
+                recognizeGrade(gradeValue,"6") -> SIX
                 else -> when (gradeValue.lowercase()) {
                     "-" -> ONE
                     "+" -> SIX
