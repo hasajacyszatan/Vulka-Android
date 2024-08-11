@@ -28,7 +28,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import dev.medzik.android.compose.ui.dialog.rememberDialogState
 import io.github.vulka.core.api.Platform
-import io.github.vulka.database.Homeworks
+import io.github.vulka.database.entities.Homeworks
 import io.github.vulka.ui.R
 import io.github.vulka.ui.common.DatePagerRange
 import io.github.vulka.ui.common.EmptyView

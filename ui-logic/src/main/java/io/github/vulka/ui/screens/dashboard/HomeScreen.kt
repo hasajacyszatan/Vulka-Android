@@ -53,7 +53,7 @@ import dev.medzik.android.compose.ui.dialog.DialogState
 import dev.medzik.android.compose.ui.dialog.PickerDialog
 import dev.medzik.android.compose.ui.dialog.rememberDialogState
 import io.github.vulka.core.api.Platform
-import io.github.vulka.database.Credentials
+import io.github.vulka.database.entities.Credentials
 import io.github.vulka.ui.R
 import io.github.vulka.ui.common.Avatar
 import io.github.vulka.ui.common.ErrorDialog

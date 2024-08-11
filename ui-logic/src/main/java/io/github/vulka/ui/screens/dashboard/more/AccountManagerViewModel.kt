@@ -8,7 +8,7 @@ import androidx.lifecycle.ViewModel
 import androidx.navigation.NavController
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import dagger.hilt.android.lifecycle.HiltViewModel
-import io.github.vulka.database.Credentials
+import io.github.vulka.database.entities.Credentials
 import io.github.vulka.database.Repository
 import io.github.vulka.ui.screens.Welcome
 import io.github.vulka.ui.screens.dashboard.Home

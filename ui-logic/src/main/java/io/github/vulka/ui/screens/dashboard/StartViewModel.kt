@@ -4,8 +4,10 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.github.vulka.core.api.types.Student
-import io.github.vulka.database.LuckyNumber
+import io.github.vulka.database.entities.LuckyNumber
 import io.github.vulka.database.Repository
+import io.github.vulka.database.entities.Grades
+import io.github.vulka.database.entities.Timetable
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 import java.time.LocalDate
@@ -19,8 +21,8 @@ class StartViewModel @Inject constructor(
 
     val student = MutableStateFlow<Student?>(null)
     val luckyNumber = MutableStateFlow<LuckyNumber?>(null)
-    val grades = MutableStateFlow<List<io.github.vulka.database.Grades>>(emptyList())
-    val timetable = MutableStateFlow<List<io.github.vulka.database.Timetable>>(emptyList())
+    val grades = MutableStateFlow<List<Grades>>(emptyList())
+    val timetable = MutableStateFlow<List<Timetable>>(emptyList())
 
     fun init(args: Start) {
         viewModelScope.launch {

@@ -13,6 +13,7 @@ import io.github.vulka.core.api.Platform
 import io.github.vulka.core.api.UserClient
 import io.github.vulka.core.api.types.Student
 import io.github.vulka.database.Repository
+import io.github.vulka.database.entities.Homeworks
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.first
@@ -49,7 +50,7 @@ class HomeworkViewModel @Inject constructor(
 
     var userId by mutableStateOf<UUID?>(null)
 
-    val homeworks = MutableStateFlow<List<io.github.vulka.database.Homeworks>>(emptyList())
+    val homeworks = MutableStateFlow<List<Homeworks>>(emptyList())
 
     suspend fun init(args: Homework) = viewModelScope.launch(Dispatchers.IO) {
         client = getUserClientFromCredentials(args.platform, args.credentials)
@@ -86,7 +87,7 @@ class HomeworkViewModel @Inject constructor(
         repository.homeworks.deleteRangeByCredentialsId(dateFrom, dateTo, userId)
         for (homework in homeworks) {
             repository.homeworks.insert(
-                io.github.vulka.database.Homeworks(
+                Homeworks(
                     homework = homework,
                     lastSync = now,
                     credentialsId = userId

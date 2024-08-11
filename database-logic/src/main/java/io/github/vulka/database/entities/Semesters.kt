@@ -1,17 +1,16 @@
-package io.github.vulka.database
+package io.github.vulka.database.entities
 
 import androidx.room.Embedded
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-import io.github.vulka.core.api.types.Summary
+import io.github.vulka.core.api.types.Semester
 import java.util.UUID
 
 @Entity
-data class Summary(
+data class Semesters(
     @PrimaryKey
     val id: UUID = UUID.randomUUID(),
     @Embedded
-    val summary: Summary,
-    val semester: Int,
+    val semester: Semester,
     val credentialsId: UUID
 )

@@ -14,7 +14,7 @@ class NotesViewModel @Inject constructor(
     private val repository: Repository
 ) : ViewModel() {
 
-    val notes = MutableStateFlow<List<io.github.vulka.database.Notes>>(emptyList())
+    val notes = MutableStateFlow<List<io.github.vulka.database.entities.Notes>>(emptyList())
 
     fun refresh(args: Notes) {
         viewModelScope.launch {

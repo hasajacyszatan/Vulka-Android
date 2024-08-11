@@ -104,7 +104,7 @@ fun ExamsScreen(
 
 @Composable
 fun ExamsCards(
-    exams: List<io.github.vulka.database.Exams>
+    exams: List<io.github.vulka.database.entities.Exams>
 ) {
     val groupedHomeworks = exams.groupBy { it.exam.deadline.dayOfWeek }
 

@@ -1,4 +1,4 @@
-package io.github.vulka.database
+package io.github.vulka.database.entities
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey

@@ -49,7 +49,7 @@ class ExamsViewModel @Inject constructor(
 
     var userId by mutableStateOf<UUID?>(null)
 
-    val exams = MutableStateFlow<List<io.github.vulka.database.Exams>>(emptyList())
+    val exams = MutableStateFlow<List<io.github.vulka.database.entities.Exams>>(emptyList())
 
     suspend fun init(args: Exams) = viewModelScope.launch(Dispatchers.IO) {
         client = getUserClientFromCredentials(args.platform, args.credentials)
@@ -86,7 +86,7 @@ class ExamsViewModel @Inject constructor(
         repository.exams.deleteRangeByCredentialsId(dateFrom, dateTo, userId)
         for (exam in exams) {
             repository.exams.insert(
-                io.github.vulka.database.Exams(
+                io.github.vulka.database.entities.Exams(
                     exam = exam,
                     lastSync = now,
                     credentialsId = userId

@@ -1,4 +1,4 @@
-package io.github.vulka.database
+package io.github.vulka.database.dao
 
 import androidx.room.Delete
 import androidx.room.Insert

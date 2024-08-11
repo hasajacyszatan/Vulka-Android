@@ -6,15 +6,14 @@ import io.github.vulka.business.utils.getUserClient
 import io.github.vulka.core.api.Platform
 import io.github.vulka.core.api.UserClient
 import io.github.vulka.core.api.types.Student
-import io.github.vulka.core.api.types.Summary
-import io.github.vulka.database.Exams
-import io.github.vulka.database.Grades
-import io.github.vulka.database.Homeworks
-import io.github.vulka.database.LuckyNumber
-import io.github.vulka.database.Meetings
-import io.github.vulka.database.Notes
-import io.github.vulka.database.Semesters
-import io.github.vulka.database.Timetable
+import io.github.vulka.database.entities.Exams
+import io.github.vulka.database.entities.Grades
+import io.github.vulka.database.entities.Homeworks
+import io.github.vulka.database.entities.LuckyNumber
+import io.github.vulka.database.entities.Meetings
+import io.github.vulka.database.entities.Notes
+import io.github.vulka.database.entities.Semesters
+import io.github.vulka.database.entities.Timetable
 import io.github.vulka.database.injection.RoomModule
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.CoroutineScope
@@ -100,7 +99,7 @@ suspend fun sync(
                 val summaries = client.getSummary(student, semester)
                 for (summary in summaries) {
                     repository.summary.insert(
-                        io.github.vulka.database.Summary(
+                        io.github.vulka.database.entities.Summary(
                             summary = summary,
                             semester = semester.number,
                             credentialsId = userId

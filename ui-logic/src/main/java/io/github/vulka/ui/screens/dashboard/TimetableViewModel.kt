@@ -40,7 +40,7 @@ class TimetableViewModel @Inject constructor(
 
     var userId by mutableStateOf<UUID?>(null)
 
-    val lessons = MutableStateFlow<List<io.github.vulka.database.Timetable>>(emptyList())
+    val lessons = MutableStateFlow<List<io.github.vulka.database.entities.Timetable>>(emptyList())
 
     suspend fun init(args: Timetable) = viewModelScope.launch(Dispatchers.IO) {
         client = getUserClientFromCredentials(args.platform, args.credentials)
@@ -117,7 +117,7 @@ class TimetableViewModel @Inject constructor(
         repository.timetable.deleteRangeByCredentialsId(selectedDate, selectedDate, userId)
         for (lesson in lessons) {
             repository.timetable.insert(
-                io.github.vulka.database.Timetable(
+                io.github.vulka.database.entities.Timetable(
                     lesson = lesson,
                     lastSync = now,
                     credentialsId = userId

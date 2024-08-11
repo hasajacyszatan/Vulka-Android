@@ -1,7 +1,8 @@
-package io.github.vulka.database
+package io.github.vulka.database.dao
 
 import androidx.room.Dao
 import androidx.room.Query
+import io.github.vulka.database.entities.Homeworks
 import kotlinx.coroutines.flow.Flow
 import java.time.LocalDate
 import java.util.UUID

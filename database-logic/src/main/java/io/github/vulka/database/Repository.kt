@@ -1,6 +1,16 @@
 package io.github.vulka.database
 
 import android.content.Context
+import io.github.vulka.database.dao.CredentialsDao
+import io.github.vulka.database.dao.ExamsDao
+import io.github.vulka.database.dao.GradesDao
+import io.github.vulka.database.dao.HomeworksDao
+import io.github.vulka.database.dao.LuckyNumberDao
+import io.github.vulka.database.dao.MeetingsDao
+import io.github.vulka.database.dao.NotesDao
+import io.github.vulka.database.dao.SemestersDao
+import io.github.vulka.database.dao.SummaryDao
+import io.github.vulka.database.dao.TimetableDao
 
 interface Repository {
     val credentials: CredentialsDao

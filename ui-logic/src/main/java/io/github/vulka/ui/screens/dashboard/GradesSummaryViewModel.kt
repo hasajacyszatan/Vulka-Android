@@ -5,7 +5,7 @@ import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.github.vulka.core.api.types.Summary
 import io.github.vulka.database.Repository
-import io.github.vulka.database.Semesters
+import io.github.vulka.database.entities.Semesters
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.first

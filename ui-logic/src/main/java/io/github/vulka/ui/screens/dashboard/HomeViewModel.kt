@@ -16,7 +16,7 @@ import dev.medzik.android.utils.runOnIOThread
 import io.github.vulka.business.crypto.decryptCredentials
 import io.github.vulka.business.sync.sync
 import io.github.vulka.core.api.types.Student
-import io.github.vulka.database.Credentials
+import io.github.vulka.database.entities.Credentials
 import io.github.vulka.database.Repository
 import io.github.vulka.ui.R
 import kotlinx.coroutines.Dispatchers

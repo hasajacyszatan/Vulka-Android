@@ -5,6 +5,26 @@ import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
+import io.github.vulka.database.dao.CredentialsDao
+import io.github.vulka.database.dao.ExamsDao
+import io.github.vulka.database.dao.GradesDao
+import io.github.vulka.database.dao.HomeworksDao
+import io.github.vulka.database.dao.LuckyNumberDao
+import io.github.vulka.database.dao.MeetingsDao
+import io.github.vulka.database.dao.NotesDao
+import io.github.vulka.database.dao.SemestersDao
+import io.github.vulka.database.dao.SummaryDao
+import io.github.vulka.database.dao.TimetableDao
+import io.github.vulka.database.entities.Credentials
+import io.github.vulka.database.entities.Exams
+import io.github.vulka.database.entities.Grades
+import io.github.vulka.database.entities.Homeworks
+import io.github.vulka.database.entities.LuckyNumber
+import io.github.vulka.database.entities.Meetings
+import io.github.vulka.database.entities.Notes
+import io.github.vulka.database.entities.Semesters
+import io.github.vulka.database.entities.Summary
+import io.github.vulka.database.entities.Timetable
 
 @Database(
     version = 1,

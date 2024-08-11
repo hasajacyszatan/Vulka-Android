@@ -13,7 +13,7 @@ import javax.inject.Inject
 class MeetingsViewModel @Inject constructor(
     private val repository: Repository
 ) : ViewModel() {
-    val meetings = MutableStateFlow<List<io.github.vulka.database.Meetings>>(emptyList())
+    val meetings = MutableStateFlow<List<io.github.vulka.database.entities.Meetings>>(emptyList())
 
     fun refresh(args: Meetings) {
         viewModelScope.launch {

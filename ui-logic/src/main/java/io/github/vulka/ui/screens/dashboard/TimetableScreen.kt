@@ -152,7 +152,7 @@ fun TimetableScreen(
 
 @Composable
 private fun LessonsCards(
-    lessons: List<io.github.vulka.database.Timetable>
+    lessons: List<io.github.vulka.database.entities.Timetable>
 ) {
     LazyColumn(
         modifier = Modifier.fillMaxSize()
