@@ -82,5 +82,6 @@
     </plurals>
     <string name="Average">Średnia</string>
     <string name="Grade">Ocena</string>
+    <string name="Select">Wybierz</string>
 
 </resources>

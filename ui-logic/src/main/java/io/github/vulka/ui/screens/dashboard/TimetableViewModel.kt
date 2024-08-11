@@ -65,6 +65,13 @@ class TimetableViewModel @Inject constructor(
         }
     }
 
+    fun onDateSet(date: LocalDate) {
+        currentDate.value = date
+        runOnIOThread {
+            syncTimetable()
+        }
+    }
+
     private suspend fun syncTimetable() {
         if (!checkIfTimetableShouldBeSync(currentDate.value, userId!!)) {
             updateLessons()

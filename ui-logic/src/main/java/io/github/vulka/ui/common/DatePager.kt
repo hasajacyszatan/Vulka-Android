@@ -1,37 +1,57 @@
 package io.github.vulka.ui.common
 
 import androidx.compose.animation.AnimatedContent
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowLeft
 import androidx.compose.material.icons.automirrored.filled.ArrowRight
+import androidx.compose.material3.Button
+import androidx.compose.material3.DatePicker
+import androidx.compose.material3.DatePickerDialog
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.material3.surfaceColorAtElevation
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import dev.medzik.android.compose.rememberMutable
 import dev.medzik.android.compose.ui.IconBox
+import io.github.vulka.ui.R
+import java.time.Duration
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DatePager(
     modifier: Modifier = Modifier,
     date: LocalDate,
     onClickBack: DatePagerScope.() -> Unit = {},
     onClickForward: DatePagerScope.() -> Unit = {},
+    onDateSelected: (LocalDate) -> Unit = {},
     content: @Composable (LocalDate) -> Unit
 ) {
+    val datePickerState = rememberDatePickerState()
+    var datePickerDialogShow by rememberMutable { false }
+
     Column(
         modifier = modifier
     ) {
@@ -66,7 +86,11 @@ fun DatePager(
 
                 Text(
                     fontWeight = FontWeight.Bold,
-                    text = formatDate(date)
+                    text = formatDate(date),
+                    modifier = Modifier
+                        .clip(CircleShape)
+                        .clickable { datePickerDialogShow = true }
+                        .padding(5.dp)
                 )
 
                 IconButton(
@@ -77,6 +101,29 @@ fun DatePager(
                     )
                 }
             }
+        }
+    }
+
+    if (datePickerDialogShow) {
+        DatePickerDialog(
+            onDismissRequest = {
+                datePickerDialogShow = false
+            },
+            confirmButton = {
+                Button(
+                    modifier = Modifier.padding(5.dp),
+                    enabled = datePickerState.selectedDateMillis != null,
+                    onClick = {
+                        onDateSelected(LocalDate.ofEpochDay(
+                            Duration.ofMillis(datePickerState.selectedDateMillis!!).toDays()))
+                        datePickerDialogShow = false
+                    }
+                ) {
+                    Text(text = stringResource(R.string.Select))
+                }
+            }
+        ) {
+            DatePicker(state = datePickerState)
         }
     }
 }

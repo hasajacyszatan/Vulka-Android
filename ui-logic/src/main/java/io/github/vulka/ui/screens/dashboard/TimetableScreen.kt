@@ -109,7 +109,8 @@ fun TimetableScreen(
                 .nestedScroll(connection = pullToRefreshState.nestedScrollConnection),
             date = currentDate,
             onClickBack = { viewModel.onBackClick() },
-            onClickForward = { viewModel.onForwardClick() }
+            onClickForward = { viewModel.onForwardClick() },
+            onDateSelected = { viewModel.onDateSet(it) }
         ) { _ ->
             val lessons by viewModel.lessons.collectAsStateWithLifecycle()
 
