@@ -59,6 +59,7 @@ import io.github.vulka.ui.common.EmptyViewProgress
 import io.github.vulka.ui.common.SegmentedButtonItem
 import io.github.vulka.ui.common.SegmentedButtons
 import io.github.vulka.ui.utils.formatByLocale
+import io.github.vulka.ui.utils.toJavaLocale
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -315,7 +316,10 @@ private fun GradeCard(grade: Grade) {
                     )
                     Text(
                         fontSize = 12.sp,
-                        text = "${stringResource(R.string.Weight)}: ${grade.weight}"
+                        text = "${stringResource(R.string.Weight)}: ${String.format(
+                            Locale.current.toJavaLocale(),
+                            "%.2f",grade.weight
+                        )}"
                     )
                 }
             }
@@ -377,7 +381,10 @@ private fun GradesDetails(grade: Grade) {
 
         AnimatedTextField(
             value = TextFieldValue(
-                value = grade.weight.toString(),
+                value = String.format(
+                    Locale.current.toJavaLocale(),
+                    "%.2f",grade.weight
+                ),
                 editable = false
             ),
             label = stringResource(R.string.Weight),
