@@ -87,5 +87,7 @@
     <string name="Average">Average</string>
     <string name="Grade">Grade</string>
     <string name="Select">Select</string>
+    <string name="Settings_Synchronization">Synchronization</string>
+    <string name="Settings_AutoSync">Sync automatically</string>
 
 </resources>

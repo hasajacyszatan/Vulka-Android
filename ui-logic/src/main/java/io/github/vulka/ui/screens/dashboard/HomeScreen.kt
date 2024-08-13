@@ -53,12 +53,14 @@ import dev.medzik.android.compose.ui.dialog.DialogState
 import dev.medzik.android.compose.ui.dialog.PickerDialog
 import dev.medzik.android.compose.ui.dialog.rememberDialogState
 import io.github.vulka.core.api.Platform
+import io.github.vulka.database.datastore.SettingsGenerated.readFromSettings
 import io.github.vulka.database.entities.Credentials
 import io.github.vulka.ui.R
 import io.github.vulka.ui.common.Avatar
 import io.github.vulka.ui.common.ErrorDialog
 import io.github.vulka.ui.screens.dashboard.more.AccountManager
 import io.github.vulka.ui.utils.getInitials
+import kotlinx.coroutines.flow.first
 import kotlinx.serialization.Serializable
 
 @Serializable
@@ -91,9 +93,11 @@ fun HomeScreen(
     LaunchedEffect(Unit) {
         viewModel.init(args)
 
-        if (!viewModel.wasRefreshed) {
-            pullToRefreshState.startRefresh()
-            viewModel.wasRefreshed = true
+        if (context.readFromSettings().first().autoSync) {
+            if (viewModel.shouldSync(context)) {
+                pullToRefreshState.startRefresh()
+                viewModel.wasRefreshed = true
+            }
         }
     }
 

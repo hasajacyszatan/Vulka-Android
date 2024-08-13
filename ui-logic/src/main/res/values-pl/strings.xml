@@ -83,5 +83,7 @@
     <string name="Average">Średnia</string>
     <string name="Grade">Ocena</string>
     <string name="Select">Wybierz</string>
+    <string name="Settings_Synchronization">Synchronizacja</string>
+    <string name="Settings_AutoSync">Synchronizuj automatycznie</string>
 
 </resources>

@@ -6,6 +6,8 @@ import io.github.vulka.business.utils.getUserClient
 import io.github.vulka.core.api.Platform
 import io.github.vulka.core.api.UserClient
 import io.github.vulka.core.api.types.Student
+import io.github.vulka.database.datastore.LastSync
+import io.github.vulka.database.datastore.LastSyncGenerated.writeToLastSync
 import io.github.vulka.database.entities.Exams
 import io.github.vulka.database.entities.Grades
 import io.github.vulka.database.entities.Homeworks
@@ -203,6 +205,11 @@ suspend fun sync(
         meetingsJob,
         homeworksJob,
         examsJob
+    )
+
+    // Set last sync date to datastore
+    context.writeToLastSync(
+        LastSync(System.currentTimeMillis())
     )
 
     if (error != null)

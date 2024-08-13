@@ -18,6 +18,8 @@ import io.github.vulka.business.sync.sync
 import io.github.vulka.core.api.types.Student
 import io.github.vulka.database.entities.Credentials
 import io.github.vulka.database.Repository
+import io.github.vulka.database.datastore.LastSyncGenerated.readFromLastSync
+import io.github.vulka.database.datastore.SettingsGenerated.readFromSettings
 import io.github.vulka.ui.R
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
@@ -27,6 +29,7 @@ import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.withContext
 import java.util.UUID
 import javax.inject.Inject
+import kotlin.time.Duration
 
 @HiltViewModel
 class HomeViewModel @Inject constructor(
@@ -55,6 +58,13 @@ class HomeViewModel @Inject constructor(
 
             student.value = dbCredentials.value!!.student
         }
+    }
+
+    suspend fun shouldSync(context: Context): Boolean {
+        val interval = context.readFromSettings().first().syncInterval
+        val lastSyncTime = context.readFromLastSync().first().lastSync
+
+        return System.currentTimeMillis() >= (lastSyncTime + (interval * 60 * 1000))
     }
 
     @OptIn(ExperimentalMaterial3Api::class)

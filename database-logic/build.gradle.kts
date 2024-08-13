@@ -4,6 +4,7 @@ plugins {
     alias(libs.plugins.dagger.hilt)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.ksp)
+    alias(libs.plugins.kotlin.serialization)
 }
 
 android {
@@ -36,6 +37,11 @@ dependencies {
     implementation(project(":vulcan-impl"))
     ksp(libs.androidx.room.compiler)
 
+    implementation(libs.kotlinx.serialization.json)
+
+    implementation(libs.datastore.annotations)
+    ksp(libs.datastore.annotations.processor)
+
     implementation(projects.coreApi)
 
     implementation(libs.dagger.hilt)
@@ -44,6 +50,9 @@ dependencies {
     // credential type converter
     implementation(libs.gson)
     implementation(libs.gson.extras)
+
+    implementation(libs.androidx.datastore)
+    implementation(libs.androidx.datastore.core)
 
     coreLibraryDesugaring(libs.desugar.jdk.libs)
 }
