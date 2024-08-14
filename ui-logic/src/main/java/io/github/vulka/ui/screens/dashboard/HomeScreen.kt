@@ -126,7 +126,7 @@ fun HomeScreen(
                         text = scaffoldTitle ?: when (bottomSelected) {
                             Start -> stringResource(R.string.Home)
                             Grades -> stringResource(R.string.Grades)
-                            Attendance -> stringResource(R.string.Grades)
+                            Attendance -> stringResource(R.string.Attendance)
                             Timetable -> stringResource(R.string.Timetable)
                             More -> stringResource(R.string.More)
                             else -> "Unknown"

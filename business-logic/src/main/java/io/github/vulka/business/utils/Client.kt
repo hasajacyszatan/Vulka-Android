@@ -16,7 +16,7 @@ fun getUserClient(
     credentials: String
 ): UserClient {
     val client = when (platform) {
-        Platform.Vulcan -> {
+        Platform.VulcanHebe -> {
             val loginData = Gson().fromJson(credentials, VulcanLoginCredentials::class.java)
             VulcanUserClient(loginData)
         }
@@ -31,7 +31,7 @@ fun getUserClient(
 
 fun getFeaturesByPlatform(platform: Platform): Features {
     return when (platform) {
-        Platform.Vulcan -> HebeFeatures()
+        Platform.VulcanHebe -> HebeFeatures()
         Platform.Librus -> LibrusFeatures()
     }
 }

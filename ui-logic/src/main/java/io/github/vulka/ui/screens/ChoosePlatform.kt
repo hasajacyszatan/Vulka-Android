@@ -25,7 +25,7 @@ fun ChoosePlatform(navController: NavController) {
         BasicPreference(
             leading = { Icon(painterResource(R.drawable.vulcan_logo), contentDescription = null) },
             title = stringResource(R.string.Vulcan),
-            onClick = { navController.navigate(Login(Platform.Vulcan)) }
+            onClick = { navController.navigate(Login(Platform.VulcanHebe)) }
         )
 
         BasicPreference(

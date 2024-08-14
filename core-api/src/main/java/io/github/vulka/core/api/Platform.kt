@@ -1,6 +1,6 @@
 package io.github.vulka.core.api
 
 enum class Platform {
-    Vulcan,
+    VulcanHebe,
     Librus
 }

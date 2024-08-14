@@ -24,11 +24,11 @@ class LoginViewModel : ViewModel() {
 
     suspend fun login(platform: Platform, navController: NavController) {
         val client = when (platform) {
-            Platform.Vulcan -> VulcanLoginClient()
+            Platform.VulcanHebe -> VulcanLoginClient()
             Platform.Librus -> LibrusLoginClient()
         }
         val requestData = when (platform) {
-            Platform.Vulcan -> {
+            Platform.VulcanHebe -> {
                 // For Vulcan we must create keystore first
                 val keystore = HebeKeystore.create(
                     alias = HebeKeystore.generateKeystoreName(vulcanSymbol.value),

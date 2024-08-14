@@ -39,7 +39,7 @@ class ChooseStudentsViewModel @Inject constructor(
 
     private fun getCredentials(credentialsData: String, platform: Platform): LoginCredentials {
         return when (platform) {
-            Platform.Vulcan -> Gson().fromJson(credentialsData, VulcanLoginCredentials::class.java)
+            Platform.VulcanHebe -> Gson().fromJson(credentialsData, VulcanLoginCredentials::class.java)
             Platform.Librus -> Gson().fromJson(credentialsData, LibrusLoginCredentials::class.java)
         }
     }
@@ -47,7 +47,7 @@ class ChooseStudentsViewModel @Inject constructor(
     fun getClient(credentialsData: String,platform: Platform): UserClient {
         val credentials = getCredentials(credentialsData, platform)
         return when (platform) {
-            Platform.Vulcan -> VulcanUserClient(credentials as VulcanLoginCredentials)
+            Platform.VulcanHebe -> VulcanUserClient(credentials as VulcanLoginCredentials)
             Platform.Librus -> LibrusUserClient(credentials as LibrusLoginCredentials)
         }
     }

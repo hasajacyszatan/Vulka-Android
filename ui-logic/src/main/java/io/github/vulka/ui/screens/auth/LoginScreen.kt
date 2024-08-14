@@ -50,7 +50,7 @@ fun LoginScreen(
     ) {
         item {
             when (args.platform) {
-                Platform.Vulcan -> {
+                Platform.VulcanHebe -> {
                     Surface(
                         modifier = Modifier.padding(bottom = 12.dp),
                         shape = MaterialTheme.shapes.medium,
