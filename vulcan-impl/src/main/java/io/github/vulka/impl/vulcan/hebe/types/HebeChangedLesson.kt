@@ -1,56 +1,42 @@
 package io.github.vulka.impl.vulcan.hebe.types
 
-import com.google.gson.annotations.SerializedName
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 
+@Serializable
 data class HebeChangedLesson(
-    @SerializedName("Id")
+    @SerialName("Id")
     val id: Int,
-
-    @SerializedName("UnitId")
+    @SerialName("UnitId")
     val unitId: Int,
-
-    @SerializedName("ScheduleId")
+    @SerialName("ScheduleId")
     val scheduleId: Int,
-
-    @SerializedName("LessonDate")
+    @SerialName("LessonDate")
     val lessonDate: HebeDate,
-
-    @SerializedName("Note")
+    @SerialName("Note")
     val note: String? = null,
-
-    @SerializedName("Reason")
+    @SerialName("Reason")
     val reason: String? = null,
-
-    @SerializedName("TimeSlot")
+    @SerialName("TimeSlot")
     val time: HebeTimeSlot? = null,
-
-    @SerializedName("Room")
+    @SerialName("Room")
     val room: HebeLessonRoom? = null,
-
-    @SerializedName("TeacherPrimary")
+    @SerialName("TeacherPrimary")
     val teacherPrimary: HebeTeacher? = null,
-
-    @SerializedName("TeacherSecondary")
+    @SerialName("TeacherSecondary")
     val secondTeacher: HebeTeacher? = null,
-
-    @SerializedName("TeacherAbsenceEffectName")
+    @SerialName("TeacherAbsenceEffectName")
     val teacherAbsenceEffectName: String?,
-
-    @SerializedName("Subject")
+    @SerialName("Subject")
     val subject: HebeSubject? = null,
-
-    @SerializedName("Event")
+    @SerialName("Event")
     val event: String? = null,
-
-    @SerializedName("Change")
+    @SerialName("Change")
     val changes: HebeLessonChanges? = null,
-
-    @SerializedName("ChangeDate")
+    @SerialName("ChangeDate")
     val changeDate: HebeDate? = null,
-
-    @SerializedName("Clazz")
+    @SerialName("Clazz")
     val teamClass: HebeTeamClass? = null,
-
-    @SerializedName("Distribution")
+    @SerialName("Distribution")
     val group: HebeTeamVirtual? = null
 )

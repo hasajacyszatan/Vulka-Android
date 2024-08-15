@@ -1,68 +1,72 @@
 package io.github.vulka.impl.vulcan.hebe.types
 
-import com.google.gson.annotations.SerializedName
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 
+@Serializable
 data class HebeGrade(
-    @SerializedName("Id")
+    @SerialName("Id")
     val id: Int,
-    @SerializedName("Key")
+    @SerialName("Key")
     val key: String,
-    @SerializedName("PupilId")
+    @SerialName("PupilId")
     val pupilId: Int,
-    @SerializedName("ContentRaw")
+    @SerialName("ContentRaw")
     val contentRaw: String,
-    @SerializedName("Content")
+    @SerialName("Content")
     val content: String,
-    @SerializedName("DateCreated")
+    @SerialName("DateCreated")
     val dateCreated: HebeDate,
-    @SerializedName("DateModify")
+    @SerialName("DateModify")
     val dateModified: HebeDate,
-    @SerializedName("Creator")
+    @SerialName("Creator")
     val teacherCreated: HebeTeacher,
-    @SerializedName("Modifier")
+    @SerialName("Modifier")
     val teacherModified: HebeTeacher,
-    @SerializedName("Column")
+    @SerialName("Column")
     val column: HebeGradeColumn,
-    @SerializedName("Value")
+    @SerialName("Value")
     val value: Float? = null,
-    @SerializedName("Comment")
+    @SerialName("Comment")
     val comment: String? = null,
-    @SerializedName("Numerator")
+    @SerialName("Numerator")
     val numerator: Float? = null,
-    @SerializedName("Denominator")
+    @SerialName("Denominator")
     val denominator: Float? = null
 )
 
+@Serializable
 data class HebeGradeColumn(
-    @SerializedName("Id")
+    @SerialName("Id")
     val id: Int,
-    @SerializedName("Key")
+    @SerialName("Key")
     val key: String,
-    @SerializedName("PeriodId")
+    @SerialName("PeriodId")
     val periodId: Int,
-    @SerializedName("Name")
+    @SerialName("Name")
     val name: String,
-    @SerializedName("Code")
+    @SerialName("Code")
     val code: String,
-    @SerializedName("Number")
+    @SerialName("Number")
     val number: Int,
-    @SerializedName("Weight")
+    @SerialName("Weight")
     val weight: Float,
-    @SerializedName("Subject")
+    @SerialName("Subject")
     val subject: HebeSubject,
-    @SerializedName("Group")
+    @SerialName("Group")
     val group: String? = null,
-    @SerializedName("Category")
+    @SerialName("Category")
     val category: HebeGradeCategory? = null,
-    @SerializedName("Period")
+    @SerialName("Period")
     val period: HebePeriod? = null
 )
 
+@Serializable
 data class HebeGradeCategory(
-    @SerializedName("Id")
+    @SerialName("Id")
     val id: Int,
-    @SerializedName("Name")
+    @SerialName("Name")
     val name: String,
-    @SerializedName("Code")
+    @SerialName("Code")
     val code: String
 )

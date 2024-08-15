@@ -1,28 +1,33 @@
 package io.github.vulka.impl.vulcan.hebe.types
 
-import com.google.gson.annotations.SerializedName
+import kotlinx.serialization.Contextual
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.json.JsonElement
 
+@Serializable
 data class HebeExam(
-    @SerializedName("Id")
+    @SerialName("Id")
     val id: Int,
-    @SerializedName("Key")
+    @SerialName("Key")
     val key: String,
-    @SerializedName("Type")
+    @SerialName("Type")
     val type: String,
-    @SerializedName("TypeId")
+    @SerialName("TypeId")
     val typeId: Int,
-    @SerializedName("Content")
+    @SerialName("Content")
     val content: String,
-    @SerializedName("DateCreated")
+    @SerialName("DateCreated")
     val dateCreated: HebeDate,
-    @SerializedName("DateModify")
+    @SerialName("DateModify")
     val dateModify: HebeDate,
-    @SerializedName("Deadline")
+    @SerialName("Deadline")
     val deadline: HebeDate,
-    @SerializedName("Creator")
+    @SerialName("Creator")
     val creator: HebeTeacher,
-    @SerializedName("Subject")
+    @SerialName("Subject")
     val subject: HebeSubject,
-    @SerializedName("Didactics")
-    val didactics: Any?,
+    @SerialName("Didactics")
+    @Contextual
+    val didactics: JsonElement?
 )

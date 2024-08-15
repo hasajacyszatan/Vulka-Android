@@ -25,7 +25,6 @@ import kotlinx.coroutines.runBlocking
 import java.io.IOException
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
-import java.util.*
 
 class VulcanHebeApi {
     private lateinit var client: HebeHttpClient
@@ -82,7 +81,7 @@ class VulcanHebeApi {
             selfIdentifier = Utils.uuid(fingerprint)
         )
 
-        val response = client.post(fullUrl, registerRequest,HebeAccount::class.java)
+        val response = client.post<RegisterRequest,HebeAccount>(fullUrl, registerRequest)
 
         credentials = VulcanLoginCredentials(response!!,keystore)
         return response
@@ -93,18 +92,17 @@ class VulcanHebeApi {
 
         val fullUrl = "$baseUrl${HebeApiEndpoints.STUDENT_LIST}"
 
-        return client.get(fullUrl, Array<HebeStudent>::class.java)!!
+        return client.get<Array<HebeStudent>>(fullUrl)!!
     }
 
-    private fun <T> getByPupil(
+    private inline fun <reified T> getByPupil(
         endpoint: String,
         student: HebeStudent,
         period: HebePeriod? = null,
         dateFrom: LocalDate? = null,
         dateTo: LocalDate? = null,
-        clazz: Class<T>,
         query: Map<String,String>? = null
-    ) = runBlocking {
+    ): T {
         val baseUrl = getRestUrl(student)
         val dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
 
@@ -125,76 +123,69 @@ class VulcanHebeApi {
 
         query?.forEach { (key, value) -> queryMap[key] = value }
 
-        return@runBlocking client.get(
+        return client.get<T>(
             url = "$baseUrl/${HebeApiEndpoints.DATA_ROOT}/${endpoint}/${HebeApiEndpoints.DATA_BY_PUPIL}",
             query = queryMap,
-            clazz = clazz
         )!!
     }
 
     fun getLuckyNumber(student: HebeStudent, date: LocalDate): Int {
         val baseUrl = getRestUrl(student)
-        val response = client.get(
+        val response = client.get<HebeLuckyNumber>(
             url = "$baseUrl/${HebeApiEndpoints.DATA_ROOT}/${HebeApiEndpoints.DATA_LUCKY_NUMBER}",
             query = mapOf(
                 "constituentId" to student.school.id.toString(),
                 "day" to DateTimeFormatter.ISO_LOCAL_DATE.format(date)
             ),
-            clazz = HebeLuckyNumber::class.java
         )
         return response!!.number
     }
 
-    fun getGrades(student: HebeStudent, period: HebePeriod): Array<HebeGrade> {
-        return getByPupil(
+    fun getGrades(student: HebeStudent,period: HebePeriod): Array<HebeGrade> {
+        return getByPupil<Array<HebeGrade>>(
             endpoint = HebeApiEndpoints.DATA_GRADE,
             student = student,
             period = period,
-            clazz = Array<HebeGrade>::class.java
         )
     }
 
-    fun getLessons(student: HebeStudent, dateFrom: LocalDate, dateTo: LocalDate = dateFrom): Array<HebeLesson> {
+    fun getLessons(student: HebeStudent,dateFrom: LocalDate,dateTo: LocalDate = dateFrom): Array<HebeLesson> {
         val currentPeriod = student.periods.find { it.current }!!
 
-        return getByPupil(
+        return getByPupil<Array<HebeLesson>>(
             endpoint = HebeApiEndpoints.DATA_TIMETABLE,
             student = student,
             period = currentPeriod,
             dateFrom = dateFrom,
             dateTo = dateTo,
-            clazz = Array<HebeLesson>::class.java,
         )
     }
 
-    fun getChangedLessons(student: HebeStudent, dateFrom: LocalDate, dateTo: LocalDate = dateFrom): Array<HebeChangedLesson> {
+    fun getChangedLessons(student: HebeStudent,dateFrom: LocalDate, dateTo: LocalDate = dateFrom): Array<HebeChangedLesson> {
         val currentPeriod = student.periods.find { it.current }!!
 
-        return getByPupil(
+        return getByPupil<Array<HebeChangedLesson>>(
             endpoint = HebeApiEndpoints.DATA_TIMETABLE_CHANGES,
             student = student,
             period = currentPeriod,
             dateFrom = dateFrom,
             dateTo = dateTo,
-            clazz = Array<HebeChangedLesson>::class.java,
         )
     }
 
     fun getSummaryGrades(student: HebeStudent, period: HebePeriod): Array<HebeSummaryGrade> {
-        return getByPupil(
+        return getByPupil<Array<HebeSummaryGrade>>(
             endpoint = HebeApiEndpoints.DATA_GRADE_SUMMARY,
             student = student,
             period = period,
-            clazz = Array<HebeSummaryGrade>::class.java
         )
     }
 
     fun getAverages(student: HebeStudent, period: HebePeriod): Array<HebeAverageGrade> {
-        return getByPupil(
+        return getByPupil<Array<HebeAverageGrade>>(
             endpoint = HebeApiEndpoints.DATA_GRADE_AVERAGE,
             student = student,
             period = period,
-            clazz = Array<HebeAverageGrade>::class.java,
 
             query = mapOf(
                 "scope" to "auto"
@@ -203,19 +194,17 @@ class VulcanHebeApi {
     }
 
     fun getNotes(student: HebeStudent): Array<HebeNote> {
-        return getByPupil(
+        return getByPupil<Array<HebeNote>>(
             endpoint = HebeApiEndpoints.DATA_NOTES,
             student = student,
-            clazz = Array<HebeNote>::class.java
         )
     }
 
     fun getMeetings(student: HebeStudent, dateFrom: LocalDate): Array<HebeMeeting> {
         val dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
-        return getByPupil(
+        return getByPupil<Array<HebeMeeting>>(
             endpoint = HebeApiEndpoints.DATA_MEETINGS,
             student = student,
-            clazz = Array<HebeMeeting>::class.java,
 
             query = mapOf(
                 "from" to dateFormatter.format(dateFrom)
@@ -223,22 +212,20 @@ class VulcanHebeApi {
         )
     }
 
-    fun getHomeworks(student: HebeStudent, dateFrom: LocalDate, dateTo: LocalDate = dateFrom): Array<HebeHomework> {
-        return getByPupil(
+    fun getHomeworks(student: HebeStudent,dateFrom: LocalDate,dateTo: LocalDate = dateFrom): Array<HebeHomework> {
+        return getByPupil<Array<HebeHomework>>(
             endpoint = HebeApiEndpoints.DATA_HOMEWORK,
             student = student,
-            clazz = Array<HebeHomework>::class.java,
 
             dateFrom = dateFrom,
             dateTo = dateTo,
         )
     }
 
-    fun getExams(student: HebeStudent, dateFrom: LocalDate, dateTo: LocalDate = dateFrom): Array<HebeExam> {
-        return getByPupil(
+    fun getExams(student: HebeStudent,dateFrom: LocalDate,dateTo: LocalDate = dateFrom): Array<HebeExam>  {
+        return getByPupil<Array<HebeExam>>(
             endpoint = HebeApiEndpoints.DATA_EXAM,
             student = student,
-            clazz = Array<HebeExam>::class.java,
 
             dateFrom = dateFrom,
             dateTo = dateTo,

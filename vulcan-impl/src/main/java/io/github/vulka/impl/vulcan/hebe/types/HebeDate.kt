@@ -1,12 +1,14 @@
 package io.github.vulka.impl.vulcan.hebe.types
 
-import com.google.gson.annotations.SerializedName
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 
+@Serializable
 data class HebeDate(
-    @SerializedName("Timestamp")
+    @SerialName("Timestamp")
     val timestamp: Long,
-    @SerializedName("Date")
+    @SerialName("Date")
     val date: String,
-    @SerializedName("Time")
+    @SerialName("Time")
     val time: String
 )

@@ -1,20 +1,24 @@
 package io.github.vulka.impl.vulcan.hebe.types
 
-import com.google.gson.annotations.SerializedName
+import kotlinx.serialization.Contextual
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 
+@Serializable
 data class HebeAverageGrade(
-    @SerializedName("Id")
+    @SerialName("Id")
     val id: Int,
-    @SerializedName("PupilId")
+    @SerialName("PupilId")
     val pupilId: Int,
-    @SerializedName("PeriodId")
+    @SerialName("PeriodId")
     val periodId: Int,
-    @SerializedName("Subject")
+    @SerialName("Subject")
     val subject: HebeSubject,
-    @SerializedName("Average")
+    @SerialName("Average")
     val average: String?,
-    @SerializedName("Points")
-    val points: Any?,
-    @SerializedName("Scope")
+    @SerialName("Points")
+    @Contextual
+    val points: Any?,  // Consider using a more specific type here if possible.
+    @SerialName("Scope")
     val scope: String
 )

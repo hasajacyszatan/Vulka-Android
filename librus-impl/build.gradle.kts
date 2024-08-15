@@ -28,7 +28,6 @@ dependencies {
     implementation(libs.ktor.core)
     implementation(libs.ktor.okhttp)
     implementation(projects.coreApi)
-    implementation(projects.databaseLogic)
 
     testImplementation(libs.junit)
     testImplementation(libs.kotlinx.coroutines.test)

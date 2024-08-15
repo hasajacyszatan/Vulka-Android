@@ -1,122 +1,130 @@
 package io.github.vulka.impl.vulcan.hebe.types
 
-import com.google.gson.annotations.SerializedName
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 
+@Serializable
 data class HebeStudent(
-    @SerializedName("ClassDisplay")
+    @SerialName("ClassDisplay")
     val classDisplay: String,
-    @SerializedName("Login")
+    @SerialName("Login")
     val login: HebeLogin,
-    @SerializedName("TopLevelPartition")
+    @SerialName("TopLevelPartition")
     val symbol: String,
-    @SerializedName("Partition")
+    @SerialName("Partition")
     val symbolCode: String,
-    @SerializedName("State")
+    @SerialName("State")
     val state: Int,
-    @SerializedName("Pupil")
+    @SerialName("Pupil")
     val pupil: HebePupil,
-    @SerializedName("Unit")
+    @SerialName("Unit")
     val unit: HebeSchoolUnit,
-    @SerializedName("ConstituentUnit")
+    @SerialName("ConstituentUnit")
     val school: HebeSchool,
-    @SerializedName("MessageBox")
+    @SerialName("MessageBox")
     val messageBox: HebeMessageBox,
-    @SerializedName("Periods")
+    @SerialName("Periods")
     val periods: List<HebePeriod>,
-    @SerializedName("Journal")
+    @SerialName("Journal")
     val journal: HebeJournal,
-    @SerializedName("Context")
+    @SerialName("Context")
     val context: String
 )
 
+@Serializable
 data class HebeJournal(
-    @SerializedName("Id")
+    @SerialName("Id")
     val id: Int,
-    @SerializedName("YearStart")
+    @SerialName("YearStart")
     val yearStart: HebeDate,
-    @SerializedName("YearEnd")
+    @SerialName("YearEnd")
     val yearEnd: HebeDate,
-    @SerializedName("PupilNumber")
+    @SerialName("PupilNumber")
     val pupilNumber: Int
 )
 
+@Serializable
 data class HebeLogin(
-    @SerializedName("Value")
+    @SerialName("Value")
     val email: String,
-    @SerializedName("DisplayName")
+    @SerialName("DisplayName")
     val name: String,
-    @SerializedName("LoginRole")
+    @SerialName("LoginRole")
     val role: String
 )
 
+@Serializable
 data class HebeSchoolUnit(
-    @SerializedName("Id")
+    @SerialName("Id")
     val id: Int,
-    @SerializedName("Symbol")
+    @SerialName("Symbol")
     val code: String,
-    @SerializedName("Name")
+    @SerialName("Name")
     val name: String,
-    @SerializedName("Short")
+    @SerialName("Short")
     val shortName: String,
-    @SerializedName("DisplayName")
+    @SerialName("DisplayName")
     val displayName: String,
-    @SerializedName("RestURL")
+    @SerialName("RestURL")
     val restUrl: String,
-    @SerializedName("Address")
+    @SerialName("Address")
     val address: String? = null
 )
 
+@Serializable
 data class HebePupil(
-    @SerializedName("Id")
+    @SerialName("Id")
     val id: Int,
-    @SerializedName("LoginId")
+    @SerialName("LoginId")
     val loginId: Int,
-    @SerializedName("FirstName")
+    @SerialName("FirstName")
     val firstName: String,
-    @SerializedName("Surname")
+    @SerialName("Surname")
     val lastName: String,
-    @SerializedName("Sex")
+    @SerialName("Sex")
     val gender: Boolean,
-    @SerializedName("SecondName")
+    @SerialName("SecondName")
     val secondName: String? = null,
-    @SerializedName("LoginValue")
+    @SerialName("LoginValue")
     val loginValue: String? = null
 )
 
+@Serializable
 data class HebeMessageBox(
-    @SerializedName("Id")
+    @SerialName("Id")
     val id: Int,
-    @SerializedName("GlobalKey")
+    @SerialName("GlobalKey")
     val globalKey: String,
-    @SerializedName("Name")
+    @SerialName("Name")
     val name: String
 )
 
+@Serializable
 data class HebeSchool(
-    @SerializedName("Id")
+    @SerialName("Id")
     val id: Int,
-    @SerializedName("Name")
+    @SerialName("Name")
     val name: String,
-    @SerializedName("Short")
+    @SerialName("Short")
     val shortName: String,
-    @SerializedName("Address")
+    @SerialName("Address")
     val address: String? = null
 )
 
+@Serializable
 data class HebePeriod(
-    @SerializedName("Id")
+    @SerialName("Id")
     val id: Int,
-    @SerializedName("Level")
+    @SerialName("Level")
     val level: Int,
-    @SerializedName("Number")
+    @SerialName("Number")
     val number: Int,
-    @SerializedName("Current")
+    @SerialName("Current")
     val current: Boolean,
-    @SerializedName("Last")
+    @SerialName("Last")
     val last: Boolean,
-    @SerializedName("Start")
+    @SerialName("Start")
     val start: HebeDate,
-    @SerializedName("End")
+    @SerialName("End")
     val end: HebeDate
 )
-

@@ -1,10 +1,12 @@
 package io.github.vulka.impl.vulcan.hebe.types
 
-import com.google.gson.annotations.SerializedName
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 
+@Serializable
 data class HebeAttachment(
-    @SerializedName("Name")
+    @SerialName("Name")
     val name: String,
-    @SerializedName("Link")
+    @SerialName("Link")
     val link: String
 )

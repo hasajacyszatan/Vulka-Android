@@ -1,14 +1,16 @@
 package io.github.vulka.impl.vulcan.hebe.types
 
-import com.google.gson.annotations.SerializedName
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 
-class HebeTeamClass(
-    @SerializedName("Id")
+@Serializable
+data class HebeTeamClass(
+    @SerialName("Id")
     val id: Int,
-    @SerializedName("Key")
+    @SerialName("Key")
     val key: String,
-    @SerializedName("DisplayName")
+    @SerialName("DisplayName")
     val displayName: String,
-    @SerializedName("Symbol")
+    @SerialName("Symbol")
     val symbol: String
 )

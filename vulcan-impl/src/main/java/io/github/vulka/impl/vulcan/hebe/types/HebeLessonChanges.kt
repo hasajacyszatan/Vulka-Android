@@ -1,12 +1,14 @@
 package io.github.vulka.impl.vulcan.hebe.types
 
-import com.google.gson.annotations.SerializedName
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 
-class HebeLessonChanges(
-    @SerializedName("Id")
+@Serializable
+data class HebeLessonChanges(
+    @SerialName("Id")
     val id: Int,
-    @SerializedName("Type")
+    @SerialName("Type")
     val type: Int,
-    @SerializedName("Separation")
+    @SerialName("Separation")
     val separation: Boolean
 )

@@ -1,7 +1,5 @@
 package io.github.vulka.impl.vulcan
 
-import android.util.Log
-import com.google.gson.Gson
 import io.github.vulka.core.api.LoginCredentials
 import io.github.vulka.core.api.UserClient
 import io.github.vulka.core.api.types.Exam
@@ -20,6 +18,8 @@ import io.github.vulka.core.api.types.Summary
 import io.github.vulka.core.api.types.Teacher
 import io.github.vulka.impl.vulcan.hebe.VulcanHebeApi
 import io.github.vulka.impl.vulcan.hebe.types.HebeStudent
+import kotlinx.serialization.json.Json
+import kotlinx.serialization.encodeToString
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.ZoneOffset
@@ -48,7 +48,7 @@ class VulcanUserClient(
                     parent = if (isParent) Parent(
                         fullName = student.login.name
                     ) else null,
-                    customData = Gson().toJson(student)
+                    customData = Json.encodeToString(student)
                 )
             )
         }

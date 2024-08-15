@@ -1,23 +1,24 @@
 package io.github.vulka.impl.vulcan.hebe.types
 
-import com.google.gson.annotations.SerializedName
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 
-
+@Serializable
 data class HebeSummaryGrade(
-    @SerializedName("Id")
+    @SerialName("Id")
     val id: Int,
-    @SerializedName("PupilId")
+    @SerialName("PupilId")
     val pupilId: Int,
-    @SerializedName("PeriodId")
+    @SerialName("PeriodId")
     val periodId: Int,
-    @SerializedName("Subject")
+    @SerialName("Subject")
     val subject: HebeSubject,
-    @SerializedName("Entry_1")
-    val entry1: String?,
-    @SerializedName("Entry_2")
-    val entry2: String?,
-    @SerializedName("Entry_3")
-    val entry3: String?,
-    @SerializedName("DateModify")
-    val dateModify: HebeTimeSlot
+    @SerialName("Entry_1")
+    val entry1: String? = null,
+    @SerialName("Entry_2")
+    val entry2: String? = null,
+    @SerialName("Entry_3")
+    val entry3: String? = null,
+    @SerialName("DateModify")
+    val dateModify: HebeDate
 )

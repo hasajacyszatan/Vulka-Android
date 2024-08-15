@@ -1,8 +1,8 @@
 package io.github.vulka.impl.vulcan
 
-import com.google.gson.Gson
 import io.github.vulka.core.api.types.Student
 import io.github.vulka.impl.vulcan.hebe.types.HebeStudent
+import kotlinx.serialization.json.Json
 import java.util.UUID
 
 object Utils {
@@ -16,4 +16,4 @@ object Utils {
     }
 }
 
-fun Student.toHebe(): HebeStudent = Gson().fromJson(customData, HebeStudent::class.java)
+fun Student.toHebe(): HebeStudent = Json.decodeFromString<HebeStudent>(customData.orEmpty())

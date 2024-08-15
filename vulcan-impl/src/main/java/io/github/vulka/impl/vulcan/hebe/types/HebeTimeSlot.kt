@@ -1,16 +1,18 @@
 package io.github.vulka.impl.vulcan.hebe.types
 
-import com.google.gson.annotations.SerializedName
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 
-class HebeTimeSlot(
-    @SerializedName("Id")
+@Serializable
+data class HebeTimeSlot(
+    @SerialName("Id")
     val id: Int,
-    @SerializedName("Start")
+    @SerialName("Start")
     val from: String,
-    @SerializedName("End")
+    @SerialName("End")
     val to: String,
-    @SerializedName("Display")
+    @SerialName("Display")
     val displayedTime: String,
-    @SerializedName("Position")
+    @SerialName("Position")
     val position: Int
 )

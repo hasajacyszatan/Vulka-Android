@@ -1,20 +1,26 @@
 package io.github.vulka.impl.vulcan.hebe.types
 
-import com.google.gson.annotations.SerializedName
+import kotlinx.serialization.Contextual
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.json.JsonElement
 
+@Serializable
 data class HebeMeeting(
-    @SerializedName("Id")
+    @SerialName("Id")
     val id: Int,
-    @SerializedName("When")
+    @SerialName("When")
     val `when`: HebeDate,
-    @SerializedName("Where")
+    @SerialName("Where")
     val where: String,
-    @SerializedName("Why")
+    @SerialName("Why")
     val why: String,
-    @SerializedName("Agenda")
+    @SerialName("Agenda")
     val agenda: String,
-    @SerializedName("AdditionalInfo")
-    val additionalInfo: Any,
-    @SerializedName("Online")
-    val online: Any,
+    @SerialName("AdditionalInfo")
+    @Contextual
+    val additionalInfo: JsonElement?, // Don't know type for this moment
+    @SerialName("Online")
+    @Contextual
+    val online: String? // Don't know type for this moment
 )

@@ -1,36 +1,42 @@
 package io.github.vulka.impl.vulcan.hebe.types
 
-import com.google.gson.annotations.SerializedName
+import kotlinx.serialization.Contextual
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.json.JsonElement
 
+@Serializable
 data class HebeHomework(
-    @SerializedName("Id")
+    @SerialName("Id")
     val id: Int,
-    @SerializedName("Key")
+    @SerialName("Key")
     val key: String,
-    @SerializedName("IdPupil")
+    @SerialName("IdPupil")
     val idPupil: Int,
-    @SerializedName("IdHomework")
+    @SerialName("IdHomework")
     val idHomework: Int,
-    @SerializedName("Content")
+    @SerialName("Content")
     val content: String,
-    @SerializedName("IsAnswerRequired")
+    @SerialName("IsAnswerRequired")
     val isAnswerRequired: Boolean,
-    @SerializedName("DateCreated")
+    @SerialName("DateCreated")
     val dateCreated: HebeDate,
-    @SerializedName("Date")
+    @SerialName("Date")
     val date: HebeDate,
-    @SerializedName("AnswerDate")
+    @SerialName("AnswerDate")
     val answerDate: HebeDate?,
-    @SerializedName("Deadline")
+    @SerialName("Deadline")
     val deadline: HebeDate,
-    @SerializedName("Creator")
+    @SerialName("Creator")
     val creator: HebeTeacher,
-    @SerializedName("Subject")
+    @SerialName("Subject")
     val subject: HebeSubject,
-    @SerializedName("Attachments")
+    @SerialName("Attachments")
     val attachments: List<HebeAttachment>,
-    @SerializedName("Didactics")
-    val didactics: Any?,
-    @SerializedName("AnswerDidactics")
-    val answerDidactics: Any?
+    @SerialName("Didactics")
+    @Contextual
+    val didactics: JsonElement?,  // Don't know type for this moment
+    @SerialName("AnswerDidactics")
+    @Contextual
+    val answerDidactics: JsonElement?  // Don't know type for this moment
 )

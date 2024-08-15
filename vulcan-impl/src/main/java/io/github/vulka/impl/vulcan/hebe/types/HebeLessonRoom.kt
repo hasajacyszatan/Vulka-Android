@@ -1,10 +1,12 @@
 package io.github.vulka.impl.vulcan.hebe.types
 
-import com.google.gson.annotations.SerializedName
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 
-class HebeLessonRoom(
-    @SerializedName("Id")
+@Serializable
+data class HebeLessonRoom(
+    @SerialName("Id")
     val id: Int,
-    @SerializedName("Code")
-    val code: String?
+    @SerialName("Code")
+    val code: String? = null
 )

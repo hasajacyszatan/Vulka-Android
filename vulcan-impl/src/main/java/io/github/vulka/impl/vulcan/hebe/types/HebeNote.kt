@@ -1,38 +1,44 @@
 package io.github.vulka.impl.vulcan.hebe.types
 
-import com.google.gson.annotations.SerializedName
+import kotlinx.serialization.Contextual
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.json.JsonElement
 
+@Serializable
 data class HebeNote(
-    @SerializedName("Id")
+    @SerialName("Id")
     val id: Int,
-    @SerializedName("Key")
+    @SerialName("Key")
     val key: String,
-    @SerializedName("IdPupil")
+    @SerialName("IdPupil")
     val idPupil: Int,
-    @SerializedName("Positive")
+    @SerialName("Positive")
     val positive: Boolean,
-    @SerializedName("DateValid")
+    @SerialName("DateValid")
     val dateValid: HebeDate,
-    @SerializedName("DateModify")
+    @SerialName("DateModify")
     val dateModify: HebeDate,
-    @SerializedName("Creator")
+    @SerialName("Creator")
     val creator: HebeTeacher,
-    @SerializedName("Category")
-    val category: HebeCategory?,
-    @SerializedName("Content")
+    @SerialName("Category")
+    val category: HebeCategory? = null,
+    @SerialName("Content")
     val content: String,
-    // Don't know type for this moment
-    @SerializedName("Points")
-    val points: String
+    @SerialName("Points")
+    val points: String? // Don't know type for this moment
 )
 
+@Serializable
 data class HebeCategory(
-    @SerializedName("Id")
+    @SerialName("Id")
     val id: Int,
-    @SerializedName("Name")
-    val name: String,
-    @SerializedName("Type")
-    val type: Any?,
-    @SerializedName("DefaultPoints")
-    val defaultPoints: Any?
+    @SerialName("Name")
+    val name: String? = null,
+    @SerialName("Type")
+    @Contextual
+    val type: JsonElement? = null,
+    @SerialName("DefaultPoints")
+    @Contextual
+    val defaultPoints: JsonElement? = null
 )

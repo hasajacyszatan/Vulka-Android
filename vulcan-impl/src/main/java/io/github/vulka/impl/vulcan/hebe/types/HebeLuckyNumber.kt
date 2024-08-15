@@ -1,10 +1,12 @@
 package io.github.vulka.impl.vulcan.hebe.types
 
-import com.google.gson.annotations.SerializedName
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 
+@Serializable
 data class HebeLuckyNumber(
-    @SerializedName("Day")
+    @SerialName("Day")
     val day: String,
-    @SerializedName("Number")
+    @SerialName("Number")
     val number: Int
 )

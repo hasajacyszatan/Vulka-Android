@@ -1,15 +1,16 @@
 package io.github.vulka.impl.vulcan.hebe.types
 
-import java.util.UUID
+import kotlinx.serialization.Serializable
 
-data class ApiRequest(
+@Serializable
+data class ApiRequest<T>(
     var appName: String,
     var appVersion: String,
     var certificateId: String,
-    var envelope: Any,
+    var envelope: T,
     var firebaseToken: String,
     var api: Int,
-    var requestId: UUID,
+    var requestId: String,
     var timestamp: Long,
     var timestampFormatted: String
 )

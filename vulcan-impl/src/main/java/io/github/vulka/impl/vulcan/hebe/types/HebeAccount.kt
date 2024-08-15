@@ -1,14 +1,16 @@
 package io.github.vulka.impl.vulcan.hebe.types
 
-import com.google.gson.annotations.SerializedName
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 
+@Serializable
 data class HebeAccount(
-    @SerializedName("LoginId")
+    @SerialName("LoginId")
     val loginId: Int,
-    @SerializedName("RestURL")
+    @SerialName("RestURL")
     val restUrl: String,
-    @SerializedName("UserLogin")
+    @SerialName("UserLogin")
     val userLogin: String,
-    @SerializedName("UserName")
+    @SerialName("UserName")
     val userName: String
 )

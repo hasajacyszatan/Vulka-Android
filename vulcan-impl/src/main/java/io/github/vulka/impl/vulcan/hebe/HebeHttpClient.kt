@@ -1,7 +1,5 @@
 package io.github.vulka.impl.vulcan.hebe
 
-import com.google.gson.Gson
-import com.google.gson.reflect.TypeToken
 import io.github.vulka.impl.vulcan.hebe.login.HebeKeystore
 import io.github.vulka.impl.vulcan.hebe.types.ApiRequest
 import io.github.vulka.impl.vulcan.hebe.types.ApiResponse
@@ -11,6 +9,8 @@ import io.ktor.client.request.*
 import io.ktor.client.statement.*
 import io.ktor.http.*
 import kotlinx.coroutines.runBlocking
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
 import java.net.URLEncoder
 import java.text.SimpleDateFormat
 import java.time.LocalDateTime
@@ -27,7 +27,11 @@ class HebeHttpClient(private val keystore: HebeKeystore) {
         const val APP_USER_AGENT = "Dart/3.3 (dart:io)"
     }
 
-    private val client = HttpClient(OkHttp)
+    internal val client = HttpClient(OkHttp)
+
+    private val json = Json {
+        ignoreUnknownKeys = true
+    }
 
     private fun getEncodedPath(fullUrl: String): String {
         val pattern = Pattern.compile("api/mobile/.+")
@@ -64,7 +68,7 @@ class HebeHttpClient(private val keystore: HebeKeystore) {
         return headers
     }
 
-    private fun buildPayload(body: Any): ApiRequest {
+    internal fun <T> buildPayload(body: T): ApiRequest<T> {
         val (_,fingerprint,_) = keystore.getData()
         return ApiRequest(
             appName = APP_NAME,
@@ -73,15 +77,15 @@ class HebeHttpClient(private val keystore: HebeKeystore) {
             envelope = body,
             firebaseToken = keystore.firebaseToken,
             api = 1,
-            requestId = UUID.randomUUID(),
+            requestId = UUID.randomUUID().toString(),
             timestamp = System.currentTimeMillis(),
             timestampFormatted = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss").format(LocalDateTime.now())
         )
     }
 
-    fun <T> post(url: String, body: Any, clazz: Class<T>): T? = runBlocking {
+    internal inline fun <reified V,reified T> post(url: String, body: V): T? = runBlocking {
         val payload = buildPayload(body)
-        val payloadString = Gson().toJson(payload)
+        val payloadString = Json.encodeToString<ApiRequest<V>>(payload)
         val headers = buildHeaders(url, payloadString)
 
         val response: HttpResponse = client.post(url) {
@@ -92,16 +96,14 @@ class HebeHttpClient(private val keystore: HebeKeystore) {
             setBody(payloadString)
         }
 
-        val type = TypeToken.getParameterized(ApiResponse::class.java, clazz).type
-        val responseBody = response.bodyAsText()
-        val apiResponse = Gson().fromJson<ApiResponse<T>>(responseBody, type)
+        val apiResponse = json.decodeFromString<ApiResponse<T>>(response.bodyAsText())
 
         checkErrors(apiResponse)
 
         return@runBlocking apiResponse.envelope
     }
 
-    fun <T> get(url: String, clazz: Class<T>, query: Map<String, String>? = null): T? = runBlocking {
+    internal inline fun <reified T> get(url: String, query: Map<String, String>? = null): T? = runBlocking {
         val urlBuilder = URLBuilder(url)
 
         query?.forEach { (key, value) ->
@@ -117,10 +119,7 @@ class HebeHttpClient(private val keystore: HebeKeystore) {
             }
         }
 
-        val responseBody = response.bodyAsText()
-
-        val type = TypeToken.getParameterized(ApiResponse::class.java, clazz).type
-        val apiResponse = Gson().fromJson<ApiResponse<T>>(responseBody, type)
+        val apiResponse = json.decodeFromString<ApiResponse<T>>(response.bodyAsText())
 
         checkErrors(apiResponse)
 
