@@ -34,7 +34,6 @@ dependencies {
     implementation(libs.androidx.room.ktx)
     implementation(libs.androidx.room.runtime)
 
-    implementation(project(":vulcan-impl"))
     ksp(libs.androidx.room.compiler)
 
     implementation(libs.kotlinx.serialization.json)
@@ -46,10 +45,6 @@ dependencies {
 
     implementation(libs.dagger.hilt)
     ksp(libs.dagger.hilt.compiler)
-
-    // credential type converter
-    implementation(libs.gson)
-    implementation(libs.gson.extras)
 
     implementation(libs.androidx.datastore)
     implementation(libs.androidx.datastore.core)

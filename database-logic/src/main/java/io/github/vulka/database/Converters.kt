@@ -1,11 +1,11 @@
 package io.github.vulka.database
 
 import androidx.room.TypeConverter
-import com.google.gson.Gson
-import com.google.gson.reflect.TypeToken
 import io.github.vulka.core.api.types.HomeworkAttachment
 import io.github.vulka.core.api.types.Lesson
 import io.github.vulka.core.api.types.LessonChange
+import kotlinx.serialization.json.Json
+import kotlinx.serialization.encodeToString
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
@@ -40,32 +40,35 @@ class Converters {
 
     @TypeConverter
     fun fromLessonType(value: Lesson?): String? {
-        return Gson().toJson(value)
+        return value?.let {
+            Json.encodeToString(value)
+        }
     }
 
     @TypeConverter
-    fun toLessonType(value: String?): Lesson? {
-        val type = object : TypeToken<Lesson>() {}.type
-        return Gson().fromJson(value, type)
+    fun toLessonType(value: String): Lesson? {
+        return Json.decodeFromString<Lesson?>(value)
     }
 
     @TypeConverter
-    fun fromLessonChange(change: LessonChange?): String? {
-        return Gson().toJson(change)
+    fun fromLessonChange(change: LessonChange?): String {
+        return Json.encodeToString(change)
     }
 
     @TypeConverter
     fun toLessonChange(changeString: String?): LessonChange? {
-        return Gson().fromJson(changeString, object : TypeToken<LessonChange>() {}.type)
+        return changeString?.let {
+            Json.decodeFromString<LessonChange?>(changeString)
+        }
     }
 
     @TypeConverter
-    fun fromListHomeworkAttachment(change: List<HomeworkAttachment>): String? {
-        return Gson().toJson(change)
+    fun fromListHomeworkAttachment(change: List<HomeworkAttachment>): String {
+        return Json.encodeToString(change)
     }
 
     @TypeConverter
-    fun toListHomeworkAttachment(changeString: String?): List<HomeworkAttachment> {
-        return Gson().fromJson(changeString, object : TypeToken<List<HomeworkAttachment>>() {}.type)
+    fun toListHomeworkAttachment(changeString: String): List<HomeworkAttachment> {
+        return Json.decodeFromString<List<HomeworkAttachment>>(changeString)
     }
 }
