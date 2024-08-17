@@ -185,7 +185,10 @@ fun GradesTab(
                                 if (summary?.average != null) {
                                     Text(
                                         fontSize = 12.sp,
-                                        text = "${stringResource(R.string.Average)}: ${summary.average}"
+                                        text = "${stringResource(R.string.Average)}: ${String.format(
+                                            Locale.current.toJavaLocale(),
+                                            "%.2f",summary.average
+                                        )}"
                                     )
                                 }
                             }
