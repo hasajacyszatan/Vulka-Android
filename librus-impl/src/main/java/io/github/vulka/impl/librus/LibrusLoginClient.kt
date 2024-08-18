@@ -3,8 +3,8 @@ package io.github.vulka.impl.librus
 import io.github.vulka.core.api.LoginClient
 import io.github.vulka.core.api.LoginCredentials
 import io.github.vulka.core.api.LoginData
-import io.github.vulka.impl.librus.internal.api.internalRequestMe
 import io.ktor.client.HttpClient
+import io.ktor.client.call.body
 import io.ktor.client.engine.okhttp.OkHttp
 import io.ktor.client.plugins.BrowserUserAgent
 import io.ktor.client.plugins.cookies.HttpCookies
@@ -24,7 +24,7 @@ class LibrusLoginClient : LoginClient {
 
         client.get("https://api.librus.pl/OAuth/Authorization?client_id=46&response_type=code&scope=mydata")
 
-        client.submitForm(
+        val response = client.submitForm(
             url = "https://api.librus.pl/OAuth/Authorization?client_id=46",
             formParameters = parameters {
                 append("action", "login")
@@ -33,20 +33,17 @@ class LibrusLoginClient : LoginClient {
             }
         )
 
+        if (response.status.value != 200) {
+            throw Exception("Login failed\nResponse: " + response.body<String>())
+        }
+
         client.get("https://api.librus.pl/OAuth/Authorization/2FA?client_id=46")
 
         val cookies = client.cookies("https://synergia.librus.pl")
 
-        val credentials = LibrusLoginCredentials(
+        return LibrusLoginCredentials(
             cookies = cookies,
             request = loginData
         )
-
-        // check if user is logged in
-        val userClient = LibrusUserClient(credentials)
-        userClient.initClient(cookies)
-        userClient.internalRequestMe()
-
-        return credentials
     }
 }
