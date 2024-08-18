@@ -1,8 +1,10 @@
 package io.github.vulka.impl.librus
 
+import io.github.vulka.core.api.ApiException
 import io.github.vulka.core.api.LoginClient
 import io.github.vulka.core.api.LoginCredentials
 import io.github.vulka.core.api.LoginData
+import io.github.vulka.impl.librus.internal.api.types.LibrusError
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.engine.okhttp.OkHttp
@@ -12,6 +14,7 @@ import io.ktor.client.plugins.cookies.cookies
 import io.ktor.client.request.forms.submitForm
 import io.ktor.client.request.get
 import io.ktor.http.parameters
+import kotlinx.serialization.json.Json
 
 class LibrusLoginClient : LoginClient {
     private val client = HttpClient(OkHttp) {
@@ -34,7 +37,11 @@ class LibrusLoginClient : LoginClient {
         )
 
         if (response.status.value != 200) {
-            throw Exception("Login failed\nResponse: " + response.body<String>())
+            val error = Json.decodeFromString<LibrusError>(response.body())
+            throw ApiException(
+                message = error.errors.first().message,
+                code = response.status.value
+            )
         }
 
         client.get("https://api.librus.pl/OAuth/Authorization/2FA?client_id=46")
