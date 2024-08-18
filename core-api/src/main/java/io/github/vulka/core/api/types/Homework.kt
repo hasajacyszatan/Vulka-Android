@@ -1,5 +1,6 @@
 package io.github.vulka.core.api.types
 
+import kotlinx.serialization.Serializable
 import java.time.LocalDate
 
 data class Homework(
@@ -14,6 +15,7 @@ data class Homework(
     val isAnswerRequired: Boolean,
 )
 
+@Serializable
 data class HomeworkAttachment(
     val name: String?,
     // In Vulcan attachments have the link to OneDrive,

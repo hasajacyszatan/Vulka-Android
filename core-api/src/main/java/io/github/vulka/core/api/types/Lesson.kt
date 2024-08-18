@@ -1,5 +1,6 @@
 package io.github.vulka.core.api.types
 
+import kotlinx.serialization.Serializable
 import java.time.LocalDate
 
 enum class LessonChangeType {
@@ -19,10 +20,11 @@ data class Lesson(
     val endTime: String
 )
 
+@Serializable
 data class LessonChange(
     val type: LessonChangeType,
-    val newSubjectName: String?,
-    val newTeacher: Teacher?,
+    val newSubjectName: String? = null,
+    val newTeacher: Teacher? = null,
     val message: String? = null,
     val classRoom: String? = null
 )
