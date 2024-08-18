@@ -6,6 +6,7 @@ import io.github.vulka.core.api.LoginData
 import io.github.vulka.impl.librus.internal.api.internalRequestMe
 import io.ktor.client.HttpClient
 import io.ktor.client.engine.okhttp.OkHttp
+import io.ktor.client.plugins.BrowserUserAgent
 import io.ktor.client.plugins.cookies.HttpCookies
 import io.ktor.client.plugins.cookies.cookies
 import io.ktor.client.request.forms.submitForm
@@ -15,6 +16,7 @@ import io.ktor.http.parameters
 class LibrusLoginClient : LoginClient {
     private val client = HttpClient(OkHttp) {
         install(HttpCookies)
+        BrowserUserAgent()
     }
 
     override suspend fun login(data: LoginData): LoginCredentials {

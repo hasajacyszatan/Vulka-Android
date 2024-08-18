@@ -27,6 +27,7 @@ import io.github.vulka.impl.librus.internal.api.internalRequestUsers
 import io.github.vulka.impl.librus.internal.api.types.TimetableDay
 import io.ktor.client.HttpClient
 import io.ktor.client.engine.okhttp.OkHttp
+import io.ktor.client.plugins.BrowserUserAgent
 import io.ktor.client.plugins.cookies.ConstantCookiesStorage
 import io.ktor.client.plugins.cookies.HttpCookies
 import io.ktor.client.request.HttpRequestBuilder
@@ -49,6 +50,8 @@ class LibrusUserClient(
             install(HttpCookies) {
                 storage = ConstantCookiesStorage(*cookies.toTypedArray())
             }
+
+            BrowserUserAgent()
         }
     }
 
