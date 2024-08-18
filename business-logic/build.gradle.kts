@@ -23,10 +23,9 @@ android {
 }
 
 dependencies {
-    implementation(libs.gson)
-    implementation(libs.medzik.android.crypto)
-
     implementation(libs.kotlinx.coroutines)
+    implementation(libs.kotlinx.serialization.json)
+    implementation(libs.medzik.android.crypto)
 
     implementation(projects.coreApi)
     implementation(projects.librusImpl)

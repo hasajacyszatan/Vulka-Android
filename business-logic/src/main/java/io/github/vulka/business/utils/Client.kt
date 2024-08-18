@@ -1,6 +1,5 @@
 package io.github.vulka.business.utils
 
-import com.google.gson.Gson
 import io.github.vulka.core.api.Features
 import io.github.vulka.core.api.Platform
 import io.github.vulka.core.api.UserClient
@@ -10,23 +9,22 @@ import io.github.vulka.impl.librus.LibrusUserClient
 import io.github.vulka.impl.vulcan.HebeFeatures
 import io.github.vulka.impl.vulcan.VulcanLoginCredentials
 import io.github.vulka.impl.vulcan.VulcanUserClient
+import kotlinx.serialization.json.Json
 
 fun getUserClient(
     platform: Platform,
     credentials: String
 ): UserClient {
-    val client = when (platform) {
+    return when (platform) {
         Platform.VulcanHebe -> {
-            val loginData = Gson().fromJson(credentials, VulcanLoginCredentials::class.java)
-            VulcanUserClient(loginData)
+            val decodedCredentials = Json.decodeFromString<VulcanLoginCredentials>(credentials)
+            VulcanUserClient(decodedCredentials)
         }
         Platform.Librus -> {
-            val loginData = Gson().fromJson(credentials, LibrusLoginCredentials::class.java)
-            LibrusUserClient(loginData)
+            val decodedCredentials = Json.decodeFromString<LibrusLoginCredentials>(credentials)
+            LibrusUserClient(decodedCredentials)
         }
     }
-
-    return client
 }
 
 fun getFeaturesByPlatform(platform: Platform): Features {

@@ -1,16 +1,19 @@
 package io.github.vulka.business.crypto
 
-import com.google.gson.Gson
 import dev.medzik.android.crypto.KeyStore
 import dev.medzik.android.crypto.KeyStoreAlias
 import io.github.vulka.core.api.LoginCredentials
+import io.github.vulka.impl.librus.LibrusLoginCredentials
+import io.github.vulka.impl.vulcan.VulcanLoginCredentials
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
 
 object CredentialsKeyStore : KeyStoreAlias {
     override val name: String = "credentials"
 }
 
 fun serializeCredentialsAndEncrypt(response: LoginCredentials): String {
-    val json = Gson().toJson(response)
+    val json = serializeCredentials(response)
 
     val cipherEnc = KeyStore.initForEncryption(CredentialsKeyStore, false)
     val cipherData = KeyStore.encrypt(cipherEnc, json.toByteArray())
@@ -19,8 +22,12 @@ fun serializeCredentialsAndEncrypt(response: LoginCredentials): String {
 }
 
 // TODO: maybe move somewhere else
-fun serializeCredentials(response: LoginCredentials): String {
-    return Gson().toJson(response)
+fun serializeCredentials(credentials: LoginCredentials): String {
+    return when (credentials) {
+        is LibrusLoginCredentials -> Json.encodeToString(credentials)
+        is VulcanLoginCredentials -> Json.encodeToString(credentials)
+        else -> throw IllegalStateException()
+    }
 }
 
 @OptIn(ExperimentalStdlibApi::class)

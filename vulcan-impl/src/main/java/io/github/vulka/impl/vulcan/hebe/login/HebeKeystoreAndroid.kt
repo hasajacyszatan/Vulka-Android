@@ -3,9 +3,11 @@ package io.github.vulka.impl.vulcan.hebe.login
 import android.util.Log
 import io.github.vulka.impl.vulcan.hebe.generateKeyPair
 import io.github.vulka.impl.vulcan.hebe.getKeyEntry
+import kotlinx.serialization.Serializable
 import java.security.PrivateKey
 import kotlin.random.Random
 
+@Serializable
 data class HebeKeystore(
     val privateKeyAlias: String,
     val firebaseToken: String,

@@ -8,15 +8,14 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavController
 import androidx.navigation.NavGraph.Companion.findStartDestination
-import com.google.gson.Gson
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.github.vulka.business.crypto.serializeCredentialsAndEncrypt
 import io.github.vulka.core.api.LoginCredentials
 import io.github.vulka.core.api.Platform
 import io.github.vulka.core.api.UserClient
 import io.github.vulka.core.api.types.Student
-import io.github.vulka.database.entities.Credentials
 import io.github.vulka.database.Repository
+import io.github.vulka.database.entities.Credentials
 import io.github.vulka.impl.librus.LibrusLoginCredentials
 import io.github.vulka.impl.librus.LibrusUserClient
 import io.github.vulka.impl.vulcan.VulcanLoginCredentials
@@ -25,6 +24,7 @@ import io.github.vulka.ui.screens.dashboard.Home
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import kotlinx.serialization.json.Json
 import javax.inject.Inject
 
 @HiltViewModel
@@ -39,8 +39,8 @@ class ChooseStudentsViewModel @Inject constructor(
 
     private fun getCredentials(credentialsData: String, platform: Platform): LoginCredentials {
         return when (platform) {
-            Platform.VulcanHebe -> Gson().fromJson(credentialsData, VulcanLoginCredentials::class.java)
-            Platform.Librus -> Gson().fromJson(credentialsData, LibrusLoginCredentials::class.java)
+            Platform.VulcanHebe -> Json.decodeFromString<VulcanLoginCredentials>(credentialsData)
+            Platform.Librus -> Json.decodeFromString<LibrusLoginCredentials>(credentialsData)
         }
     }
 

@@ -51,7 +51,6 @@ dependencies {
     implementation(libs.medzik.android.crypto)
     implementation(libs.medzik.android.utils)
     implementation(libs.medzik.libcrypto)
-    implementation(libs.gson)
     implementation(libs.ktor.core)
     implementation(projects.businessLogic)
     implementation(projects.coreApi)
