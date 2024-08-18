@@ -18,7 +18,7 @@
     <string name="Student">Student</string>
     <string name="None">None</string>
     <string name="SelectAccount">Select Account</string>
-    <string name="AccountManager">AccountManager</string>
+    <string name="AccountManager">Account Manager</string>
     <string name="LuckyNumberNone">No info about lucky number</string>
     <string name="LuckyNumberText">Today lucky number is:</string>
     <string name="AddAccount">Add account</string>
@@ -89,5 +89,4 @@
     <string name="Select">Select</string>
     <string name="Settings_Synchronization">Synchronization</string>
     <string name="Settings_AutoSync">Sync automatically</string>
-
 </resources>
