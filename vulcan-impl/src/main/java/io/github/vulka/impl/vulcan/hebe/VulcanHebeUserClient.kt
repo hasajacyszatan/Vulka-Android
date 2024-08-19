@@ -1,4 +1,4 @@
-package io.github.vulka.impl.vulcan
+package io.github.vulka.impl.vulcan.hebe
 
 import io.github.vulka.core.api.LoginCredentials
 import io.github.vulka.core.api.UserClient
@@ -16,8 +16,8 @@ import io.github.vulka.core.api.types.Semester
 import io.github.vulka.core.api.types.Student
 import io.github.vulka.core.api.types.Summary
 import io.github.vulka.core.api.types.Teacher
-import io.github.vulka.impl.vulcan.hebe.VulcanHebeApi
 import io.github.vulka.impl.vulcan.hebe.types.HebeStudent
+import io.github.vulka.impl.vulcan.toHebe
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.encodeToString
 import java.time.LocalDate
@@ -25,13 +25,13 @@ import java.time.LocalDateTime
 import java.time.ZoneOffset
 import java.time.format.DateTimeFormatter
 
-class VulcanUserClient(
+class VulcanHebeUserClient(
     credentials: LoginCredentials
 ) : UserClient {
     val api = VulcanHebeApi()
 
     init {
-        api.setup(credentials as VulcanLoginCredentials)
+        api.setup(credentials as VulcanHebeLoginCredentials)
     }
 
     override suspend fun getStudents(): Array<Student> {

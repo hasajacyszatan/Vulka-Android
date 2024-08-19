@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="SelectJournal">Select your e-journal</string>
-    <string name="Vulcan" translatable="false">UONET+ Vulcan</string>
+    <string name="Vulcan">UONET+ Vulcan (Deprecated)</string>
     <string name="Librus" translatable="false">Librus Synergia</string>
     <string name="Login">Login</string>
     <string name="Field_Symbol" translatable="false">Symbol</string>
@@ -90,4 +90,5 @@
     <string name="Settings_Synchronization">Synchronization</string>
     <string name="Settings_AutoSync">Sync automatically</string>
     <string name="DiaryNumber">Diary number</string>
+    <string name="EduVulcan" translatable="false">eduVULCAN</string>
 </resources>

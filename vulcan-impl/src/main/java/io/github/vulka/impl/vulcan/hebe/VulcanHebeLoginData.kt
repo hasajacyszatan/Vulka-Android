@@ -1,9 +1,9 @@
-package io.github.vulka.impl.vulcan
+package io.github.vulka.impl.vulcan.hebe
 
 import io.github.vulka.core.api.LoginData
 import io.github.vulka.impl.vulcan.hebe.login.HebeKeystore
 
-class VulcanLoginData(
+class VulcanHebeLoginData(
     val symbol: String,
     val token: String,
     val pin: String,

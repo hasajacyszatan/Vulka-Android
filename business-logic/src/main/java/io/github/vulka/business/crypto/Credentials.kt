@@ -4,7 +4,8 @@ import dev.medzik.android.crypto.KeyStore
 import dev.medzik.android.crypto.KeyStoreAlias
 import io.github.vulka.core.api.LoginCredentials
 import io.github.vulka.impl.librus.LibrusLoginCredentials
-import io.github.vulka.impl.vulcan.VulcanLoginCredentials
+import io.github.vulka.impl.vulcan.hebe.VulcanHebeLoginCredentials
+import io.github.vulka.impl.vulcan.prometheus.VulcanPrometheusLoginCredentials
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 
@@ -25,7 +26,8 @@ fun serializeCredentialsAndEncrypt(response: LoginCredentials): String {
 fun serializeCredentials(credentials: LoginCredentials): String {
     return when (credentials) {
         is LibrusLoginCredentials -> Json.encodeToString(credentials)
-        is VulcanLoginCredentials -> Json.encodeToString(credentials)
+        is VulcanHebeLoginCredentials -> Json.encodeToString(credentials)
+        is VulcanPrometheusLoginCredentials -> Json.encodeToString(credentials)
         else -> throw IllegalStateException()
     }
 }

@@ -1,7 +1,6 @@
 package io.github.vulka.impl.vulcan.hebe
 
 import io.github.vulka.impl.vulcan.Utils
-import io.github.vulka.impl.vulcan.VulcanLoginCredentials
 import io.github.vulka.impl.vulcan.hebe.login.HebeKeystore
 import io.github.vulka.impl.vulcan.hebe.login.RegisterRequest
 import io.github.vulka.impl.vulcan.hebe.types.HebeAccount
@@ -26,16 +25,16 @@ import java.io.IOException
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 
-class VulcanHebeApi {
-    private lateinit var client: HebeHttpClient
-    private lateinit var credentials: VulcanLoginCredentials
+open class VulcanHebeApi {
+    protected lateinit var client: HebeHttpClient
+    protected lateinit var credentials: VulcanHebeLoginCredentials
 
-    fun setup(credentials: VulcanLoginCredentials) {
+    open fun setup(credentials: VulcanHebeLoginCredentials) {
         client = HebeHttpClient(credentials.keystore)
         this.credentials = credentials
     }
 
-    private fun getBaseUrl(token: String): String = runBlocking {
+    protected open fun getBaseUrl(token: String): String = runBlocking {
         val client = HttpClient(OkHttp)
 
         val response = client.get("http://komponenty.vulcan.net.pl/UonetPlusMobile/RoutingRules.txt")
@@ -83,7 +82,7 @@ class VulcanHebeApi {
 
         val response = client.post<RegisterRequest,HebeAccount>(fullUrl, registerRequest)
 
-        credentials = VulcanLoginCredentials(response!!,keystore)
+        credentials = VulcanHebeLoginCredentials(response!!,keystore)
         return response
     }
 

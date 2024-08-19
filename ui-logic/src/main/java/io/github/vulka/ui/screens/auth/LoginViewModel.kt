@@ -8,37 +8,44 @@ import io.github.vulka.business.crypto.serializeCredentials
 import io.github.vulka.core.api.Platform
 import io.github.vulka.impl.librus.LibrusLoginClient
 import io.github.vulka.impl.librus.LibrusLoginData
-import io.github.vulka.impl.vulcan.VulcanLoginClient
-import io.github.vulka.impl.vulcan.VulcanLoginData
+import io.github.vulka.impl.vulcan.hebe.VulcanHebeLoginClient
+import io.github.vulka.impl.vulcan.hebe.VulcanHebeLoginData
 import io.github.vulka.impl.vulcan.hebe.login.HebeKeystore
+import io.github.vulka.impl.vulcan.prometheus.VulcanPrometheusLoginClient
+import io.github.vulka.impl.vulcan.prometheus.VulcanPrometheusLoginData
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
 class LoginViewModel : ViewModel() {
-    val vulcanSymbol = mutableStateOf("")
-    val vulcanToken = mutableStateOf("")
-    val vulcanPin = mutableStateOf("")
+
+    val eduVulcanLogin = mutableStateOf("")
+    val eduVulcanPassword = mutableStateOf("")
+
+    val vulcanHebeSymbol = mutableStateOf("")
+    val vulcanHebeToken = mutableStateOf("")
+    val vulcanHebePin = mutableStateOf("")
 
     val librusLogin = mutableStateOf("")
     val librusPassword = mutableStateOf("")
 
     suspend fun login(platform: Platform, navController: NavController) {
         val client = when (platform) {
-            Platform.VulcanHebe -> VulcanLoginClient()
+            Platform.VulcanHebe -> VulcanHebeLoginClient()
+            Platform.VulcanPrometheus -> VulcanPrometheusLoginClient()
             Platform.Librus -> LibrusLoginClient()
         }
         val requestData = when (platform) {
             Platform.VulcanHebe -> {
                 // For Vulcan we must create keystore first
                 val keystore = HebeKeystore.create(
-                    alias = HebeKeystore.generateKeystoreName(vulcanSymbol.value),
+                    alias = HebeKeystore.generateKeystoreName(vulcanHebeSymbol.value),
                     firebaseToken = "",
                     deviceModel = "${Build.MANUFACTURER} ${Build.MODEL} (Vulka)")
 
-                VulcanLoginData(
-                    symbol = vulcanSymbol.value,
-                    token = vulcanToken.value,
-                    pin = vulcanPin.value,
+                VulcanHebeLoginData(
+                    symbol = vulcanHebeSymbol.value,
+                    token = vulcanHebeToken.value,
+                    pin = vulcanHebePin.value,
                     keystore = keystore
                 )
             }
@@ -47,6 +54,21 @@ class LoginViewModel : ViewModel() {
                 LibrusLoginData(
                     login = librusLogin.value,
                     password = librusPassword.value
+                )
+            }
+
+            Platform.VulcanPrometheus -> {
+                // For Vulcan we must create keystore first
+                val keystore = HebeKeystore.create(
+                    alias = HebeKeystore.generateKeystoreName(vulcanHebeSymbol.value),
+                    firebaseToken = "",
+                    deviceModel = Build.MODEL
+                )
+
+                VulcanPrometheusLoginData(
+                    login = eduVulcanLogin.value,
+                    password = eduVulcanPassword.value,
+                    keystore = keystore
                 )
             }
         }

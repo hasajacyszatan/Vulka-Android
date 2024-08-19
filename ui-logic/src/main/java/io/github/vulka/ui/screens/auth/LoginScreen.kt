@@ -24,6 +24,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import dev.medzik.android.compose.rememberMutable
 import dev.medzik.android.compose.theme.combineAlpha
+import dev.medzik.android.compose.theme.warningContainer
 import dev.medzik.android.compose.ui.LoadingButton
 import dev.medzik.android.compose.ui.dialog.rememberDialogState
 import dev.medzik.android.compose.ui.textfield.AnimatedTextField
@@ -44,103 +45,16 @@ fun LoginScreen(
     navController: NavController,
     viewModel: LoginViewModel = hiltViewModel()
 ) {
+    var enableLogin by rememberMutable { true }
     LazyColumn(
         modifier = Modifier.fillMaxSize(),
         verticalArrangement = Arrangement.SpaceBetween
     ) {
         item {
             when (args.platform) {
-                Platform.VulcanHebe -> {
-                    Surface(
-                        modifier = Modifier.padding(bottom = 12.dp),
-                        shape = MaterialTheme.shapes.medium,
-                        color = MaterialTheme.colorScheme.tertiary.combineAlpha(0.9f)
-                    ) {
-                        Text(
-                            modifier = Modifier.padding(12.dp),
-                            text = "Aby zalogować się do aplikacji, zaloguj się na stronę e-dziennika na komputerze, przejdź do zakładki \"Dostęp mobilny\", następnie kliknij \"Wygeneruj kod dostępu\" i przepisz podane dane poniżej.",
-                            style = MaterialTheme.typography.bodyMedium,
-                            color = MaterialTheme.colorScheme.onTertiary.combineAlpha(0.9f)
-                        )
-                    }
-
-                    AnimatedTextField(
-                        modifier = Modifier.padding(vertical = 5.dp),
-                        label = stringResource(R.string.Field_Token),
-                        value = TextFieldValue.fromMutableState(viewModel.vulcanToken),
-                        clearButton = true,
-                        singleLine = true,
-                        leading = {
-                            Icon(
-                                imageVector = Icons.Default.DataObject,
-                                contentDescription = null
-                            )
-                        }
-                    )
-
-                    AnimatedTextField(
-                        modifier = Modifier.padding(vertical = 5.dp),
-                        label = stringResource(R.string.Field_Symbol),
-                        value = TextFieldValue.fromMutableState(viewModel.vulcanSymbol),
-                        clearButton = true,
-                        singleLine = true,
-                        leading = {
-                            Icon(
-                                imageVector = Icons.Default.School,
-                                contentDescription = null
-                            )
-                        }
-                    )
-
-                    AnimatedTextField(
-                        modifier = Modifier.padding(vertical = 5.dp),
-                        label = stringResource(R.string.Field_Pin),
-                        value = TextFieldValue.fromMutableState(viewModel.vulcanPin),
-                        clearButton = true,
-                        singleLine = true,
-                        leading = {
-                            Icon(
-                                imageVector = Icons.Default.Password,
-                                contentDescription = null
-                            )
-                        }
-                    )
-                }
-
-                Platform.Librus -> {
-                    Surface(
-                        modifier = Modifier.padding(bottom = 12.dp),
-                        shape = MaterialTheme.shapes.medium,
-                        color = MaterialTheme.colorScheme.tertiary.combineAlpha(0.9f)
-                    ) {
-                        Text(
-                            modifier = Modifier.padding(12.dp),
-                            text = "Aby zalogować się do aplikacji, użyj tych samych danych, których używasz do logowania się na stronie internetowej Librus Synergia: https://portal.librus.pl/rodzina/synergia/loguj.",
-                            style = MaterialTheme.typography.bodyMedium,
-                            color = MaterialTheme.colorScheme.onTertiary.combineAlpha(0.9f)
-                        )
-                    }
-
-                    AnimatedTextField(
-                        modifier = Modifier.padding(vertical = 5.dp),
-                        label = stringResource(R.string.Field_Login),
-                        value = TextFieldValue.fromMutableState(viewModel.librusLogin),
-                        clearButton = true,
-                        singleLine = true,
-                        leading = {
-                            Icon(
-                                imageVector = Icons.Default.Person,
-                                contentDescription = null
-                            )
-                        }
-                    )
-
-                    PasswordAnimatedTextField(
-                        modifier = Modifier.padding(vertical = 5.dp),
-                        label = stringResource(R.string.Field_Password),
-                        value = TextFieldValue.fromMutableState(viewModel.librusPassword)
-                    )
-                }
+                Platform.VulcanHebe -> VulcanHebe(viewModel) { enableLogin = it }
+                Platform.Librus -> Librus(viewModel) { enableLogin = it }
+                Platform.VulcanPrometheus -> VulcanPrometheus(viewModel) { enableLogin = it }
             }
         }
 
@@ -163,6 +77,7 @@ fun LoginScreen(
                         loading = false
                     }
                 },
+                enabled = enableLogin,
                 loading = loading,
                 modifier = Modifier
                     .fillMaxWidth()
@@ -177,4 +92,165 @@ fun LoginScreen(
             )
         }
     }
+}
+
+@Composable
+fun VulcanHebe(viewModel: LoginViewModel,login: (Boolean) -> Unit) {
+    login(true)
+
+    Surface(
+        modifier = Modifier.padding(bottom = 12.dp),
+        shape = MaterialTheme.shapes.medium,
+        color = MaterialTheme.colorScheme.warningContainer.combineAlpha(0.9f)
+    ) {
+        Text(
+            modifier = Modifier.padding(12.dp),
+            text = "UWAGA! Ten sposób logowania został wycofany przez firmę VULCAN. Nie jest już możliwe zalogowanie się za jego pomocą.",
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.onSurface.combineAlpha(0.9f)
+        )
+    }
+
+    Surface(
+        modifier = Modifier.padding(bottom = 12.dp),
+        shape = MaterialTheme.shapes.medium,
+        color = MaterialTheme.colorScheme.tertiary.combineAlpha(0.9f)
+    ) {
+        Text(
+            modifier = Modifier.padding(12.dp),
+            text = "Aby zalogować się do aplikacji, zaloguj się na stronę e-dziennika na komputerze, przejdź do zakładki \"Dostęp mobilny\", następnie kliknij \"Wygeneruj kod dostępu\" i przepisz podane dane poniżej.",
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.onTertiary.combineAlpha(0.9f)
+        )
+    }
+
+    AnimatedTextField(
+        modifier = Modifier.padding(vertical = 5.dp),
+        label = stringResource(R.string.Field_Token),
+        value = TextFieldValue.fromMutableState(viewModel.vulcanHebeToken),
+        clearButton = true,
+        singleLine = true,
+        leading = {
+            Icon(
+                imageVector = Icons.Default.DataObject,
+                contentDescription = null
+            )
+        }
+    )
+
+    AnimatedTextField(
+        modifier = Modifier.padding(vertical = 5.dp),
+        label = stringResource(R.string.Field_Symbol),
+        value = TextFieldValue.fromMutableState(viewModel.vulcanHebeSymbol),
+        clearButton = true,
+        singleLine = true,
+        leading = {
+            Icon(
+                imageVector = Icons.Default.School,
+                contentDescription = null
+            )
+        }
+    )
+
+    AnimatedTextField(
+        modifier = Modifier.padding(vertical = 5.dp),
+        label = stringResource(R.string.Field_Pin),
+        value = TextFieldValue.fromMutableState(viewModel.vulcanHebePin),
+        clearButton = true,
+        singleLine = true,
+        leading = {
+            Icon(
+                imageVector = Icons.Default.Password,
+                contentDescription = null
+            )
+        }
+    )
+}
+
+@Composable
+fun Librus(viewModel: LoginViewModel,login: (Boolean) -> Unit) {
+    login(true)
+    Surface(
+        modifier = Modifier.padding(bottom = 12.dp),
+        shape = MaterialTheme.shapes.medium,
+        color = MaterialTheme.colorScheme.tertiary.combineAlpha(0.9f)
+    ) {
+        Text(
+            modifier = Modifier.padding(12.dp),
+            text = "Aby zalogować się do aplikacji, użyj tych samych danych, których używasz do logowania się na stronie internetowej Librus Synergia: https://portal.librus.pl/rodzina/synergia/loguj.",
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.onTertiary.combineAlpha(0.9f)
+        )
+    }
+
+    AnimatedTextField(
+        modifier = Modifier.padding(vertical = 5.dp),
+        label = stringResource(R.string.Field_Login),
+        value = TextFieldValue.fromMutableState(viewModel.librusLogin),
+        clearButton = true,
+        singleLine = true,
+        leading = {
+            Icon(
+                imageVector = Icons.Default.Person,
+                contentDescription = null
+            )
+        }
+    )
+
+    PasswordAnimatedTextField(
+        modifier = Modifier.padding(vertical = 5.dp),
+        label = stringResource(R.string.Field_Password),
+        value = TextFieldValue.fromMutableState(viewModel.librusPassword)
+    )
+}
+
+@Composable
+fun VulcanPrometheus(viewModel: LoginViewModel, login: (Boolean) -> Unit) {
+    login(false)
+
+    Surface(
+        modifier = Modifier.padding(bottom = 12.dp),
+        shape = MaterialTheme.shapes.medium,
+        color = MaterialTheme.colorScheme.warningContainer.combineAlpha(0.9f)
+    ) {
+        Text(
+            modifier = Modifier.padding(12.dp),
+            text = "UWAGA! Ten sposób logowania jest eksperymentalny. Aktualnie nie jest zaimplementowany",
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.onSurface.combineAlpha(0.9f)
+        )
+    }
+
+    Surface(
+        modifier = Modifier.padding(bottom = 12.dp),
+        shape = MaterialTheme.shapes.medium,
+        color = MaterialTheme.colorScheme.tertiary.combineAlpha(0.9f)
+    ) {
+        Text(
+            modifier = Modifier.padding(12.dp),
+            text = "Aby zalogować się do aplikacji, użyj tych samych danych, których używasz do logowania się na stronie internetowej eduvulcan.pl",
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.onTertiary.combineAlpha(0.9f)
+        )
+    }
+
+    AnimatedTextField(
+        modifier = Modifier.padding(vertical = 5.dp),
+        label = stringResource(R.string.Field_Login),
+        value = TextFieldValue.fromMutableState(viewModel.eduVulcanLogin),
+        clearButton = true,
+        singleLine = true,
+        leading = {
+            Icon(
+                imageVector = Icons.Default.Person,
+                contentDescription = null
+            )
+        }
+    )
+
+    PasswordAnimatedTextField(
+        modifier = Modifier.padding(vertical = 5.dp),
+        label = stringResource(R.string.Field_Password),
+        value = TextFieldValue.fromMutableState(viewModel.eduVulcanPassword)
+    )
 }

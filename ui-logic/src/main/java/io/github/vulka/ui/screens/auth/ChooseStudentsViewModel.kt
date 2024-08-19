@@ -18,8 +18,8 @@ import io.github.vulka.database.Repository
 import io.github.vulka.database.entities.Credentials
 import io.github.vulka.impl.librus.LibrusLoginCredentials
 import io.github.vulka.impl.librus.LibrusUserClient
-import io.github.vulka.impl.vulcan.VulcanLoginCredentials
-import io.github.vulka.impl.vulcan.VulcanUserClient
+import io.github.vulka.impl.vulcan.hebe.VulcanHebeLoginCredentials
+import io.github.vulka.impl.vulcan.hebe.VulcanHebeUserClient
 import io.github.vulka.ui.screens.dashboard.Home
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -39,7 +39,9 @@ class ChooseStudentsViewModel @Inject constructor(
 
     private fun getCredentials(credentialsData: String, platform: Platform): LoginCredentials {
         return when (platform) {
-            Platform.VulcanHebe -> Json.decodeFromString<VulcanLoginCredentials>(credentialsData)
+            // TODO: Add prometheus
+            Platform.VulcanHebe -> Json.decodeFromString<VulcanHebeLoginCredentials>(credentialsData)
+            Platform.VulcanPrometheus -> Json.decodeFromString<VulcanHebeLoginCredentials>(credentialsData)
             Platform.Librus -> Json.decodeFromString<LibrusLoginCredentials>(credentialsData)
         }
     }
@@ -47,7 +49,9 @@ class ChooseStudentsViewModel @Inject constructor(
     fun getClient(credentialsData: String,platform: Platform): UserClient {
         val credentials = getCredentials(credentialsData, platform)
         return when (platform) {
-            Platform.VulcanHebe -> VulcanUserClient(credentials as VulcanLoginCredentials)
+            // TODO: Add prometheus
+            Platform.VulcanPrometheus -> VulcanHebeUserClient(credentials as VulcanHebeLoginCredentials)
+            Platform.VulcanHebe -> VulcanHebeUserClient(credentials as VulcanHebeLoginCredentials)
             Platform.Librus -> LibrusUserClient(credentials as LibrusLoginCredentials)
         }
     }

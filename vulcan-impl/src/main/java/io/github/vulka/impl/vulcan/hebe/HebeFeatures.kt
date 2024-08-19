@@ -1,4 +1,4 @@
-package io.github.vulka.impl.vulcan
+package io.github.vulka.impl.vulcan.hebe
 
 import io.github.vulka.core.api.Features
 
