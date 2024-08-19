@@ -85,5 +85,6 @@
     <string name="Select">Wybierz</string>
     <string name="Settings_Synchronization">Synchronizacja</string>
     <string name="Settings_AutoSync">Synchronizuj automatycznie</string>
+    <string name="DiaryNumber">Numer w dzienniku</string>
 
 </resources>

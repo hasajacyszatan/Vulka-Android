@@ -89,4 +89,5 @@
     <string name="Select">Select</string>
     <string name="Settings_Synchronization">Synchronization</string>
     <string name="Settings_AutoSync">Sync automatically</string>
+    <string name="DiaryNumber">Diary number</string>
 </resources>

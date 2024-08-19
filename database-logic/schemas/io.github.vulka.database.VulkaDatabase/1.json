@@ -2,11 +2,11 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "64ff79333dea8697f44f07b80bc3aba4",
+    "identityHash": "640fd6a5e296989a2b771553841a0293",
     "entities": [
       {
         "tableName": "Credentials",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` BLOB NOT NULL, `platform` TEXT NOT NULL, `data` TEXT NOT NULL, `fullName` TEXT NOT NULL, `isParent` INTEGER NOT NULL, `parent` TEXT, `classId` TEXT, `customData` TEXT, PRIMARY KEY(`id`))",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` BLOB NOT NULL, `platform` TEXT NOT NULL, `data` TEXT NOT NULL, `selfSetDiaryNumber` INTEGER, `fullName` TEXT NOT NULL, `isParent` INTEGER NOT NULL, `parent` TEXT, `classId` TEXT, `customData` TEXT, `diaryNumber` INTEGER, PRIMARY KEY(`id`))",
         "fields": [
           {
             "fieldPath": "id",
@@ -25,6 +25,12 @@
             "columnName": "data",
             "affinity": "TEXT",
             "notNull": true
+          },
+          {
+            "fieldPath": "selfSetDiaryNumber",
+            "columnName": "selfSetDiaryNumber",
+            "affinity": "INTEGER",
+            "notNull": false
           },
           {
             "fieldPath": "student.fullName",
@@ -54,6 +60,12 @@
             "fieldPath": "student.customData",
             "columnName": "customData",
             "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "student.diaryNumber",
+            "columnName": "diaryNumber",
+            "affinity": "INTEGER",
             "notNull": false
           }
         ],
@@ -592,7 +604,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '64ff79333dea8697f44f07b80bc3aba4')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '640fd6a5e296989a2b771553841a0293')"
     ]
   }
 }

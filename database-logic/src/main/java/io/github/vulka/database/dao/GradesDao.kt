@@ -18,6 +18,6 @@ interface GradesDao : BaseDao<Grades> {
     @Query("SELECT COUNT(*) FROM grades WHERE subject = :subjectName AND credentialsId = :id AND semester = :semester")
     fun countBySubjectSemesterAndCredentials(id: UUID, semester: Int, subjectName: String): Flow<Int>
 
-    @Query("SELECT * FROM Grades WHERE DATE(date) >= DATE(:weekAgoDate) AND credentialsId = :id")
+    @Query("SELECT * FROM Grades WHERE DATE(date) BETWEEN DATE(:weekAgoDate) AND DATE('now') AND credentialsId = :id")
     fun getFromLastWeek(id: UUID, weekAgoDate: LocalDate): Flow<List<Grades>>
 }

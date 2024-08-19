@@ -14,5 +14,6 @@ data class Credentials(
     val platform: Platform,
     val data: String,
     @Embedded
-    val student: Student
+    val student: Student,
+    val selfSetDiaryNumber: Int? = null
 )

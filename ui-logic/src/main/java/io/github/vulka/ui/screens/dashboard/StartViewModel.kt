@@ -32,7 +32,7 @@ class StartViewModel @Inject constructor(
         }
         viewModelScope.launch {
             repository.credentials.getById(UUID.fromString(args.userId)).collect {
-                student.value = it!!.student
+                student.value = it?.student
             }
         }
         viewModelScope.launch {

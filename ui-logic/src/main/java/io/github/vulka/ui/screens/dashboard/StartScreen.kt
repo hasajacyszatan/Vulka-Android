@@ -1,6 +1,5 @@
 package io.github.vulka.ui.screens.dashboard
 
-import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxScope
@@ -27,7 +26,6 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.pulltorefresh.PullToRefreshState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -39,7 +37,6 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import dev.medzik.android.compose.ui.IconBox
 import dev.medzik.android.compose.ui.bottomsheet.rememberBottomSheetState
@@ -67,7 +64,6 @@ fun StartScreen(
     viewModel: StartViewModel = hiltViewModel()
 ) {
     val student by viewModel.student.collectAsStateWithLifecycle()
-    val luckyNumber by viewModel.luckyNumber.collectAsStateWithLifecycle()
 
     LaunchedEffect(Unit) {
         viewModel.init(args)
@@ -97,9 +93,7 @@ fun StartScreen(
 
             item {
                 Row {
-                    if (luckyNumber != null) {
-                        LuckyCard(luckyNumber!!.number)
-                    }
+                    LuckyCard(viewModel)
                 }
             }
 
@@ -141,6 +135,12 @@ fun HeaderCard(student: Student) {
                     text = student.fullName
                 )
                 Text(student.classId.orEmpty())
+                if (student.diaryNumber != null) {
+                    Text(
+                        fontSize = 13.sp,
+                        text = "${stringResource(R.string.DiaryNumber)}: ${student.diaryNumber.toString()}"
+                    )
+                }
             }
         }
     }
@@ -149,35 +149,49 @@ fun HeaderCard(student: Student) {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun LuckyCard(luckyNumber: Int) {
+fun LuckyCard(viewModel: StartViewModel) {
+    val student by viewModel.student.collectAsStateWithLifecycle()
+    val luckyNumberState by viewModel.luckyNumber.collectAsStateWithLifecycle()
+
+    val luckyNumber = luckyNumberState?.number
+
     val bottomSheetState = rememberBottomSheetState()
 
-    Surface(
-        modifier = Modifier.padding(horizontal = 3.dp, vertical = 5.dp),
-        shape = MaterialTheme.shapes.medium,
-        color = MaterialTheme.colorScheme.surfaceContainer,
-        onClick = { bottomSheetState.show() }
-    ) {
-        Row(
-            modifier = Modifier
-                .heightIn(min = 48.dp)
-                .padding(10.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            IconBox(Icons.Default.Star)
+    if (luckyNumber != null && student != null) {
+        val cardColor = if (luckyNumber == student!!.diaryNumber)
+            MaterialTheme.colorScheme.primaryContainer
+        else
+            MaterialTheme.colorScheme.surfaceContainer
 
-            Text(
-                modifier = Modifier.padding(horizontal = 8.dp),
-                fontSize = 18.sp,
-                text = "${if (luckyNumber != 0) luckyNumber else stringResource(R.string.None)}"
-            )
+        Surface(
+            modifier = Modifier.padding(horizontal = 3.dp, vertical = 5.dp),
+            shape = MaterialTheme.shapes.medium,
+            color = cardColor,
+            onClick = { bottomSheetState.show() }
+        ) {
+            Row(
+                modifier = Modifier
+                    .heightIn(min = 48.dp)
+                    .padding(10.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                IconBox(Icons.Default.Star)
+
+                Text(
+                    modifier = Modifier.padding(horizontal = 8.dp),
+                    fontSize = 18.sp,
+                    text = "${if (luckyNumber != 0) luckyNumber else stringResource(R.string.None)}"
+                )
+            }
         }
+
+        LuckyNumberBottomSheet(
+            bottomSheetState = bottomSheetState,
+            luckyNumber = luckyNumber
+        )
     }
 
-    LuckyNumberBottomSheet(
-        bottomSheetState = bottomSheetState,
-        luckyNumber = luckyNumber
-    )
+
 }
 
 @Composable

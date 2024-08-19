@@ -48,6 +48,7 @@ class VulcanUserClient(
                     parent = if (isParent) Parent(
                         fullName = student.login.name
                     ) else null,
+                    diaryNumber = student.journal.pupilNumber,
                     customData = Json.encodeToString(student)
                 )
             )

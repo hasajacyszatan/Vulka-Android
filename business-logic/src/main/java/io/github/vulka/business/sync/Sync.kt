@@ -51,19 +51,12 @@ suspend fun sync(
     val luckyNumberJob = coroutineScope.launch(handler) {
         // sync lucky number
         val newLuckyNumber = client.getLuckyNumber(student)
-        val luckyNumber = repository.luckyNumber.get(userId).first()
-        if (luckyNumber != null && luckyNumber.number != newLuckyNumber) {
-            repository.luckyNumber.update(
-                luckyNumber.copy(number = newLuckyNumber)
+        repository.luckyNumber.insert(
+            LuckyNumber(
+                credentialsId = userId,
+                number = newLuckyNumber
             )
-        } else {
-            repository.luckyNumber.insert(
-                LuckyNumber(
-                    credentialsId = userId,
-                    number = newLuckyNumber
-                )
-            )
-        }
+        )
     }
 
     val gradesJob = coroutineScope.launch(handler) {

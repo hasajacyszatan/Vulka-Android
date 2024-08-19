@@ -8,7 +8,8 @@ data class Student(
     val isParent: Boolean,
     val parent: Parent?,
     val classId: String?,
-    val customData: String? = null
+    val customData: String? = null,
+    val diaryNumber: Int? = null
 )
 
 /**
