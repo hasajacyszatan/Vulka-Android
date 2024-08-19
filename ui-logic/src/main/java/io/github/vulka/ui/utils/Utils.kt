@@ -1,5 +1,6 @@
 package io.github.vulka.ui.utils
 
+import androidx.compose.runtime.Composable
 import io.github.vulka.core.api.types.Student
 import androidx.compose.ui.text.intl.Locale
 import java.time.LocalDate
@@ -28,3 +29,9 @@ fun LocalDateTime.formatByLocale(locale: Locale): String {
     return this.format(formatter)
 }
 fun Locale.toJavaLocale() = JavaLocale(language, region)
+
+@Composable
+fun Float?.formatForUI() = String.format(
+    Locale.current.toJavaLocale(),
+    "%.2f",this
+)

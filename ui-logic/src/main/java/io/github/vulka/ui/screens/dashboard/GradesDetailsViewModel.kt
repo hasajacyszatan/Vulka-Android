@@ -41,11 +41,12 @@ class GradesDetailsViewModel @Inject constructor(
     }
 
     fun refreshGrades(args: Grades) {
+        val userId = UUID.fromString(args.userId)
         viewModelScope.launch(Dispatchers.IO) {
             val gradesReturned = repository.grades
                 .getBySemesterAndCredentialsId(
                     semester.value!!.semester.number,
-                    UUID.fromString(args.userId)
+                    userId
                 )
                 .first()
             gradesList.value = gradesReturned.map { it.grade }
@@ -57,7 +58,7 @@ class GradesDetailsViewModel @Inject constructor(
             val summaryReturned = repository.summary
                 .getBySemesterAndCredentialsId(
                     semester.value!!.semester.number,
-                    UUID.fromString(args.userId)
+                    userId
                 )
                 .first()
             summaryList.value = summaryReturned.map { it.summary }

@@ -13,6 +13,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 
 enum class AvatarShape {
@@ -26,11 +27,12 @@ fun Avatar(
     modifier: Modifier = Modifier,
     cardColors: CardColors = CardDefaults.cardColors(),
     shape: AvatarShape = AvatarShape.Circle,
+    size: Dp = 45.dp,
     onClick: () -> Unit = {}
 ) {
     Card(
         shape = if (shape == AvatarShape.Circle) RoundedCornerShape(50.dp) else CardDefaults.shape,
-        modifier = modifier.size(45.dp),
+        modifier = modifier.size(size),
         colors = cardColors,
         onClick = onClick
     ) {

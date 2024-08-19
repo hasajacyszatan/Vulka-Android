@@ -1,16 +1,21 @@
 package io.github.vulka.ui.screens.dashboard
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.ArrowDropUp
@@ -21,6 +26,7 @@ import androidx.compose.material.icons.filled.Scale
 import androidx.compose.material.icons.filled.TextFormat
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -33,11 +39,13 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.intl.Locale
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -59,6 +67,7 @@ import io.github.vulka.ui.common.EmptyViewProgress
 import io.github.vulka.ui.common.SegmentedButtonItem
 import io.github.vulka.ui.common.SegmentedButtons
 import io.github.vulka.ui.utils.formatByLocale
+import io.github.vulka.ui.utils.formatForUI
 import io.github.vulka.ui.utils.toJavaLocale
 import kotlinx.coroutines.launch
 
@@ -95,35 +104,35 @@ fun GradesTab(
             val summaryList by viewModel.summaryList.collectAsStateWithLifecycle()
 
             if (gradeList.isNotEmpty() && summaryList.isNotEmpty()) {
-                Column(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .verticalScroll(rememberScrollState()),
+                LazyColumn(
+                    modifier = Modifier.fillMaxSize()
                 ) {
-                    Row(
-                        modifier = Modifier
-                            .padding(horizontal = 50.dp)
-                            .padding(top = 10.dp)
-                            .fillMaxWidth()
-                            .height(35.dp),
-                        horizontalArrangement = Arrangement.Center
-                    ) {
-                        SegmentedButtons {
-                            for (s in semesters) {
-                                SegmentedButtonItem(
-                                    selected = semester!!.semester.number == s.semester.number,
-                                    onClick = {
-                                        viewModel.setSemester(s)
-                                        viewModel.refreshGrades(args)
-                                    },
-                                    label = {
-                                        Text("${stringResource(R.string.Semester)} ${s.semester.number}")
-                                    }
-                                )
+                    item {
+                        Row(
+                            modifier = Modifier
+                                .padding(horizontal = 50.dp)
+                                .padding(top = 10.dp)
+                                .fillMaxWidth()
+                                .height(35.dp),
+                            horizontalArrangement = Arrangement.Center
+                        ) {
+                            SegmentedButtons {
+                                for (s in semesters) {
+                                    SegmentedButtonItem(
+                                        selected = semester!!.semester.number == s.semester.number,
+                                        onClick = {
+                                            viewModel.setSemester(s)
+                                            viewModel.refreshGrades(args)
+                                        },
+                                        label = {
+                                            Text("${stringResource(R.string.Semester)} ${s.semester.number}")
+                                        }
+                                    )
+                                }
                             }
                         }
                     }
-                    uniqueSubjectNames.forEach { subjectName ->
+                    items(uniqueSubjectNames) { subjectName ->
                         val summary = summaryList.firstOrNull { it.subject == subjectName }
 
                         SubjectCard(
@@ -154,12 +163,14 @@ fun GradesTab(
                                 }
                             },
                             more = {
-                                gradeList
-                                    .filter { it.subject == subjectName }
-                                    .sortedByDescending { it.date }
-                                    .forEach { grade ->
-                                        GradeCard(grade = grade)
-                                    }
+                                val filteredGrades by rememberMutable {
+                                    gradeList
+                                        .filter { it.subject == subjectName }
+                                        .sortedByDescending { it.date }
+                                }
+                                filteredGrades.forEach { grade ->
+                                    GradeCard(grade = grade)
+                                }
                             }
                         ) {
                             Text(subjectName)
@@ -185,10 +196,7 @@ fun GradesTab(
                                 if (summary?.average != null) {
                                     Text(
                                         fontSize = 12.sp,
-                                        text = "${stringResource(R.string.Average)}: ${String.format(
-                                            Locale.current.toJavaLocale(),
-                                            "%.2f",summary.average
-                                        )}"
+                                        text = "${stringResource(R.string.Average)}: ${summary.average.formatForUI()}"
                                     )
                                 }
                             }
@@ -319,10 +327,7 @@ private fun GradeCard(grade: Grade) {
                     )
                     Text(
                         fontSize = 12.sp,
-                        text = "${stringResource(R.string.Weight)}: ${String.format(
-                            Locale.current.toJavaLocale(),
-                            "%.2f",grade.weight
-                        )}"
+                        text = "${stringResource(R.string.Weight)}: ${grade.weight.formatForUI()}"
                     )
                 }
             }
@@ -347,29 +352,31 @@ private fun GradesDetails(grade: Grade) {
         modifier = Modifier.padding(horizontal = 12.dp),
         verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
-        if (grade.name.isNotEmpty()) {
-            AnimatedTextField(
-                value = TextFieldValue(
-                    value = grade.name,
-                    editable = false
-                ),
-                label = stringResource(R.string.Name),
-                leading = {
-                    IconBox(Icons.Default.TextFormat)
-                }
-            )
-        }
 
-        AnimatedTextField(
-            value = TextFieldValue(
-                value = grade.subject,
-                editable = false
-            ),
-            label = stringResource(R.string.Subject),
-            leading = {
-                IconBox(Icons.Default.Book)
+        Row(
+            horizontalArrangement = Arrangement.SpaceBetween,
+            modifier = Modifier.padding(5.dp)
+        ) {
+            Column(
+                modifier = Modifier
+                    .weight(1F)
+                    .padding(end = 10.dp),
+                verticalArrangement = Arrangement.spacedBy(12.dp)
+            ) {
+                Text(
+                    text = grade.subject,
+                    color = MaterialTheme.colorScheme.primary,
+                    fontSize = 25.sp
+                )
+
+                Text(
+                    text = grade.name,
+                    fontSize = 20.sp
+                )
             }
-        )
+
+            GradeBadge(grade)
+        }
 
         AnimatedTextField(
             value = TextFieldValue(
@@ -409,6 +416,78 @@ private fun GradesDetails(grade: Grade) {
 
     }
 }
+
+@Composable
+fun GradeBadge(grade: Grade) {
+    val gradeColor = GradeColor.getColorByValue(grade.value)
+    val contentColor = gradeColor?.contentColor ?: MaterialTheme.colorScheme.onPrimaryContainer
+    val containerColor = gradeColor?.containerColor ?: MaterialTheme.colorScheme.primaryContainer
+    Column {
+        Surface(
+            modifier = Modifier
+                .clip(
+                    RoundedCornerShape(
+                        topStart = 16.dp,
+                        topEnd = 16.dp,
+                        bottomEnd = 0.dp,
+                        bottomStart = 0.dp
+                    )
+                )
+                .size(85.dp),
+            color = containerColor
+        ) {
+            Column(
+                modifier = Modifier.fillMaxSize(),
+                verticalArrangement = Arrangement.Center,
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Text(
+                    fontSize = 35.sp,
+                    textAlign = TextAlign.Center,
+                    text = grade.value.toString(),
+                    color = contentColor
+                )
+            }
+        }
+
+        Spacer(modifier = Modifier.size(3.dp))
+
+        Surface(
+            modifier = Modifier
+                .clip(
+                    RoundedCornerShape(
+                        topStart = 0.dp,
+                        topEnd = 0.dp,
+                        bottomEnd = 16.dp,
+                        bottomStart = 16.dp
+                    )
+                )
+                .height(30.dp)
+                .width(85.dp),
+            color = containerColor
+        ) {
+            Row(
+                modifier = Modifier.fillMaxSize().padding(horizontal = 12.dp),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                Icon(
+                    modifier = Modifier.size(20.dp),
+                    imageVector = Icons.Default.Scale,
+                    contentDescription = null,
+                    tint = contentColor
+                )
+
+                Text(
+                    textAlign = TextAlign.Center,
+                    text = grade.weight.formatForUI(),
+                    color = contentColor
+                )
+            }
+        }
+    }
+}
+
 
 private enum class GradeColor(
     val containerColor: Color,

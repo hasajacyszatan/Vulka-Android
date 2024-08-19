@@ -51,7 +51,11 @@ class GradesSummaryViewModel @Inject constructor(
                 )
                 .first()
 
-            summaryList.value = collectedSummary.map { it.summary }.sortedBy { it.subject }
+            summaryList.value = collectedSummary.map { it.summary }.filterNot {
+                // filter empty subject
+                it.endGrade == null && it.average == null && it.proposedGrade == null
+            }.sortedBy { it.subject }
+
             val (eAverage,eSubjects) = calculateEndAverage(summaryList.value)
             endAverage.value = eAverage
             val (cAverage,cSubjects) = calculateCalculatedAverage(summaryList.value)
