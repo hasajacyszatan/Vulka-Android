@@ -4,6 +4,7 @@ import io.github.vulka.impl.vulcan.Utils
 import io.github.vulka.impl.vulcan.hebe.login.HebeKeystore
 import io.github.vulka.impl.vulcan.hebe.login.RegisterRequest
 import io.github.vulka.impl.vulcan.hebe.types.HebeAccount
+import io.github.vulka.impl.vulcan.hebe.types.HebeAttendance
 import io.github.vulka.impl.vulcan.hebe.types.HebeAverageGrade
 import io.github.vulka.impl.vulcan.hebe.types.HebeChangedLesson
 import io.github.vulka.impl.vulcan.hebe.types.HebeExam
@@ -224,6 +225,16 @@ open class VulcanHebeApi {
     fun getExams(student: HebeStudent,dateFrom: LocalDate,dateTo: LocalDate = dateFrom): Array<HebeExam>  {
         return getByPupil<Array<HebeExam>>(
             endpoint = HebeApiEndpoints.DATA_EXAM,
+            student = student,
+
+            dateFrom = dateFrom,
+            dateTo = dateTo,
+        )
+    }
+
+    fun getAttendance(student: HebeStudent,dateFrom: LocalDate,dateTo: LocalDate = dateFrom): Array<HebeAttendance> {
+        return getByPupil<Array<HebeAttendance>>(
+            endpoint = HebeApiEndpoints.DATA_ATTENDANCE,
             student = student,
 
             dateFrom = dateFrom,

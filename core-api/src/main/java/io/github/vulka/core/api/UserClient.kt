@@ -1,5 +1,6 @@
 package io.github.vulka.core.api
 
+import io.github.vulka.core.api.types.Attendance
 import io.github.vulka.core.api.types.Exam
 import io.github.vulka.core.api.types.Grade
 import io.github.vulka.core.api.types.Homework
@@ -33,6 +34,7 @@ interface UserClient {
     suspend fun getMeetings(student: Student): Array<Meeting>
     suspend fun getHomework(student: Student,dateFrom: LocalDate = LocalDate.now(),dateTo: LocalDate = dateFrom): Array<Homework>
     suspend fun getExam(student: Student,dateFrom: LocalDate = LocalDate.now(),dateTo: LocalDate = dateFrom): Array<Exam>
+    suspend fun getAttendance(student: Student,dateFrom: LocalDate = LocalDate.now(),dateTo: LocalDate = dateFrom): Array<Attendance>
 
     fun featuresSet(): Features
 

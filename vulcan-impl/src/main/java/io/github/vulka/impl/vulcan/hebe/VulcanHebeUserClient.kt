@@ -2,16 +2,19 @@ package io.github.vulka.impl.vulcan.hebe
 
 import io.github.vulka.core.api.LoginCredentials
 import io.github.vulka.core.api.UserClient
+import io.github.vulka.core.api.types.Attendance
 import io.github.vulka.core.api.types.Exam
 import io.github.vulka.core.api.types.Grade
 import io.github.vulka.core.api.types.Homework
 import io.github.vulka.core.api.types.HomeworkAttachment
+import io.github.vulka.core.api.types.JustificationStatus
 import io.github.vulka.core.api.types.Lesson
 import io.github.vulka.core.api.types.LessonChange
 import io.github.vulka.core.api.types.LessonChangeType
 import io.github.vulka.core.api.types.Meeting
 import io.github.vulka.core.api.types.Note
 import io.github.vulka.core.api.types.Parent
+import io.github.vulka.core.api.types.PresenceType
 import io.github.vulka.core.api.types.Semester
 import io.github.vulka.core.api.types.Student
 import io.github.vulka.core.api.types.Summary
@@ -22,6 +25,7 @@ import kotlinx.serialization.json.Json
 import kotlinx.serialization.encodeToString
 import java.time.LocalDate
 import java.time.LocalDateTime
+import java.time.LocalTime
 import java.time.ZoneOffset
 import java.time.format.DateTimeFormatter
 
@@ -296,6 +300,42 @@ class VulcanHebeUserClient(
         }
 
         return exams.toTypedArray()
+    }
+
+    override suspend fun getAttendance(student: Student, dateFrom: LocalDate, dateTo: LocalDate): Array<Attendance> {
+        val attendances = ArrayList<Attendance>()
+        val response = api.getAttendance(student.toHebe(),dateFrom,dateTo).filter { it.visible }
+
+        for (attendance in response) {
+            attendances.add(
+                Attendance(
+                    subject = attendance.subject.name,
+                    date = LocalDate.parse(attendance.day.date),
+                    time = LocalTime.parse(attendance.timeSlot.from),
+                    teacher = attendance.teacherPrimary.displayName,
+                    presenceType = when (attendance.presenceType.categoryId) {
+                        1 -> PresenceType.Presence
+                        2 -> PresenceType.Absence
+                        3 -> PresenceType.AbsenceExcused
+                        4 -> PresenceType.Lateness
+                        5 -> PresenceType.LatenessExcused
+                        6 -> PresenceType.AbsenceForSchoolReasons
+                        7 -> PresenceType.Exemption
+                        else -> PresenceType.Unknown
+                    },
+                    justificationStatus = when (attendance.justificationStatus) {
+                        0 -> JustificationStatus.Requested
+                        1 -> JustificationStatus.Accepted
+                        2 -> JustificationStatus.Rejected
+                        else -> null
+                    },
+                    topic = attendance.topic,
+                    position = attendance.subject.position
+                )
+            )
+        }
+
+        return attendances.toTypedArray()
     }
 
     private fun getSchoolYearDates(hebeStudent: HebeStudent): Pair<LocalDate,LocalDate> {

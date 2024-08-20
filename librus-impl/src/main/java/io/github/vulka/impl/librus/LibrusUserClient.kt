@@ -1,6 +1,7 @@
 package io.github.vulka.impl.librus
 
 import io.github.vulka.core.api.UserClient
+import io.github.vulka.core.api.types.Attendance
 import io.github.vulka.core.api.types.Exam
 import io.github.vulka.core.api.types.Grade
 import io.github.vulka.core.api.types.Homework
@@ -292,6 +293,14 @@ class LibrusUserClient(
             date.plusDays(1)
         }
         return exams.toTypedArray()
+    }
+
+    override suspend fun getAttendance(
+        student: Student,
+        dateFrom: LocalDate,
+        dateTo: LocalDate
+    ): Array<Attendance> {
+        return emptyArray()
     }
 
     override fun shouldSyncSemesters(student: Student): Boolean {
