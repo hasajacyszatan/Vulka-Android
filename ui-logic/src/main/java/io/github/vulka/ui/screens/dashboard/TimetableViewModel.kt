@@ -73,6 +73,8 @@ class TimetableViewModel @Inject constructor(
     }
 
     private suspend fun syncTimetable() {
+        timetableRefreshing.value = true
+
         if (!checkIfTimetableShouldBeSync(currentDate.value, userId!!)) {
             updateLessons()
             return
@@ -82,8 +84,6 @@ class TimetableViewModel @Inject constructor(
             client?.renewCredentials()
             userClientCredentialsRenewed = true
         }
-
-        timetableRefreshing.value = true
 
         try {
             loadingError.value = false
