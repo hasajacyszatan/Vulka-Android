@@ -214,7 +214,7 @@ class VulcanPrometheusUserClient(
                 Note(
                     name = note.category?.name,
                     content = note.content,
-                    points = note.points.toString(),
+                    points = note.points?.toString(),
                     creator = note.creator.displayName,
                     date = LocalDate.parse(note.dateValid.date)
                 )

@@ -26,7 +26,7 @@ data class HebeNote(
     @SerialName("Content")
     val content: String,
     @SerialName("Points")
-    val points: Int
+    val points: Int?
 )
 
 @Serializable
