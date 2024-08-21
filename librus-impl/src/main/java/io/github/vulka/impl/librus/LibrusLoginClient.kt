@@ -39,8 +39,7 @@ class LibrusLoginClient : LoginClient {
         if (response.status.value != 200) {
             val error = Json.decodeFromString<LibrusError>(response.body())
             throw ApiException(
-                message = error.errors.first().message,
-                code = response.status.value
+                message = error.errors.first().message
             )
         }
 
