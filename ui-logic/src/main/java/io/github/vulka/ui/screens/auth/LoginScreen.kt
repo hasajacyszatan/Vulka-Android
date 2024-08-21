@@ -206,7 +206,7 @@ fun Librus(viewModel: LoginViewModel,login: (Boolean) -> Unit) {
 
 @Composable
 fun VulcanPrometheus(viewModel: LoginViewModel, login: (Boolean) -> Unit) {
-    login(false)
+    login(true)
 
     Surface(
         modifier = Modifier.padding(bottom = 12.dp),
@@ -215,7 +215,7 @@ fun VulcanPrometheus(viewModel: LoginViewModel, login: (Boolean) -> Unit) {
     ) {
         Text(
             modifier = Modifier.padding(12.dp),
-            text = "UWAGA! Ten sposób logowania jest eksperymentalny. Aktualnie nie jest zaimplementowany",
+            text = "UWAGA! Ten sposób logowania jest eksperymentalny. Może zawierać błędy.",
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.onSurface.combineAlpha(0.9f)
         )
@@ -252,5 +252,32 @@ fun VulcanPrometheus(viewModel: LoginViewModel, login: (Boolean) -> Unit) {
         modifier = Modifier.padding(vertical = 5.dp),
         label = stringResource(R.string.Field_Password),
         value = TextFieldValue.fromMutableState(viewModel.eduVulcanPassword)
+    )
+
+    Surface(
+        modifier = Modifier.padding(vertical = 12.dp),
+        shape = MaterialTheme.shapes.medium,
+        color = MaterialTheme.colorScheme.tertiary.combineAlpha(0.9f)
+    ) {
+        Text(
+            modifier = Modifier.padding(12.dp),
+            text = "Jeśli wyświetla ci się błąd captcha, zaloguj się na komputerze na eduvulcan.pl, następnie wejdź w https://eduvulcan.pl/api/api, kliknij pokaż kod źródłowy w przeglądarce, znajdź pole \"accessToken\", i wklej do aplikacji, pracujemy nad pełnym wsparciem captchy",
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.onTertiary.combineAlpha(0.9f)
+        )
+    }
+
+    AnimatedTextField(
+        modifier = Modifier.padding(vertical = 5.dp),
+        label = stringResource(R.string.Field_Token),
+        value = TextFieldValue.fromMutableState(viewModel.eduVulcanAccessToken),
+        clearButton = true,
+        singleLine = true,
+        leading = {
+            Icon(
+                imageVector = Icons.Default.DataObject,
+                contentDescription = null
+            )
+        }
     )
 }

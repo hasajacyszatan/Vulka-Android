@@ -39,7 +39,7 @@ fun ChooseStudentsScreen(
     val client = viewModel.getClient(args.credentialsData,args.platform)
 
     LaunchedEffect(Unit) {
-        viewModel.refreshStudents(args.platform,client)
+        viewModel.refreshStudents(client)
     }
 
     if (viewModel.loaded) {
@@ -82,9 +82,9 @@ private fun StudentBox(student: Student,studentsList: MutableList<Student>) {
 
         Column {
             if (student.isParent) {
-                Text(student.parent!!.fullName)
+                Text(student.fullName)
                 Text(
-                    text = "${student.fullName} - ${stringResource(R.string.Parent)}",
+                    text = "${student.parent!!.fullName} - ${stringResource(R.string.Parent)}",
                     fontSize = 12.sp
                 )
             } else {

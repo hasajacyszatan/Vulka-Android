@@ -20,6 +20,7 @@ class LoginViewModel : ViewModel() {
 
     val eduVulcanLogin = mutableStateOf("")
     val eduVulcanPassword = mutableStateOf("")
+    val eduVulcanAccessToken = mutableStateOf("")
 
     val vulcanHebeSymbol = mutableStateOf("")
     val vulcanHebeToken = mutableStateOf("")
@@ -58,18 +59,20 @@ class LoginViewModel : ViewModel() {
             }
 
             Platform.VulcanPrometheus -> {
-                // For Vulcan we must create keystore first
-                val keystore = HebeKeystore.create(
-                    alias = HebeKeystore.generateKeystoreName(vulcanHebeSymbol.value),
-                    firebaseToken = "",
-                    deviceModel = Build.MODEL
-                )
-
-                VulcanPrometheusLoginData(
-                    login = eduVulcanLogin.value,
-                    password = eduVulcanPassword.value,
-                    keystore = keystore
-                )
+                if (eduVulcanAccessToken.value.isNotEmpty()) {
+                    VulcanPrometheusLoginData(
+                        login = eduVulcanLogin.value,
+                        password = eduVulcanPassword.value,
+                        accessToken = eduVulcanAccessToken.value,
+                        deviceModel = Build.MODEL
+                    )
+                } else {
+                    VulcanPrometheusLoginData(
+                        login = eduVulcanLogin.value,
+                        password = eduVulcanPassword.value,
+                        deviceModel = Build.MODEL
+                    )
+                }
             }
         }
 

@@ -6,11 +6,11 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class HebeAccount(
     @SerialName("LoginId")
-    val loginId: Int,
+    val loginId: Int? = null,
     @SerialName("RestURL")
     val restUrl: String,
     @SerialName("UserLogin")
-    val userLogin: String,
+    val userLogin: String? = null,
     @SerialName("UserName")
-    val userName: String
+    val userName: String? = null
 )

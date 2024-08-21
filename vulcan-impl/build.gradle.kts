@@ -27,6 +27,9 @@ dependencies {
     implementation(libs.kotlinx.serialization.json)
     implementation(libs.ktor.core)
     implementation(libs.ktor.okhttp)
+    implementation(libs.ktor.client.content.negotiation)
+    implementation(libs.ktor.serialization.kotlinx.json)
+    implementation(libs.ksoup)
     implementation(libs.migbase64)
     implementation(projects.coreApi)
 

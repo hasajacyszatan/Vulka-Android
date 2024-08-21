@@ -10,6 +10,6 @@ data class VulcanPrometheusLoginCredentials(
     // Save for future backend migrations
     val login: String,
     val password: String,
-    val account: HebeAccount,
-    val keystore: HebeKeystore
+    val accessToken: String,
+    val deviceModel: String
 ) : LoginCredentials()

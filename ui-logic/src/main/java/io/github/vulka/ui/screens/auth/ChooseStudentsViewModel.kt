@@ -20,6 +20,8 @@ import io.github.vulka.impl.librus.LibrusLoginCredentials
 import io.github.vulka.impl.librus.LibrusUserClient
 import io.github.vulka.impl.vulcan.hebe.VulcanHebeLoginCredentials
 import io.github.vulka.impl.vulcan.hebe.VulcanHebeUserClient
+import io.github.vulka.impl.vulcan.prometheus.VulcanPrometheusLoginCredentials
+import io.github.vulka.impl.vulcan.prometheus.VulcanPrometheusUserClient
 import io.github.vulka.ui.screens.dashboard.Home
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -39,9 +41,8 @@ class ChooseStudentsViewModel @Inject constructor(
 
     private fun getCredentials(credentialsData: String, platform: Platform): LoginCredentials {
         return when (platform) {
-            // TODO: Add prometheus
             Platform.VulcanHebe -> Json.decodeFromString<VulcanHebeLoginCredentials>(credentialsData)
-            Platform.VulcanPrometheus -> Json.decodeFromString<VulcanHebeLoginCredentials>(credentialsData)
+            Platform.VulcanPrometheus -> Json.decodeFromString<VulcanPrometheusLoginCredentials>(credentialsData)
             Platform.Librus -> Json.decodeFromString<LibrusLoginCredentials>(credentialsData)
         }
     }
@@ -49,16 +50,14 @@ class ChooseStudentsViewModel @Inject constructor(
     fun getClient(credentialsData: String,platform: Platform): UserClient {
         val credentials = getCredentials(credentialsData, platform)
         return when (platform) {
-            // TODO: Add prometheus
-            Platform.VulcanPrometheus -> VulcanHebeUserClient(credentials as VulcanHebeLoginCredentials)
+            Platform.VulcanPrometheus -> VulcanPrometheusUserClient(credentials as VulcanPrometheusLoginCredentials)
             Platform.VulcanHebe -> VulcanHebeUserClient(credentials as VulcanHebeLoginCredentials)
             Platform.Librus -> LibrusUserClient(credentials as LibrusLoginCredentials)
         }
     }
 
-    fun refreshStudents(platform: Platform,client: UserClient) = viewModelScope.launch(Dispatchers.IO) {
-        if (platform == Platform.Librus)
-            (client as LibrusUserClient).renewCredentials()
+    fun refreshStudents(client: UserClient) = viewModelScope.launch(Dispatchers.IO) {
+        client.renewCredentials()
 
         client.getStudents().forEach {
             students.add(it)
