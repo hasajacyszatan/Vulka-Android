@@ -5,7 +5,7 @@
     <string name="Login">войти</string>
     <string name="Field_Password">Пароль</string>
     <string name="Home">Пуск</string>
-    <string name="ChooseStudents">Wybierz uczniów</string>
+    <string name="ChooseStudents">Выберите учеников</string>
     <string name="Done">Готово</string>
     <string name="Grades">Оценки</string>
     <string name="Timetable">Расписание</string>
@@ -15,7 +15,7 @@
     <string name="SelectAccount">Выберите учетную запись</string>
     <string name="AccountManager">управление аккаунтами</string>
     <string name="LuckyNumberNone">Нет информации об счастливом числе</string>
-    <string name="LuckyNumberText">Dzisiejszy szczęśliwy numerek to:</string>
+    <string name="LuckyNumberText">сегодняшнее счастливое число:</string>
     <string name="AddAccount">добавить учетную запись</string>
     <string name="ManageAccounts">управление аккаунтом</string>
     <string name="WelcomeScreen_Title">Добро пожаловать в Vulka!</string>
