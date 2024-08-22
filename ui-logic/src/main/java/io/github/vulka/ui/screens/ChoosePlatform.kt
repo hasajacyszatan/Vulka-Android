@@ -23,19 +23,19 @@ fun ChoosePlatform(navController: NavController) {
         modifier = Modifier.fillMaxSize()
     ) {
         BasicPreference(
-            leading = { Icon(painterResource(R.drawable.eduvulcan_logo), contentDescription = null) },
+            leading = { },
             title = stringResource(R.string.EduVulcan),
             onClick = { navController.navigate(Login(Platform.VulcanPrometheus)) }
         )
 
         BasicPreference(
-            leading = { Icon(painterResource(R.drawable.vulcan_logo), contentDescription = null) },
+            leading = { },
             title = stringResource(R.string.Vulcan),
             onClick = { navController.navigate(Login(Platform.VulcanHebe)) }
         )
 
         BasicPreference(
-            leading = { Icon(painterResource(R.drawable.librus_logo), contentDescription = null) },
+            leading = {  },
             title = stringResource(R.string.Librus),
             onClick = { navController.navigate(Login(Platform.Librus)) }
         )

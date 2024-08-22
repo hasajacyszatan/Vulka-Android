@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="SelectJournal">Wybierz swój dziennik</string>
-    <string name="Vulcan">UONET+ Vulcan (Przestarzały)</string>
+    <string name="Vulcan">Bogini młodości</string>
     <string name="Login">Zaloguj się</string>
     <string name="Field_Password">Hasło</string>
     <string name="Home">Start</string>
@@ -87,5 +87,6 @@
     <string name="Settings_Synchronization">Synchronizacja</string>
     <string name="Settings_AutoSync">Synchronizuj automatycznie</string>
     <string name="DiaryNumber">Numer w dzienniku</string>
+    <string name="EduVulcan">Jeden z tytanów</string>
 
 </resources>

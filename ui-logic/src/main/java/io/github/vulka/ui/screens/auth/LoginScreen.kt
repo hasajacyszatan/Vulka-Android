@@ -101,19 +101,6 @@ fun VulcanHebe(viewModel: LoginViewModel,login: (Boolean) -> Unit) {
     Surface(
         modifier = Modifier.padding(bottom = 12.dp),
         shape = MaterialTheme.shapes.medium,
-        color = MaterialTheme.colorScheme.warningContainer.combineAlpha(0.9f)
-    ) {
-        Text(
-            modifier = Modifier.padding(12.dp),
-            text = "UWAGA! Ten sposób logowania został wycofany przez firmę VULCAN. Nie jest już możliwe zalogowanie się za jego pomocą.",
-            style = MaterialTheme.typography.bodyMedium,
-            color = MaterialTheme.colorScheme.onSurface.combineAlpha(0.9f)
-        )
-    }
-
-    Surface(
-        modifier = Modifier.padding(bottom = 12.dp),
-        shape = MaterialTheme.shapes.medium,
         color = MaterialTheme.colorScheme.tertiary.combineAlpha(0.9f)
     ) {
         Text(
@@ -228,7 +215,7 @@ fun VulcanPrometheus(viewModel: LoginViewModel, login: (Boolean) -> Unit) {
     ) {
         Text(
             modifier = Modifier.padding(12.dp),
-            text = "Aby zalogować się do aplikacji, użyj tych samych danych, których używasz do logowania się na stronie internetowej eduvulcan.pl",
+            text = "Aby zalogować się do aplikacji, użyj tych samych danych, których używasz do logowania się na stronie internetowej.",
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.onTertiary.combineAlpha(0.9f)
         )
@@ -252,32 +239,5 @@ fun VulcanPrometheus(viewModel: LoginViewModel, login: (Boolean) -> Unit) {
         modifier = Modifier.padding(vertical = 5.dp),
         label = stringResource(R.string.Field_Password),
         value = TextFieldValue.fromMutableState(viewModel.eduVulcanPassword)
-    )
-
-    Surface(
-        modifier = Modifier.padding(vertical = 12.dp),
-        shape = MaterialTheme.shapes.medium,
-        color = MaterialTheme.colorScheme.tertiary.combineAlpha(0.9f)
-    ) {
-        Text(
-            modifier = Modifier.padding(12.dp),
-            text = "Jeśli wyświetla ci się błąd captcha, zaloguj się na komputerze na eduvulcan.pl, następnie wejdź w https://eduvulcan.pl/api/api, kliknij pokaż kod źródłowy w przeglądarce, znajdź pole \"accessToken\", i wklej do aplikacji, pracujemy nad pełnym wsparciem captchy",
-            style = MaterialTheme.typography.bodyMedium,
-            color = MaterialTheme.colorScheme.onTertiary.combineAlpha(0.9f)
-        )
-    }
-
-    AnimatedTextField(
-        modifier = Modifier.padding(vertical = 5.dp),
-        label = stringResource(R.string.Field_Token),
-        value = TextFieldValue.fromMutableState(viewModel.eduVulcanAccessToken),
-        clearButton = true,
-        singleLine = true,
-        leading = {
-            Icon(
-                imageVector = Icons.Default.DataObject,
-                contentDescription = null
-            )
-        }
     )
 }
